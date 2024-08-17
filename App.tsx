@@ -1,5 +1,5 @@
-import React from 'react'
-import { StatusBar, useColorScheme } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { ColorSchemeName, StatusBar, useColorScheme } from 'react-native'
 
 import {
   NavigationContainer,
@@ -22,6 +22,7 @@ import BootSplash from 'react-native-bootsplash'
 import NetworkLogger from 'react-native-network-logger'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './libs/axiosInstance'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -34,36 +35,42 @@ const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme)
 function AppContent() {
   const colorScheme = useColorScheme()
   const authenticate = useBoundStore(state => state.authenticate)
-  const isAuthenticated = useBoundStore(state => state.isAuthenticated)
+  const isAuthenticated: boolean = useBoundStore(state => state.isAuthenticated)
 
   const isDarkTheme = colorScheme === 'dark'
 
   const theme = isDarkTheme ? CombinedDarkTheme : CombinedDefaultTheme
 
-  const { isLoading } = useQuery({
+  const focusedRef = useRef<boolean>(true)
+
+  useQuery({
     queryKey: ['users/2'],
     retry: 0,
+    enabled: focusedRef.current,
     onSuccess: async () => {
+      focusedRef.current = false
       authenticate()
       await BootSplash.hide({ fade: true })
+    },
+    onError: () => {
+      focusedRef.current = false
     }
   })
 
-  if (isLoading) {
-    return null
-  }
-
   return (
-    <PaperProvider theme={theme}>
-      <StatusBar
-        barStyle={isDarkTheme ? 'light-content' : 'dark-content'}
-        backgroundColor={theme.colors.background}
-      />
+    <SafeAreaProvider>
+      <PaperProvider theme={theme}>
+        <StatusBar
+          barStyle={isDarkTheme ? 'light-content' : 'dark-content'}
+          backgroundColor="transparent"
+          translucent
+        />
 
-      <NavigationContainer theme={theme}>
-        {isAuthenticated ? <MainTabs /> : <AuthStacks />}
-      </NavigationContainer>
-    </PaperProvider>
+        <NavigationContainer theme={theme}>
+          {isAuthenticated ? <MainTabs /> : <AuthStacks />}
+        </NavigationContainer>
+      </PaperProvider>
+    </SafeAreaProvider>
   )
 }
 

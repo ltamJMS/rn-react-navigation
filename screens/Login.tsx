@@ -24,19 +24,15 @@ import { useTranslation } from 'react-i18next'
 import { LoginFormSchema, LoginFormValues } from '../schemas/LoginFormSchema'
 import useMutation from '../hooks/useMutation'
 import { User } from '../types'
-import { useQuery } from '../hooks/useQuery'
 import useBoundStore from '../store'
 import { AuthStacksProps } from '../navigators/stacks/AuthStacks'
+import { useQuery } from '../hooks/useQuery'
 
 export default function Login({ navigation }: AuthStacksProps) {
   const { t } = useTranslation()
   const theme: MD3Theme = useTheme()
   const styles = makeStyles(theme)
   const authenticate = useBoundStore(state => state.authenticate)
-  const { refetch } = useQuery<User>({
-    queryKey: ['users/2'],
-    refetchOnMount: false
-  })
 
   const {
     control,
@@ -50,6 +46,11 @@ export default function Login({ navigation }: AuthStacksProps) {
     }
   })
 
+  const { refetch } = useQuery<User>({
+    queryKey: ['users/2'],
+    enabled: false
+  })
+
   const { isPending, mutate } = useMutation<
     User,
     DefaultError,
@@ -57,7 +58,7 @@ export default function Login({ navigation }: AuthStacksProps) {
   >({
     url: 'users',
     onSuccess: async () => {
-      await refetch
+      await refetch()
       authenticate()
     }
   })

@@ -15,16 +15,16 @@ export default function Home({ navigation }: MainTabsProps) {
 
   const { data } = useQuery<User>({
     queryKey: ['users/2'],
-    refetchOnMount: false
+    enabled: false
   })
-  console.log('first', queryClient)
+
   const handleLogout = () => {
     unAuthenticate()
-    // queryClient.removeQueries()
+    queryClient.removeQueries()
   }
 
   return (
-    <View>
+    <View className="flex-1 justify-center gap-y-6">
       <Text className="text-2xl text-center text-red-600">
         {t('common.hello', { name: data?.name })}👋
       </Text>
