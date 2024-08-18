@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { ColorSchemeName, StatusBar, useColorScheme } from 'react-native'
+import React, { useRef } from 'react'
+import { StatusBar, useColorScheme } from 'react-native'
 
 import {
   NavigationContainer,
@@ -23,6 +23,7 @@ import NetworkLogger from 'react-native-network-logger'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './libs/axiosInstance'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -31,6 +32,8 @@ const { LightTheme, DarkTheme } = adaptNavigationTheme({
 
 const CombinedDefaultTheme = merge(MD3LightTheme, LightTheme)
 const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme)
+
+const Stack = createNativeStackNavigator()
 
 function AppContent() {
   const colorScheme = useColorScheme()
@@ -67,7 +70,17 @@ function AppContent() {
         />
 
         <NavigationContainer theme={theme}>
-          {isAuthenticated ? <MainTabs /> : <AuthStacks />}
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false
+            }}
+          >
+            {isAuthenticated ? (
+              <Stack.Screen name="main" component={MainTabs} />
+            ) : (
+              <Stack.Screen name="auth" component={AuthStacks} />
+            )}
+          </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
     </SafeAreaProvider>
