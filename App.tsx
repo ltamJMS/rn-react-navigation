@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { StatusBar, useColorScheme } from 'react-native'
 
 import {
@@ -37,8 +37,8 @@ const Stack = createNativeStackNavigator()
 
 function AppContent() {
   const colorScheme = useColorScheme()
-  const authenticate = useBoundStore(state => state.authenticate)
-  const isAuthenticated: boolean = useBoundStore(state => state.isAuthenticated)
+  // const authenticate = useBoundStore(state => state.authenticate)
+  // const isAuthenticated: boolean = useBoundStore(state => state.isAuthenticated)
 
   const isDarkTheme = colorScheme === 'dark'
 
@@ -46,19 +46,29 @@ function AppContent() {
 
   const focusedRef = useRef<boolean>(true)
 
-  useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['users/2'],
     retry: 0,
     enabled: focusedRef.current,
     onSuccess: async () => {
       focusedRef.current = false
-      authenticate()
-      await BootSplash.hide({ fade: true })
+      // authenticate()
+      // await BootSplash.hide({ fade: true })
     },
     onError: () => {
       focusedRef.current = false
     }
   })
+
+  useEffect(() => {
+    const initial = async () => {
+      if (!isLoading) {
+        await BootSplash.hide({ fade: true })
+      }
+    }
+
+    initial()
+  }, [isLoading])
 
   return (
     <SafeAreaProvider>
@@ -75,7 +85,7 @@ function AppContent() {
               headerShown: false
             }}
           >
-            {isAuthenticated ? (
+            {data ? (
               <Stack.Screen name="main" component={MainTabs} />
             ) : (
               <Stack.Screen name="auth" component={AuthStacks} />

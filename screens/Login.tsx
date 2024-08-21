@@ -57,10 +57,13 @@ export default function Login({ navigation }: AuthStacksProps) {
     LoginFormValues
   >({
     url: 'users',
-    onSuccess: async () => {
-      await refetch()
-      authenticate()
+    onSuccess: () => {
+      refetch()
     }
+    // onSuccess: async () => {
+    //   await refetch()
+    //   authenticate()
+    // }
   })
 
   const onSubmit = (formValues: LoginFormValues) => mutate(formValues)
