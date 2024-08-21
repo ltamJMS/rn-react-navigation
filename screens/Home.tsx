@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { Button } from 'react-native-paper'
 import { MainTabsProps } from '../navigators/tabs/MainTabs'
@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 export default function Home({ navigation }: MainTabsProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const unAuthenticate = useBoundStore(state => state.unAuthenticate)
+  // const unAuthenticate = useBoundStore(state => state.unAuthenticate)
 
   const { data } = useQuery<User>({
     queryKey: ['users/2'],
@@ -19,12 +19,13 @@ export default function Home({ navigation }: MainTabsProps) {
   })
 
   const handleLogout = () => {
-    unAuthenticate()
+    // unAuthenticate()
+    queryClient.setQueryData(['users/2'], null)
     queryClient.removeQueries()
   }
 
   return (
-    <View className="flex-1 justify-center gap-y-6">
+    <View className="flex-1 justify-center gap-y-6" style={styles.container}>
       <Text className="text-2xl text-center text-red-600">
         {t('common.hello', { name: data?.name })}👋
       </Text>
@@ -37,3 +38,14 @@ export default function Home({ navigation }: MainTabsProps) {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    width: '100%',
+    maxWidth: 340,
+    alignSelf: 'center',
+    justifyContent: 'center'
+  }
+})

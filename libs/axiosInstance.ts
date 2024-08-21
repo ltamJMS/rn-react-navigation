@@ -37,7 +37,8 @@ const refresh = async () => {
     clearTokens()
 
     if (error instanceof AxiosError && error.response?.status === 401) {
-      useBoundStore.getState().unAuthenticate()
+      // useBoundStore.getState().unAuthenticate()
+      queryClient.setQueryData(['users/2'], null)
       queryClient.removeQueries()
     }
 
