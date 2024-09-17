@@ -1,107 +1,44 @@
-import React, { useEffect, useRef } from 'react'
-import { StatusBar, useColorScheme } from 'react-native'
+// import 'react-native-gesture-handler'
+import React, { useEffect } from 'react'
+import { StatusBar, useColorScheme, LogBox } from 'react-native'
+import { NativeBaseProvider } from 'native-base'
+import Toast from 'react-native-toast-message'
+import messaging from '@react-native-firebase/messaging'
+import Navigation from './navigation'
 
-import {
-  NavigationContainer,
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme
-} from '@react-navigation/native'
-import {
-  MD3DarkTheme,
-  MD3LightTheme,
-  adaptNavigationTheme,
-  PaperProvider
-} from 'react-native-paper'
-import merge from 'deepmerge'
-import { useQuery } from './hooks/useQuery'
-import useBoundStore from './store'
-import AuthStacks from './navigators/stacks/AuthStacks'
-import MainTabs from './navigators/tabs/MainTabs'
-import BootSplash from 'react-native-bootsplash'
+LogBox.ignoreAllLogs()
 
-import NetworkLogger from 'react-native-network-logger'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClient } from './libs/axiosInstance'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
-const { LightTheme, DarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: NavigationDefaultTheme,
-  reactNavigationDark: NavigationDarkTheme
-})
-
-const CombinedDefaultTheme = merge(MD3LightTheme, LightTheme)
-const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme)
-
-const Stack = createNativeStackNavigator()
-
-function AppContent() {
-  const colorScheme = useColorScheme()
-  // const authenticate = useBoundStore(state => state.authenticate)
-  // const isAuthenticated: boolean = useBoundStore(state => state.isAuthenticated)
-
-  const isDarkTheme = colorScheme === 'dark'
-
-  const theme = isDarkTheme ? CombinedDarkTheme : CombinedDefaultTheme
-
-  const focusedRef = useRef<boolean>(true)
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['users/2'],
-    retry: 0,
-    enabled: focusedRef.current,
-    onSuccess: async () => {
-      focusedRef.current = false
-      // authenticate()
-      // await BootSplash.hide({ fade: true })
-    },
-    onError: () => {
-      focusedRef.current = false
-    }
-  })
-
+const App = () => {
+  const scheme = useColorScheme()
   useEffect(() => {
-    const initial = async () => {
-      if (!isLoading) {
-        await BootSplash.hide({ fade: true })
+    console.log('=====> APP RUNNING ...')
+    StatusBar.setBarStyle('dark-content')
+
+    const requestUserPermission = async () => {
+      const authStatus = await messaging().requestPermission()
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+
+      if (enabled) {
+        console.warn('Permission status:', authStatus)
       }
     }
 
-    initial()
-  }, [isLoading])
+    requestUserPermission()
+  }, [scheme])
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <StatusBar
-          barStyle={isDarkTheme ? 'light-content' : 'dark-content'}
-          backgroundColor="transparent"
-          translucent
-        />
-
-        <NavigationContainer theme={theme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false
-            }}
-          >
-            {data ? (
-              <Stack.Screen name="main" component={MainTabs} />
-            ) : (
-              <Stack.Screen name="auth" component={AuthStacks} />
-            )}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <>
+      <NativeBaseProvider>
+        <Navigation />
+      </NativeBaseProvider>
+      <Toast position="top" bottomOffset={20} />
+      {/* <View>
+        <Text style={{ color: "red" }}>Hello World!</Text>
+      </View> */}
+    </>
   )
 }
 
-export default function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AppContent />
-      {/* <NetworkLogger /> */}
-    </QueryClientProvider>
-  )
-}
+export default App

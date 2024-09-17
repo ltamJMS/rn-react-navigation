@@ -5,7 +5,6 @@ import axios, {
   InternalAxiosRequestConfig
 } from 'axios'
 import { clearTokens, getTokens, storeTokens } from '../utils'
-import useBoundStore from '../store'
 import { API_URL } from '@env'
 
 const apiDomain = API_URL

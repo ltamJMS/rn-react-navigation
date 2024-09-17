@@ -3,7 +3,7 @@ import {
   BottomTabScreenProps,
   createBottomTabNavigator
 } from '@react-navigation/bottom-tabs'
-import Home from '../../screens/Home'
+import Home from '../../screens/HomeScreen'
 import Setting from '../../screens/Setting'
 
 export type IconProps = {

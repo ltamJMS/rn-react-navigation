@@ -1,208 +1,371 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DefaultError } from '@tanstack/react-query'
-import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import {
-  Image,
-  KeyboardAvoidingView,
-  StyleSheet,
-  TouchableOpacity,
-  View
-} from 'react-native'
-import {
-  ActivityIndicator,
-  Button,
-  Dialog,
-  HelperText,
-  MD3Theme,
-  Portal,
-  Text,
-  TextInput,
-  useTheme
-} from 'react-native-paper'
-import { useTranslation } from 'react-i18next'
-import { LoginFormSchema, LoginFormValues } from '../schemas/LoginFormSchema'
-import useMutation from '../hooks/useMutation'
-import { User } from '../types'
-import useBoundStore from '../store'
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Theme, useTheme } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
+import { Image, Text, View, ActivityIndicator, StyleSheet } from "react-native";
+import { Button, Checkbox, FormControl, Input } from "native-base";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+
 import { AuthStacksProps } from '../navigators/stacks/AuthStacks'
-import { useQuery } from '../hooks/useQuery'
+import { useSetRecoilState } from 'recoil';
+import { AuthUser } from "../services/models/account";
+import { authState, sipAccountState } from "../services/store/auth";
+import { applyToken, getSipAccount, loginByPassword } from "../services/usecases/auth/auth";
+import { HTTPError } from "../services/models/error";
 
 export default function Login({ navigation }: AuthStacksProps) {
-  const { t } = useTranslation()
-  const theme: MD3Theme = useTheme()
-  const styles = makeStyles(theme)
-  const authenticate = useBoundStore(state => state.authenticate)
+  const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState<boolean>(false);
+  const [authRes, setAuthRes] = useState<AuthUser>();
+  const setAuth = useSetRecoilState(authState);
+  const setSipAccountData = useSetRecoilState(sipAccountState);
+  const { control } = useForm();
+  const characterMax = 90;
+  
+  useEffect(() => {
+    const getStoredCredentials = async () => {
+      try {
+        const storedCredentials = await AsyncStorage.getItem("loginRemember");
+        if (storedCredentials) {
+          const parsedCredentials = JSON.parse(storedCredentials);
+          if (parsedCredentials.remember) {
+            setUsername(parsedCredentials.username);
+            setPassword(parsedCredentials.password);
+            setRemember(parsedCredentials.remember);
+          }
+        }
+      } catch (error) {}
+    };
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(LoginFormSchema),
-    defaultValues: {
-      email: 'example@gmail.com',
-      password: '2343'
+    getStoredCredentials();
+  }, []);
+
+  const handleLogin = useCallback(async () => {
+    if (password.length < 1 || username.length < 1) {
+      Toast.show({
+        type: "error",
+        text1: "アカウントやパスワードを入力してください",
+      });
+    } else {
+      setIsLoading(true);
+      try {
+        const res = await loginByPassword(username, password);
+        if (res instanceof HTTPError) {
+          setIsLoading(false);
+          switch (res.getCode()) {
+            case 400:
+              Toast.show({
+                type: "error",
+                text1: "アカウントまたはパスワードが間違っています",
+              });
+              break;
+            case 401:
+              Toast.show({
+                type: "error",
+                text1: "アカウントまたはパスワードが間違っています",
+              });
+              break;
+            case 200:
+              Toast.show({
+                type: "success",
+                text1: "ログインしました",
+              });
+              break;
+            case 404:
+              Toast.show({
+                type: "error",
+                text1: "ログインできません",
+              });
+              break;
+            case 500:
+              Toast.show({
+                type: "error",
+                text1: "サーバーに接続できません",
+              });
+              break;
+          }
+          return;
+        }
+        setAuthRes(res);
+        const loginData = {
+          username,
+          password,
+          remember,
+        };
+        AsyncStorage.setItem("loginRemember", JSON.stringify(loginData));
+        AsyncStorage.setItem("auth", JSON.stringify(res));
+      } catch (error) {
+        console.error("=====> LOGIN ERROR", error);
+        Toast.show({
+          type: "error",
+          text1: `${error}: login failed`,
+        });
+        setIsLoading(false);
+      }
     }
-  })
+  }, [password, username, remember]);
 
-  const { refetch } = useQuery<User>({
-    queryKey: ['users/2'],
-    enabled: false
-  })
+  useEffect(() => {
+    if (authRes) {
+      const applyTokenAsync = async () => {
+        try {
+          await applyToken(authRes.token);
+          setIsLoading(false);
+          setAuth(authRes);
+          getSipAccount(authRes.username, authRes.customerID).then((result) => {
+            if (result.error) {
+              let message = "";
+              switch (result.message) {
+                case "SIP_ACCOUNT_NOT_FOUND":
+                  message = "ソフトフォンの設定が間違っています。";
+                  break;
+                case "COMPANY_NOT_FOUND":
+                  message =
+                    "管理者に連絡してください。(SIPACC_COMPANY_NOT_FOUND)";
+                  break;
+                case "SERVER_ERROR":
+                  message = "サーバーに接続できません";
+                  break;
+                default:
+                  message = "サーバーに接続できません";
+              }
+              Toast.show({
+                type: "error",
+                text1: message,
+              });
+              return;
+            }
 
-  const { isPending, mutate } = useMutation<
-    User,
-    DefaultError,
-    LoginFormValues
-  >({
-    url: 'users',
-    onSuccess: () => {
-      refetch()
+            setSipAccountData({
+              sipAccount: result.data.account,
+              sipPassword: result.data.password,
+              sipType: result.data.sipType,
+              agent: result.data.agent,
+              transport: result.data.transport,
+              domain: result.data.domain,
+              asteriskDomain: result.data?.asteriskDomain,
+            });
+          });
+          navigation.navigate('Home');
+        } catch (err) {
+          console.error("=====> AUTH ERROR", err);
+        }
+      };
+      applyTokenAsync();
     }
-    // onSuccess: async () => {
-    //   await refetch()
-    //   authenticate()
-    // }
-  })
-
-  const onSubmit = (formValues: LoginFormValues) => mutate(formValues)
+  });
 
   return (
-    <View style={styles.background}>
-      <Portal>
-        <Dialog dismissable={false} visible={isPending}>
-          <Dialog.Content className="py-8">
-            <ActivityIndicator size="large" animating={true} />
-            <View className="h-4" />
-            <Text style={{ textAlign: 'center' }} variant="bodyLarge">
-              Please wait …
-            </Text>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior="padding"
-        keyboardVerticalOffset={100}
-      >
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.image}
-        />
-
-        <Text style={styles.header}>Welcome back.</Text>
-
-        <View style={styles.input}>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                mode="outlined"
-                label="Email"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={!!errors.email}
-              />
-            )}
-          />
-          <HelperText type="error" visible={!!errors.email}>
-            {t(`${errors.email?.message}`)}
-          </HelperText>
-        </View>
-
-        <View style={styles.input}>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                mode="outlined"
-                label="Password"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={!!errors.password}
-              />
-            )}
-          />
-          <HelperText type="error" visible={!!errors.password}>
-            {t(`${errors.password?.message}`)}
-          </HelperText>
-        </View>
-
-        <View style={styles.forgotPassword}>
-          <TouchableOpacity>
-            <Text style={styles.label}>Forgot your password?</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Button
-          className="w-full"
-          mode="contained"
-          onPress={handleSubmit(onSubmit)}
+    <>
+      <View style={styles.container}>
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          LOGIN
-        </Button>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Don’t have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.link}>Register</Text>
-          </TouchableOpacity>
+          <Image
+            source={require("../assets/images/logoApp.png")}
+            resizeMode="stretch"
+            alt="logo"
+            style={{ width: 120, height: 120 }}
+          />
+          <Text style={styles.textTitle}>SOFTPHONE</Text>
         </View>
-      </KeyboardAvoidingView>
-    </View>
-  )
+
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 10,
+          }}
+        >
+          <View style={{ width: "84%", marginTop: 10 }}>
+            <FormControl isRequired>
+              <Controller
+                name="username"
+                control={control}
+                rules={{
+                  required: "Please input username",
+                }}
+                render={() => (
+                  <View>
+                    <Input
+                      bgColor="#E6E3E6"
+                      borderRadius="10"
+                      borderWidth={0.5}
+                      maxLength={characterMax}
+                      w={{
+                        base: "100%",
+                        // md: '25%',
+                      }}
+                      InputLeftElement={
+                        <Image
+                          source={require("../assets/images/iconAccount.png")}
+                          style={{ marginLeft: "6%", width: 14, height: 16 }}
+                        />
+                      }
+                      style={{ color: "#000" }}
+                      placeholder={"アカウント"}
+                      placeholderTextColor={"dark.50"}
+                      // autoFocus
+                      onChangeText={(text) => setUsername(text)}
+                      value={username}
+                      autoCapitalize="none"
+                    />
+                    {username.length === characterMax && (
+                      <View
+                        style={{
+                          marginVertical: 5,
+                          marginLeft: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "red",
+                            fontSize: 10,
+                          }}
+                        >
+                          90文字以内で入力してください
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              />
+            </FormControl>
+          </View>
+          <View style={{ width: "84%", margin: 10 }}>
+            <FormControl minW="75%" isRequired>
+              <Controller
+                name="password"
+                control={control}
+                rules={{
+                  required: "Please input password",
+                }}
+                render={() => (
+                  <View>
+                    <Input
+                      bgColor="#E6E3E6"
+                      borderRadius="10"
+                      borderWidth={0.5}
+                      maxLength={characterMax}
+                      w={{
+                        base: "100%",
+                        // md: '25%',
+                      }}
+                      type={"password"}
+                      InputLeftElement={
+                        <Image
+                          source={require("../assets/images/iconPassword.png")}
+                          style={{ marginLeft: "6%", width: 14.2, height: 16 }}
+                        />
+                      }
+                      style={{ color: "#000" }}
+                      placeholder={"パスワード"}
+                      placeholderTextColor={"dark.50"}
+                      // autoFocus
+                      onChangeText={(text) => setPassword(text)}
+                      value={password}
+                      autoCapitalize="none"
+                    />
+                    {password.length === characterMax && (
+                      <View
+                        style={{
+                          marginVertical: 5,
+                          marginLeft: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "red",
+                            fontSize: 10,
+                          }}
+                        >
+                          90文字以内で入力してください
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              />
+            </FormControl>
+          </View>
+          <View
+            style={{
+              width: "100%",
+              height: 40,
+              margin: 10,
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <View>
+              <Checkbox
+                isChecked={remember}
+                value={"1"}
+                my="1"
+                onChange={() => setRemember(!remember)}
+                size="sm"
+                variant="outline"
+                style={{ borderWidth: 0.8 }}
+              >
+                <Text style={styles.textSmall}>パスワードを保存する</Text>
+              </Checkbox>
+            </View>
+          </View>
+          <View style={{ width: "84%" }}>
+            <Button
+              onPress={handleLogin}
+              disabled={isLoading}
+              style={{ backgroundColor: "#AACD06", borderRadius: 10 }}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.text}>ログイン</Text>
+              )}
+            </Button>
+          </View>
+        </View>
+      </View>
+    </>
+  );
 }
 
-const makeStyles = (theme: MD3Theme) =>
-  StyleSheet.create({
-    image: {
-      width: 128,
-      height: 128,
-      marginBottom: 12
-    },
-    header: {
-      fontSize: 26,
-      color: theme.colors.primary,
-      fontWeight: 'bold',
-      paddingVertical: 14
-    },
-    background: {
-      flex: 1,
-      width: '100%'
-    },
-    container: {
-      flex: 1,
-      padding: 20,
-      width: '100%',
-      maxWidth: 340,
-      alignSelf: 'center',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    input: {
-      width: '100%',
-      marginVertical: 8
-    },
-    forgotPassword: {
-      width: '100%',
-      alignItems: 'flex-end',
-      marginBottom: 24
-    },
-    label: {
-      color: theme.colors.secondary
-    },
-    row: {
-      flexDirection: 'row',
-      marginTop: 4
-    },
-    link: {
-      fontWeight: 'bold',
-      color: theme.colors.primary
-    }
-  })
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f6f8fa",
+    justifyContent: "center",
+  },
+  textTitle: {
+    fontSize: 26,
+    color: "black",
+    marginVertical: "2%",
+  },
+  textNormal: {
+    fontSize: 16,
+    color: "black",
+    textAlign: "right",
+    alignItems: "flex-end",
+    marginRight: "30%",
+    marginBottom: "10%",
+  },
+  text: {
+    fontSize: 14,
+    color: "black",
+    marginVertical: "4%",
+  },
+  textSmall: {
+    fontSize: 13,
+    color: "black",
+  },
+  });
+function createStyles(theme: Theme): any {
+  throw new Error("Function not implemented.");
+}
+
