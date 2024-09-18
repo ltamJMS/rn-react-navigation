@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import "RNBootSplash.h"
+// #import "RNBootSplash.h"
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -29,8 +29,8 @@
 #endif
 }
 
-- (void)customizeRootView:(RCTRootView *)rootView {
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
-}
+// - (void)customizeRootView:(RCTRootView *)rootView {
+//   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
+// }
 
 @end

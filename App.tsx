@@ -1,32 +1,31 @@
-// import 'react-native-gesture-handler'
+import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
-import { StatusBar, useColorScheme, LogBox } from 'react-native'
+import { LogBox, Text, View } from 'react-native'
 import { NativeBaseProvider } from 'native-base'
 import Toast from 'react-native-toast-message'
-import messaging from '@react-native-firebase/messaging'
 import Navigation from './navigation'
 
 LogBox.ignoreAllLogs()
 
 const App = () => {
-  const scheme = useColorScheme()
   useEffect(() => {
-    console.log('=====> APP RUNNING ...')
-    StatusBar.setBarStyle('dark-content')
+    console.log('=====> APP RUNNING ... app')
 
-    const requestUserPermission = async () => {
-      const authStatus = await messaging().requestPermission()
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    // const requestUserPermission = async () => {
+    //   console.log('=====> APP RUNNING ... app 2')
 
-      if (enabled) {
-        console.warn('Permission status:', authStatus)
-      }
-    }
+    //   const authStatus = await messaging().requestPermission()
+    //   const enabled =
+    //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    //     authStatus === messaging.AuthorizationStatus.PROVISIONAL
 
-    requestUserPermission()
-  }, [scheme])
+    //   if (enabled) {
+    //     console.warn('Permission status:', authStatus)
+    //   }
+    // }
+
+    // requestUserPermission()
+  }, [])
 
   return (
     <>
@@ -34,9 +33,9 @@ const App = () => {
         <Navigation />
       </NativeBaseProvider>
       <Toast position="top" bottomOffset={20} />
-      {/* <View>
-        <Text style={{ color: "red" }}>Hello World!</Text>
-      </View> */}
+      <View>
+        <Text style={{ color: 'red' }}>Hello World!</Text>
+      </View>
     </>
   )
 }
