@@ -1,13 +1,15 @@
 import axios from 'axios'
 import { useCallback, useMemo } from 'react'
 import { useResetRecoilState } from 'recoil'
+import * as NavigationService from 'react-navigation-helpers'
+import { authState, sipAccountState } from '../../store/auth'
 import {
   agentLoginState,
   currentCallState,
   holdingCallState,
   incomingShowState
 } from '../../store/softphone'
-import { authState, sipAccountState } from '../../store/auth'
+import { SCREENS } from '../../../shared/constants'
 
 const useLogout = () => {
   const resetAuth = useResetRecoilState(authState)
@@ -43,7 +45,7 @@ const useLogout = () => {
     } catch (err) {
       console.error(err)
     } finally {
-      // navigation.navigate('Register')
+      NavigationService.navigate(SCREENS.LOGIN)
     }
   }, [resetStore])
 }

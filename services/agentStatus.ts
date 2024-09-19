@@ -62,9 +62,10 @@ export const loginAgentByPrivateIP = async (
   } catch (err: any) {
     const httpError = new HTTPError(err)
     let messageErr = httpError.getMessage()
-    if (httpError.getCode() === 401)
+    if (httpError.getCode() === 401) {
       messageErr =
         'セッションがタイムアウトしました。再度サインインしてください'
+    }
     return {
       success: false,
       message: messageErr,
@@ -81,7 +82,7 @@ export const loginAgent = async (
   domain: string
 ): Promise<any> => {
   const domainFull = `https://${domain}`
-  const url = `https://dev-api.infinitalk.net/infinitalk/agentstatus/login?domain=${domainFull}`
+  const url = `https://api.infinitalk.net/infinitalk/agentstatus/login?domain=${domainFull}`
 
   try {
     // login agent
@@ -110,9 +111,10 @@ export const loginAgent = async (
   } catch (err: any) {
     const httpError = new HTTPError(err)
     let messageErr = httpError.getMessage()
-    if (httpError.getCode() === 401)
+    if (httpError.getCode() === 401) {
       messageErr =
         'セッションがタイムアウトしました。再度サインインしてください'
+    }
     return {
       success: false,
       message: messageErr,
@@ -128,7 +130,7 @@ export const changeAgentStatus = async (
   paused: string,
   reason?: string
 ): Promise<any> => {
-  const uri = `https://dev-api.infinitalk.net/api/v1/ami/agent/status?serverNumber=${customerId.slice(
+  const uri = `https://api.infinitalk.net/api/v1/ami/agent/status?serverNumber=${customerId.slice(
     0,
     3
   )}`

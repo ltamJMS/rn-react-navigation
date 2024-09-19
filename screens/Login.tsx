@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Image, Text, View, ActivityIndicator, StyleSheet } from 'react-native'
-import { Button, Checkbox, FormControl, Input } from 'native-base'
+import { Checkbox, FormControl, Input } from 'native-base'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Toast from 'react-native-toast-message'
@@ -15,6 +15,9 @@ import {
   loginByPassword
 } from '../services/usecases/auth/auth'
 import { HTTPError } from '../services/models/error'
+import { SCREENS } from '../shared/constants'
+import * as NavigationService from 'react-navigation-helpers'
+import { Button } from 'react-native-paper'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
@@ -46,6 +49,8 @@ export default function Login() {
   }, [])
 
   const handleLogin = useCallback(async () => {
+    console.log('=====> handleLogin', username, password, remember)
+
     if (password.length < 1 || username.length < 1) {
       Toast.show({
         type: 'error',
@@ -151,6 +156,8 @@ export default function Login() {
               asteriskDomain: result.data?.asteriskDomain
             })
           })
+          NavigationService.navigate(SCREENS.HOME)
+          // RenderTabNavigation();
         } catch (err) {
           console.error('=====> AUTH ERROR', err)
         }
@@ -203,6 +210,7 @@ export default function Login() {
                         base: '100%'
                         // md: '25%',
                       }}
+                      height={10}
                       InputLeftElement={
                         <Image
                           source={require('../assets/images/iconAccount.png')}
@@ -215,6 +223,7 @@ export default function Login() {
                       // autoFocus
                       onChangeText={text => setUsername(text)}
                       value={username}
+                      // defaultValue='099aChatOutsideTest2/6628@talk'
                       autoCapitalize="none"
                     />
                     {username.length === characterMax && (
@@ -258,6 +267,7 @@ export default function Login() {
                         base: '100%'
                         // md: '25%',
                       }}
+                      height={10}
                       type={'password'}
                       InputLeftElement={
                         <Image
@@ -271,6 +281,7 @@ export default function Login() {
                       // autoFocus
                       onChangeText={text => setPassword(text)}
                       value={password}
+                      defaultValue="6628@talk"
                       autoCapitalize="none"
                     />
                     {password.length === characterMax && (
@@ -327,7 +338,7 @@ export default function Login() {
               {isLoading ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.text}>ログイン</Text>
+                <Text style={{ color: 'white' }}>ログイン</Text>
               )}
             </Button>
           </View>
@@ -346,15 +357,9 @@ const styles = StyleSheet.create({
   textTitle: {
     fontSize: 26,
     color: 'black',
-    marginVertical: '2%'
-  },
-  text: {
-    fontSize: 14,
-    color: 'black',
     marginVertical: '4%'
   },
   textSmall: {
-    fontSize: 13,
-    color: 'black'
+    color: '#30363b'
   }
 })

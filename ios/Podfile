@@ -16,7 +16,8 @@ end
 
 target 'rnCliApp' do
   config = use_native_modules!
-
+  pod 'Firebase/Core'
+  pod 'Firebase/Messaging'
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

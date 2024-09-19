@@ -92,3 +92,30 @@ export interface IncomingUserInfo {
 export interface CallSessionMap {
   [index: string]: CallSession
 }
+
+export enum AgentType {
+  'MANAGER' = 3,
+  'NORMAL' = 1
+}
+
+interface AgentStatus {
+  userID: number
+  name: string
+  type: AgentType
+  username?: string
+  exten?: string
+  sipAccount?: string
+  contextName: string
+  groupNames: string[]
+  interface: string
+  status?: number
+  phoneStatus?: number
+  updateTime?: Date
+  raiseHandAt?: Date
+  contextPrefix?: number
+}
+
+export type AgentStatusMap = {
+  [index: string]: AgentStatus
+}
+export default AgentStatus

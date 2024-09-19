@@ -11,18 +11,12 @@ import { SCREENS } from '../shared/constants'
 import { palette } from '../shared/theme/themes'
 
 const Tab = createBottomTabNavigator()
-const logo = '../assets/images/logoApp.png'
 
 const CustomHeaderTitle = (title: string) => (
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Image
-      source={require('' + logo)}
-      style={{ width: 22, height: 22, marginTop: 4, marginLeft: 12 }}
-    />
     <Text
       numberOfLines={1}
       style={{
-        marginLeft: 12,
         fontSize: 18,
         color: 'white'
       }}
@@ -52,8 +46,8 @@ const RenderTabNavigation = () => {
     return (
       <MaterialCommunityIcons
         name={iconName}
-        size={24}
-        color={focused ? palette.infinitalk : 'gray'}
+        size={26}
+        color={focused ? palette.borderColorDark : 'gray'}
       />
     )
   }

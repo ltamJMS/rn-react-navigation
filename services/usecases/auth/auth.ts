@@ -1,8 +1,9 @@
-import auth from '@react-native-firebase/auth'
+import axios from 'axios'
 import configs from '../../configs'
 import { AuthUser, Token } from '../../models/account'
 import { HTTPError } from '../../models/error'
-import axios from 'axios'
+import auth from '@react-native-firebase/auth'
+
 const { apiRoot, clientID } = configs
 
 export async function loginByPassword(

@@ -5,7 +5,6 @@ import { isReadyRef, navigationRef } from 'react-navigation-helpers'
 
 // ? Screens
 import LoginScreen from '../screens/Login'
-import SplashScreen from '../screens/SplashScreen'
 import RenderTabNavigation from './RenderTabNavigation'
 import CallHistory from '../screens/CallHistory'
 import ContactList from '../screens/ContactList'
@@ -27,9 +26,8 @@ const Navigation = () => {
     >
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName={SCREENS.SPLASH}
+        initialRouteName={SCREENS.LOGIN}
       >
-        <Stack.Screen name={SCREENS.SPLASH} component={SplashScreen} />
         <Stack.Screen name={SCREENS.LOGIN} component={LoginScreen} />
         <Stack.Screen name={SCREENS.HOME} component={RenderTabNavigation} />
         <Stack.Screen name={SCREENS.CALL_HISTORY} component={CallHistory} />

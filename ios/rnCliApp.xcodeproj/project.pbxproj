@@ -15,6 +15,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BF2D9A6DE7B94413A9C4A1EB /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CB6AE3280814EF09C2D8120 /* BootSplash.storyboard */; };
 		CA4DD9BAA3F7D6A906C8336C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3B65B9777563C4E0D2857D71 /* PrivacyInfo.xcprivacy */; };
+		CECC37BE2C9A795800651BC1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CECC37BD2C9A795800651BC1 /* GoogleService-Info.plist */; };
 		D9F5037A141CD942D155DC66 /* Pods_rnCliApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ACBBCE35330A74750D50E /* Pods_rnCliApp.framework */; };
 		E2FE4AD3462D4CB2AF4CD29D /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E39109A379E4E3AB76E2770 /* Colors.xcassets */; };
 /* End PBXBuildFile section */
@@ -49,6 +50,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = rnCliApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		87E4C4EC7FAD8604AF442E2D /* Pods-rnCliApp-rnCliAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnCliApp-rnCliAppTests.release.xcconfig"; path = "Target Support Files/Pods-rnCliApp-rnCliAppTests/Pods-rnCliApp-rnCliAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		8CB6AE3280814EF09C2D8120 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = rnCliApp/BootSplash.storyboard; sourceTree = "<group>"; };
+		CECC37BD2C9A795800651BC1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D6C91FAF00F1B3AE2DB135B9 /* Pods-rnCliApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnCliApp.release.xcconfig"; path = "Target Support Files/Pods-rnCliApp/Pods-rnCliApp.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -93,6 +95,7 @@
 		13B07FAE1A68108700A75B9A /* rnCliApp */ = {
 			isa = PBXGroup;
 			children = (
+				CECC37BD2C9A795800651BC1 /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -212,6 +215,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				KnownAssetTags = (
+					New,
+				);
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -259,6 +265,7 @@
 				BF2D9A6DE7B94413A9C4A1EB /* BootSplash.storyboard in Resources */,
 				E2FE4AD3462D4CB2AF4CD29D /* Colors.xcassets in Resources */,
 				CA4DD9BAA3F7D6A906C8336C /* PrivacyInfo.xcprivacy in Resources */,
+				CECC37BE2C9A795800651BC1 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -641,10 +648,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -728,10 +732,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

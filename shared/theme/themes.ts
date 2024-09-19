@@ -25,7 +25,7 @@ export const palette = {
   transparent: 'transparent',
   calpyse: '#2b7488',
   greyDefault: '#D9D9D9',
-  infinitalk: '#00AEEF'
+  infinitalk: '#AACD06'
 }
 
 export const LightTheme: ExtendedTheme = {

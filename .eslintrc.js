@@ -42,6 +42,9 @@ module.exports = {
         endOfLine: 'auto'
       }
     ],
-    'no-var': 0
+    'no-var': 0,
+    'curly': 0,
+    'comma-dangle': 'off',
+    "semi": ["off"],
   }
 }

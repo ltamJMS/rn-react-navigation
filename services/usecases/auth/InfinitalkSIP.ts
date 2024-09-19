@@ -28,6 +28,7 @@ import {
   InfinitalkCallConfig,
   UAEventEmitterPayload
 } from '../../models/softPhone'
+import { onconnectionstatechange } from './sip'
 
 // Define global variables
 declare var global: {
@@ -116,6 +117,7 @@ export interface InfinitalkSipInterface {
   ): Promise<boolean>
   setMute(muted: boolean, sessionId: string, options?: any): Promise<boolean>
   isSessionExisted(sessionId: string): boolean
+  listenToConnectionStateChange(session: RTCSession): void
 }
 
 export class InfinitalkSIP implements InfinitalkSipInterface {
@@ -159,25 +161,31 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   }
 
   async call(phoneNumber: string, callOptions?: any): Promise<RTCSession> {
-    const options = {
-      mediaConstraints: { audio: true, video: false }
-    }
-    const target = `sip:${phoneNumber}@${this.sip.domain}`
-    const resSession: RTCSession = this.ua.call(target, options)
+    try {
+      const options = {
+        mediaConstraints: { audio: true, video: false }
+      }
+      const target = `sip:${phoneNumber}@${this.sip.domain}`
 
-    // add session to map
-    this.callSessionMap[resSession.id] = {
-      session: resSession,
-      type: CallSessionType.CURRENT
-    }
+      const resSession: RTCSession = this.ua.call(target, options)
 
-    // listen event
-    if (this.config.listenCall) {
-      const removeListener = this.listenCall(resSession.id)
-      this.callSessionMap[resSession.id].removeListener = removeListener
-    }
+      // add session to map
+      this.callSessionMap[resSession.id] = {
+        session: resSession,
+        type: CallSessionType.CURRENT
+      }
 
-    return resSession
+      // listen event
+      if (this.config.listenCall) {
+        const removeListener = this.listenCall(resSession.id)
+        this.callSessionMap[resSession.id].removeListener = removeListener
+      }
+
+      return resSession
+    } catch (error) {
+      console.error('Call error', error)
+      throw error
+    }
   }
 
   getCurrentSession(): RTCSession | undefined {
@@ -486,156 +494,256 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   }
 
   listenCall(sessionId: string) {
-    const sessionData = this.callSessionMap[sessionId]
+    try {
+      const sessionData = this.callSessionMap[sessionId]
 
-    if (sessionData) {
-      const { session } = sessionData
-
-      // set call to session if not are
-      if (sessionData.type !== CallSessionType.CURRENT) {
-        this.callSessionMap[session.id] = {
-          session,
-          type: CallSessionType.CURRENT
+      if (sessionData) {
+        const { session } = sessionData
+        // set call to session if not are
+        if (sessionData.type !== CallSessionType.CURRENT) {
+          this.callSessionMap[session.id] = {
+            session,
+            type: CallSessionType.CURRENT
+          }
         }
-      }
+        console.log(444444, session)
 
-      // overwrite remote description for fixing case do not use stun
-
-      // TODO
-      // if (session.connection) {
-      //   this.overwriteRemoteDescription(session);
-      //   this.listenToConnectionStateChange(session);
-      // } else {
-      //   session.on('peerconnection', () => {
-      //     this.overwriteRemoteDescription(session);
-      //     this.listenToConnectionStateChange(session);
-      //   });
-      // }
-
-      session.on('progress', (data: IncomingEvent | OutgoingEvent) => {
-        console.log('session on progress', sessionId)
-        const payload: CallEventEmitterPayload<IncomingEvent | OutgoingEvent> =
-          {
+        session.on('progress', (data: IncomingEvent | OutgoingEvent) => {
+          const payload: CallEventEmitterPayload<
+            IncomingEvent | OutgoingEvent
+          > = {
             event: 'progress',
             sessionId,
             data
           }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
 
-      session.on('confirmed', (data: IncomingEvent | OutgoingEvent) => {
-        console.log('session on confirmed', sessionId)
-        const payload: CallEventEmitterPayload<IncomingEvent | OutgoingEvent> =
-          {
+        session.on('sdp', data => {
+          let { sdp } = data
+          const publicIp = this.getPublicIPFromSdp(sdp) || ''
+          const privateIps = this.getAllPrivateIpFromCandidate(sdp)
+
+          if (publicIp && privateIps.length > 0) {
+            privateIps.forEach(privateIp => {
+              const privateIpPattern = new RegExp(privateIp, 'g')
+              sdp = sdp.replace(privateIpPattern, publicIp)
+            })
+          }
+          data.sdp = sdp
+        })
+
+        session.on('confirmed', (data: IncomingEvent | OutgoingEvent) => {
+          console.log('session on confirmed', sessionId)
+          const payload: CallEventEmitterPayload<
+            IncomingEvent | OutgoingEvent
+          > = {
             event: 'confirmed',
             sessionId,
             data
           }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
 
-      session.on('accepted', (data: IncomingEvent | OutgoingEvent) => {
-        const payload: CallEventEmitterPayload<IncomingEvent | OutgoingEvent> =
-          {
+        session.on('accepted', (data: IncomingEvent | OutgoingEvent) => {
+          const payload: CallEventEmitterPayload<
+            IncomingEvent | OutgoingEvent
+          > = {
             event: 'accepted',
             sessionId,
             data
           }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
 
-      session.on('ended', (data: EndEvent) => {
-        console.log('session on ended', sessionId)
-        const payload: CallEventEmitterPayload<EndEvent> = {
-          event: 'ended',
-          sessionId,
-          data
+        session.on('ended', (data: EndEvent) => {
+          console.log('session on ended', sessionId)
+          const payload: CallEventEmitterPayload<EndEvent> = {
+            event: 'ended',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+
+          // TODO
+          // this.removeListenerOnTerminate(session as any);
+        })
+
+        session.on('failed', (data: EndEvent) => {
+          console.log('session on failed', sessionId)
+          const payload: CallEventEmitterPayload<EndEvent> = {
+            event: 'failed',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+          // TODO
+          // this.removeListenerOnTerminate(session as any);
+        })
+
+        session.on('hold', (data: HoldEvent) => {
+          console.log('session on hold', sessionId, data)
+          const payload: CallEventEmitterPayload<HoldEvent> = {
+            event: 'hold',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
+
+        session.on('unhold', (data: HoldEvent) => {
+          console.log('session on unhold', sessionId, data)
+          const payload: CallEventEmitterPayload<HoldEvent> = {
+            event: 'unhold',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
+
+        session.on('refer', (data: ReferEvent) => {
+          console.log('session on refer', sessionId, data)
+          const payload: CallEventEmitterPayload<ReferEvent> = {
+            event: 'refer',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
+
+        session.on('replaces', (data: ReferEvent) => {
+          console.log('session on replaces', sessionId, data)
+          const payload: CallEventEmitterPayload<ReferEvent> = {
+            event: 'replaces',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
+
+        session.on('getusermediafailed', (data: any) => {
+          console.log('session on getusermediafailed', sessionId, data)
+          const payload: CallEventEmitterPayload<any> = {
+            event: 'getusermediafailed',
+            sessionId,
+            data
+          }
+          this.eventSFEmitter.emit('listenCall', payload)
+        })
+
+        return () => {
+          console.log('Remove listener for sessionId ', sessionId)
+          session.removeAllListeners('progress')
+          session.removeAllListeners('confirmed')
+          session.removeAllListeners('ended')
+          session.removeAllListeners('failed')
+          session.removeAllListeners('hold')
+          session.removeAllListeners('unhold')
+          session.removeAllListeners('refer')
+          session.removeAllListeners('replaces')
+          session.removeAllListeners('getusermediafailed')
+          session.removeAllListeners('peerconnection')
         }
-        this.eventSFEmitter.emit('listenCall', payload)
-
-        // TODO
-        // this.removeListenerOnTerminate(session as any);
-      })
-
-      session.on('failed', (data: EndEvent) => {
-        console.log('session on failed', sessionId)
-        const payload: CallEventEmitterPayload<EndEvent> = {
-          event: 'failed',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-        // TODO
-        // this.removeListenerOnTerminate(session as any);
-      })
-
-      session.on('hold', (data: HoldEvent) => {
-        console.log('session on hold', sessionId, data)
-        const payload: CallEventEmitterPayload<HoldEvent> = {
-          event: 'hold',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
-
-      session.on('unhold', (data: HoldEvent) => {
-        console.log('session on unhold', sessionId, data)
-        const payload: CallEventEmitterPayload<HoldEvent> = {
-          event: 'unhold',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
-
-      session.on('refer', (data: ReferEvent) => {
-        console.log('session on refer', sessionId, data)
-        const payload: CallEventEmitterPayload<ReferEvent> = {
-          event: 'refer',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
-
-      session.on('replaces', (data: ReferEvent) => {
-        console.log('session on replaces', sessionId, data)
-        const payload: CallEventEmitterPayload<ReferEvent> = {
-          event: 'replaces',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
-
-      session.on('getusermediafailed', (data: any) => {
-        console.log('session on getusermediafailed', sessionId, data)
-        const payload: CallEventEmitterPayload<any> = {
-          event: 'getusermediafailed',
-          sessionId,
-          data
-        }
-        this.eventSFEmitter.emit('listenCall', payload)
-      })
+      }
 
       return () => {
-        console.log('Remove listener for sessionId ', sessionId)
-        session.removeAllListeners('progress')
-        session.removeAllListeners('confirmed')
-        session.removeAllListeners('ended')
-        session.removeAllListeners('failed')
-        session.removeAllListeners('hold')
-        session.removeAllListeners('unhold')
-        session.removeAllListeners('refer')
-        session.removeAllListeners('replaces')
-        session.removeAllListeners('getusermediafailed')
-        session.removeAllListeners('peerconnection')
+        console.log('Session data not exist. sessionId ', sessionId)
+      }
+    } catch (error) {
+      console.error('Error in listenCall:', error)
+      return () => {
+        console.log('Error in listenCall. ', sessionId)
+      }
+    }
+  }
+
+  /**
+   * @param sdp
+   * Session Description of SDP protocol has the following format:
+   * v= (protocol version)
+   * o= (owner/creator and session identification)
+   * s= (session name)
+   * i= (session information)
+   * u= (URI of description)
+   * e= (email address – contact detail)
+   * p= (phone number – contact detail)\
+   * c= (connection information – not required if included in media description)
+   * b= (session bandwidth information)
+   * z= (time zone adjustments)
+   * k= (encryption key)
+   * a= (zero or more session attribute lines)
+   *
+   * This function will return originator's public ip address from o= line.
+   * Details about the originator and identification of the session have format:
+   * o=<username><sess-id><sess-version><nettype><addrtype><unicast-address>
+   *
+   * @returns public-ip
+   */
+  getPublicIPFromSdp(sdp: string): string | undefined {
+    let ip
+    const getOriginatorDetailsRegex = /o=(.*)/g
+    const getAddressRegex = /IN(.*)/g
+    const originatorDetailsMatch = sdp.match(getOriginatorDetailsRegex)
+    if (originatorDetailsMatch) {
+      // eslint-disable-next-line prefer-destructuring
+      const originatorDetails = originatorDetailsMatch[0]
+      const addressDetailsMatch = originatorDetails.match(getAddressRegex)
+      if (addressDetailsMatch) {
+        // eslint-disable-next-line prefer-destructuring
+        const addressDetails = addressDetailsMatch[0]
+
+        // example address details = "IN IP4 [public-ip]"
+        // will be returned value = "public-ip"
+        // eslint-disable-next-line prefer-destructuring
+        ip = addressDetails.split(' ')[2]
       }
     }
 
-    return () => {
-      console.log('Session data not exist. sessionId ', sessionId)
+    return ip
+  }
+
+  /**
+   * @param sdp
+   * In body of sdp, a= line has the following example format:
+   * a=candidate:Ha800033 1 UDP 2130706431 10.128.0.51 11006 typ host
+   * a=candidate:Ha800033 2 UDP 2130706430 10.128.0.51 11007 typ host
+   * a=candidate:Ha800033 2 UDP 2130706430 10.128.0.52 11007 typ host
+   *
+   * This function will return private ip has was written in a= line with host type
+   * @returns list private-ip ['10.128.0.51', '10.128.0.52']
+   */
+  getAllPrivateIpFromCandidate(sdp: string): string[] {
+    // match example: "10.128.0.51 11006 typ host"
+    const getPrivateIpDetailsRegex =
+      /(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b\s+[0-9]+\s+typ host/g
+
+    const ips = new Set<string>()
+
+    const privateIpDetailsMatch = sdp.match(getPrivateIpDetailsRegex)
+    if (privateIpDetailsMatch) {
+      // return $0 items: "10.128.0.51"
+      privateIpDetailsMatch.forEach(line => {
+        // eslint-disable-next-line prefer-destructuring
+        const ip: string | null = line.split(' ')[0]
+        if (ip) {
+          ips.add(ip)
+        }
+      })
     }
+
+    return Array.from(ips)
+  }
+
+  /**
+   * After receiving information about the webrtc-remote-client's connection description,
+   * this function will overwrite the received, replace private ip by public ip and return new setRemoteDescription() func
+   */
+
+  listenToConnectionStateChange(session: any): void {
+    session.connection.onconnectionstatechange = onconnectionstatechange(
+      this.terminate.bind(this),
+      session.id,
+      session.connection
+    )
   }
 }

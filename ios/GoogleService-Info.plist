@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDDdCfYAbzswx3hIx0w9mabBUhXv29b_5o</string>
+	<key>GCM_SENDER_ID</key>
+	<string>552887512270</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.softphone</string>
+	<key>PROJECT_ID</key>
+	<string>commercial-001</string>
+	<key>STORAGE_BUCKET</key>
+	<string>commercial-001.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:552887512270:ios:7df122931d83eb2f91b49f</string>
+	<key>DATABASE_URL</key>
+	<string>https://commercial-001.firebaseio.com</string>
+</dict>
+</plist>
