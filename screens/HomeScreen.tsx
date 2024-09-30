@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
-  StyleSheet
+  StyleSheet,
+  Text,
+  Keyboard,
+  TouchableWithoutFeedback
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Text from '../shared/components/text-wrapper/TextWrapper'
+// import Text from '../shared/components/text-wrapper/TextWrapper'
 import JsSIP from 'jssip'
 import { useRecoilState } from 'recoil'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -40,12 +43,9 @@ export default function HomeScreen() {
   const [holdingCall] = useRecoilState(holdingCallState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
   const handleDecline = () => {
-    console.log('Decline the call')
     setIsShowIncoming(false)
   }
-  useEffect(() => {
-    console.log('=====> agentLoginStatus', agentLoginStatus)
-  }, [agentLoginStatus])
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={'padding'} style={{ flex: 1 }}>
@@ -57,128 +57,142 @@ export default function HomeScreen() {
               </View>
             </View>
           ) : (
-            <View style={styles.screenView}>
-              {/* 1. Agent Login */}
-              <View>
-                <View style={styles.spaceButton}>
-                  {agentLoginStatus ? (
-                    <Button
-                      mode="contained"
-                      icon="headphones"
-                      style={{ backgroundColor: '#3498db' }}
-                      onPress={async () => {
-                        handleLogin(setLoading)
-                      }}
-                    >
-                      待機中
-                    </Button>
-                  ) : (
-                    <Button
-                      mode="contained"
-                      style={{ backgroundColor: '#757575' }}
-                      onPress={async () => {
-                        handleLogin(setLoading)
-                      }}
-                    >
-                      Agent Login
-                    </Button>
-                  )}
-                </View>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                console.log('Pressed!!!!!!!44')
+                Keyboard.dismiss()
+              }}
+              accessible={false}
+            >
+              <View style={styles.screenView}>
+                {/* 1. Agent Login */}
                 <View>
-                  <View>
-                    {isShowIncoming && (
-                      <IncomingCallDialog
-                        visible={isShowIncoming}
-                        onAnswer={() => handleAnswer(currentCall?.sessionId)}
-                        onDecline={handleDecline}
-                        phoneNumber={currentCall?.src.num || 'anonymous'}
-                        onRequestClose={() => setIsShowIncoming(false)}
-                      />
+                  <View style={styles.spaceButton}>
+                    {agentLoginStatus ? (
+                      <Button
+                        mode="contained"
+                        icon="headphones"
+                        style={{ backgroundColor: '#3498db' }}
+                        onPress={async () => {
+                          handleLogin(setLoading)
+                        }}
+                      >
+                        待機中
+                      </Button>
+                    ) : (
+                      <Button
+                        mode="contained"
+                        style={{ backgroundColor: '#757575' }}
+                        onPress={async () => {
+                          handleLogin(setLoading)
+                        }}
+                      >
+                        Agent Login
+                      </Button>
                     )}
-                    <OutgoingCall handleCall={handleCall} />
                   </View>
-                  {(currentCall || holdingCall) && (
-                    <View style={styles.actionContainer}>
-                      {/* hold and unHold */}
-                      {!holdingCall ? (
+                  <View>
+                    <View>
+                      {isShowIncoming && (
+                        <IncomingCallDialog
+                          visible={isShowIncoming}
+                          onAnswer={() => handleAnswer(currentCall?.sessionId)}
+                          onDecline={handleDecline}
+                          phoneNumber={currentCall?.src.num || 'anonymous'}
+                          onRequestClose={() => setIsShowIncoming(false)}
+                        />
+                      )}
+                      <OutgoingCall handleCall={handleCall} />
+                    </View>
+                    {(currentCall || holdingCall) && (
+                      <View style={styles.actionContainer}>
+                        {/* hold and unHold */}
+                        {!holdingCall ? (
+                          <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                              style={styles.actionButton}
+                              onPress={() => handleHold(currentCall?.sessionId)}
+                            >
+                              <Icon
+                                name="hand-back-right"
+                                size={22}
+                                color="#ffffff"
+                              />
+                            </TouchableOpacity>
+                            <Text style={styles.buttonText}>保留</Text>
+                          </View>
+                        ) : (
+                          <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                              style={[
+                                styles.actionButton,
+                                { backgroundColor: '#FF7628' }
+                              ]}
+                              onPress={() =>
+                                handleUnHold(holdingCall?.sessionId)
+                              }
+                            >
+                              <Icon
+                                name="hand-back-right-off"
+                                size={22}
+                                color="#ffffff"
+                              />
+                            </TouchableOpacity>
+                            <Text style={styles.buttonText}>解除</Text>
+                          </View>
+                        )}
+                        {/* refer */}
                         <View style={styles.buttonContainer}>
                           <TouchableOpacity
                             style={styles.actionButton}
-                            onPress={() => handleHold(currentCall?.sessionId)}
+                            onPress={() =>
+                              handleRefer(
+                                holdingCall?.sessionId,
+                                currentCall?.sessionId
+                              )
+                            }
                           >
                             <Icon
-                              name="hand-back-right"
+                              name="phone-forward"
                               size={22}
                               color="#ffffff"
                             />
                           </TouchableOpacity>
-                          <Text style={styles.buttonText}>保留</Text>
+                          <Text style={styles.buttonText}>転送</Text>
                         </View>
-                      ) : (
+                        {/* end call */}
                         <View style={styles.buttonContainer}>
                           <TouchableOpacity
                             style={[
                               styles.actionButton,
-                              { backgroundColor: '#FF7628' }
+                              { backgroundColor: '#D92E27' }
                             ]}
-                            onPress={() => handleUnHold(holdingCall?.sessionId)}
+                            onPress={() =>
+                              handleTerminate(currentCall?.sessionId)
+                            }
                           >
                             <Icon
-                              name="hand-back-right-off"
+                              name="phone-hangup"
                               size={22}
                               color="#ffffff"
                             />
                           </TouchableOpacity>
-                          <Text style={styles.buttonText}>解除</Text>
+                          <Text style={styles.buttonText}>切断</Text>
                         </View>
-                      )}
-                      {/* refer */}
-                      <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                          style={styles.actionButton}
-                          onPress={() =>
-                            handleRefer(
-                              holdingCall?.sessionId,
-                              currentCall?.sessionId
-                            )
-                          }
-                        >
-                          <Icon
-                            name="phone-forward"
-                            size={22}
-                            color="#ffffff"
-                          />
-                        </TouchableOpacity>
-                        <Text style={styles.buttonText}>転送</Text>
                       </View>
-                      {/* end call */}
-                      <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                          style={[
-                            styles.actionButton,
-                            { backgroundColor: '#D92E27' }
-                          ]}
-                          onPress={() =>
-                            handleTerminate(currentCall?.sessionId)
-                          }
-                        >
-                          <Icon name="phone-hangup" size={22} color="#ffffff" />
-                        </TouchableOpacity>
-                        <Text style={styles.buttonText}>切断</Text>
-                      </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
+                <Button
+                  icon="power-standby"
+                  mode="contained"
+                  style={{ backgroundColor: '#333942', marginBottom: 20 }}
+                  onPress={() => handleLogout()}
+                >
+                  Logout
+                </Button>
               </View>
-              <Button
-                icon="power-standby"
-                mode="contained"
-                style={{ backgroundColor: '#333942' }}
-                onPress={() => handleLogout()}
-              >
-                Logout
-              </Button>
-            </View>
+            </TouchableWithoutFeedback>
           )}
         </View>
       </KeyboardAvoidingView>

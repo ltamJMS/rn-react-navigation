@@ -1,5 +1,5 @@
 // OutgoingCall.tsx
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
 import {
   View,
@@ -24,11 +24,6 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ handleCall }) => {
   const [holdingCall] = useRecoilState(holdingCallState)
   const [callAvailable, setCallAvailable] = useState(false)
 
-  console.log('=====> OUTGOING CALL', currentCall)
-  useEffect(() => {
-    if (!currentCall) return
-    console.log('=====> CURRENT CALL: ', currentCall)
-  }, [currentCall])
   const handlePhoneNumberChange = useCallback((text: string) => {
     phoneNumberRef.current = text
     setCallAvailable(!!text)
@@ -50,14 +45,16 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ handleCall }) => {
           style={styles.input}
           placeholder="電話番号 ..."
           placeholderTextColor="#30363b"
-          defaultValue={phoneNumberRef.current} // Set initial value from ref
+          defaultValue={'09019747098'} // Set initial value from ref
           onChangeText={handlePhoneNumberChange}
           keyboardType="phone-pad"
         />
         <TouchableOpacity
           style={[
             styles.callButton,
-            { backgroundColor: phoneNumberRef.current ? '#AACD06' : '#D9D9D9' }
+            {
+              backgroundColor: phoneNumberRef.current ? '#AACD06' : '#D9D9D9'
+            }
           ]}
           disabled={!callAvailable}
           onPress={handleCallPress}

@@ -49,7 +49,7 @@ export default function Login() {
   }, [])
 
   const handleLogin = useCallback(async () => {
-    console.log('=====> handleLogin', username, password, remember)
+    console.log('🍀 Click Login', username, password)
 
     if (password.length < 1 || username.length < 1) {
       Toast.show({
@@ -105,7 +105,7 @@ export default function Login() {
         AsyncStorage.setItem('loginRemember', JSON.stringify(loginData))
         AsyncStorage.setItem('auth', JSON.stringify(res))
       } catch (error) {
-        console.error('=====> LOGIN ERROR', error)
+        console.error('🔴  LOGIN ERROR', error)
         Toast.show({
           type: 'error',
           text1: `${error}: login failed`
@@ -159,7 +159,7 @@ export default function Login() {
           NavigationService.navigate(SCREENS.HOME)
           // RenderTabNavigation();
         } catch (err) {
-          console.error('=====> AUTH ERROR', err)
+          console.error('🔴 AUTH ERROR', err)
         }
       }
       applyTokenAsync()

@@ -24,11 +24,10 @@ export class HTTPError implements Error {
 
   constructor(err: AxiosError | undefined) {
     if (err) {
-      console.error('error', err)
+      console.error('🔴 error', err)
       let code = 500
       let message = 'SERVER_ERROR'
       let detail
-      console.error(err)
       if (err.response && err.response.data) {
         const res = err.response
         code = res.status

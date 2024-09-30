@@ -9,7 +9,7 @@ import notifee, {
 } from '@notifee/react-native'
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.warn('=====> FCM BACKGROUND', remoteMessage)
+  console.log('🍀 FCM BACKGROUND', remoteMessage)
 
   if (remoteMessage && remoteMessage.data) {
     const { customerPhoneNumber } = remoteMessage.data
@@ -45,7 +45,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 })
 
 notifee.onBackgroundEvent(async ({ type, detail }) => {
-  console.warn('=====> NOTIFEE BACKGROUND', type, detail)
+  console.warn('🍀 NOTIFEE BACKGROUND', type, detail)
 })
 
 AppRegistry.registerComponent(appName, () => RecoilApp)

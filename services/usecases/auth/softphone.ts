@@ -27,7 +27,7 @@ export const saveTokenToFirestore = async (
     })
     console.warn('STORE FCM SUCCESS!')
   } catch (err: any) {
-    console.error('Failed to store FCM', sipAccount, err)
+    console.error('🔴 Failed to store FCM', sipAccount, err)
   }
 }
 
@@ -113,18 +113,16 @@ export const handleChangeStatus =
             if (res.success) {
               resolve()
             } else {
-              console.error(' 3. Change Status: FAILED ')
-              console.error(res.message)
+              console.error('🔴 Change Status: FAILED ', res.message)
               reject(res.message)
             }
           })
           .catch(error => {
-            console.error(' 3. Change Status: FAILED ')
-            console.error(error)
+            console.error('🔴 Change Status: FAILED ', error)
             reject(error)
           })
       } catch (error) {
-        console.error(' 3. Change Status: FAILED ')
+        console.error('🔴 Change Status: FAILED ', error)
         reject(error)
       }
     })

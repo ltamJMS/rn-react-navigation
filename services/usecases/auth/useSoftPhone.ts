@@ -36,10 +36,6 @@ export const useSoftPhone = () => {
   const [agentLoginStatus, setAgentLoginStatus] =
     useRecoilState(agentLoginState)
   const logout = useLogout()
-  useEffect(() => {
-    if (!currentCall) return
-    console.log('=====> CURRENT CALL: ', currentCall)
-  }, [currentCall])
 
   const auth = useRecoilValue(authState)
 
@@ -58,22 +54,14 @@ export const useSoftPhone = () => {
     return softphone
   }, [sipAccountData])
 
-  useEffect(() => {
-    if (!softPhone) return
-    const sessionMap = softPhone?.getCallSessionMap()
-    console.log('=====> SESSION MAP: ', sessionMap)
-  }, [softPhone])
-
   const handleLogin = async (
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    console.log('=====> CLICK LOGIN ')
-
     try {
       const fcmToken = await messaging().getToken()
-      console.log('=====> FCM TOKEN: ', fcmToken)
+      console.log('🍀 FCM TOKEN', fcmToken)
     } catch (error) {
-      console.error('Error getting FCM token', error)
+      console.error('🔴 Error getting FCM token', error)
     }
     setLoading(true)
     if (!softPhone || !auth) {
@@ -92,7 +80,6 @@ export const useSoftPhone = () => {
       )
       if (response.success) {
         const dataAgent = await getAgents(auth.customerID, auth.username)
-        console.log('=====> KKKKKKKKKKKKKKKK dataAgent: ', dataAgent)
         const status = 0
         await handleChangeStatus(status, auth, dataAgent)()
         await saveTokenToFirestore(
@@ -106,7 +93,7 @@ export const useSoftPhone = () => {
         setLoading(false)
       }
     } catch (error) {
-      console.error('Login error', error)
+      console.error('🔴 Login error', error)
       setLoading(false)
     }
   }
@@ -114,7 +101,6 @@ export const useSoftPhone = () => {
   const handleCall = useCallback(
     async (phoneNumber: string) => {
       try {
-        console.log('=====> CLICK CALL: ', phoneNumber)
         if (!softPhone || !auth || !phoneNumber) return
         const callSession: RTCSession = await softPhone.call(phoneNumber)
 
@@ -129,7 +115,7 @@ export const useSoftPhone = () => {
 
         setCurrentCall(outgoingCall)
       } catch (error) {
-        console.error('Call error', error)
+        console.error('🔴 Call error', error)
       }
     },
     [softPhone, auth, setCurrentCall]
@@ -138,7 +124,6 @@ export const useSoftPhone = () => {
   const handleAnswer = useCallback(
     async (sessionId: any) => {
       if (!softPhone) return
-      console.log('Answer the call')
       setIncomingShow(false)
       await softPhone.answer(sessionId)
     },
@@ -147,14 +132,12 @@ export const useSoftPhone = () => {
 
   const handleHold = useCallback(
     async (sessionId: any) => {
-      console.log('Request to hold sessionId:', sessionId)
-
       if (!softPhone) return
 
       try {
         await softPhone.hold(sessionId)
       } catch (e) {
-        console.log('hold failed', e)
+        console.log('🔴 hold failed', e)
       }
     },
     [softPhone]
@@ -162,12 +145,11 @@ export const useSoftPhone = () => {
 
   const handleUnHold = useCallback(
     async (sessionId: any) => {
-      console.log('Request to unhold sessionId: ', sessionId)
       if (!softPhone) return
       try {
         await softPhone.unhold(sessionId)
       } catch (e) {
-        console.log('unhold fail.', e)
+        console.log('🔴 unhold fail.', e)
       }
     },
     [softPhone]
@@ -175,12 +157,11 @@ export const useSoftPhone = () => {
 
   const handleTerminate = useCallback(
     async (sessionId: any) => {
-      console.log('Request to terminate sessionId: ', sessionId)
       if (!softPhone) return
       try {
         await softPhone.terminate(sessionId)
       } catch (e) {
-        console.log('terminate fail', e)
+        console.log('🔴 terminate fail', e)
       }
     },
     [softPhone]
@@ -188,15 +169,12 @@ export const useSoftPhone = () => {
 
   const handleRefer = useCallback(
     async (holdSessionId: any, currentSessionId: any) => {
-      console.log(
-        `Request to refer. current session ${currentSessionId}. hold session ${holdSessionId}`
-      )
       if (!softPhone) return
 
       try {
         await softPhone.refer(holdSessionId, currentSessionId)
       } catch (e) {
-        console.log('refer fail', e)
+        console.log('🔴 refer fail', e)
       }
     },
     [softPhone]
@@ -245,18 +223,14 @@ export const useSoftPhone = () => {
   }, [agentLoginStatus, logout, sipAccountData, softPhone])
 
   useEffect(() => {
-    console.log('=====> useEffect listen call', softPhone)
-
     if (!softPhone || !auth) return
     try {
       const { eventSFEmitter } = softPhone
-      console.log('=====> eventSFEmitter', eventSFEmitter)
 
       eventSFEmitter.on(
         'listenCall',
         (payload: CallEventEmitterPayload<any>) => {
           const { event, sessionId, data } = payload
-          console.log('=====> on listenCall', event, sessionId)
           let currSession
           let holdSession
           // let errCode: number | undefined;
@@ -265,7 +239,7 @@ export const useSoftPhone = () => {
 
           switch (event) {
             case 'progress': {
-              console.log('=====> on listenCall >> progress', event)
+              console.log('🌸 handle emitter case progress')
 
               if (!softPhone.isSessionExisted(sessionId)) return
               setCurrentCall((currVal: SoftPhoneCallInfo | undefined) => {
@@ -276,7 +250,8 @@ export const useSoftPhone = () => {
               break
             }
             case 'confirmed': {
-              console.log('=====> on listenCall >> confirmed', event)
+              console.log('🌸 handle emitter case confirmed')
+
               if (!softPhone.isSessionExisted(sessionId)) return
               setCurrentCall((currVal: SoftPhoneCallInfo | undefined) => {
                 if (!currVal) return
@@ -290,12 +265,13 @@ export const useSoftPhone = () => {
               break
             }
             case 'accepted': {
+              console.log('🌸 handle emitter case accepted')
               // TODO
               break
             }
             case 'ended':
             case 'failed': {
-              console.log('=====> on listenCall >> failed', event)
+              console.log('🌸 handle emitter case ended/failed')
 
               // remove session from map
               if (!softPhone.isSessionExisted(sessionId)) return
@@ -318,7 +294,7 @@ export const useSoftPhone = () => {
               break
             }
             case 'incoming': {
-              console.log('=====> on listenCall >> incoming', event)
+              console.log('🌸 handle emitter case incoming')
               if (!softPhone.isSessionExisted(sessionId)) return
               // TODO: if softphone busy then terminate incoming session, else listen session
 
@@ -354,29 +330,35 @@ export const useSoftPhone = () => {
               break
             }
             case 'hold':
+              console.log('🌸 handle emitter case hold')
               if (!softPhone.isSessionExisted(sessionId)) return
               setHoldingCall(currentCall)
               setCurrentCall(undefined)
               break
             case 'unhold':
+              console.log('🌸 handle emitter case unhold')
               if (!softPhone.isSessionExisted(sessionId)) return
               setCurrentCall(holdingCall)
               setHoldingCall(undefined)
               break
             case 'refer':
+              console.log('🌸 handle emitter case refer')
               if (!softPhone.isSessionExisted(sessionId)) return
               // handle when receive a refer from another call
               break
             case 'send-refer-success':
+              console.log('🌸 handle emitter case send-refer-success')
               if (!softPhone.isSessionExisted(sessionId)) return
               setHoldingCall(undefined)
               setCurrentCall(undefined)
               break
             case 'send-refer-failed':
+              console.log('🌸 handle emitter case send-refer-failed')
               if (!softPhone.isSessionExisted(sessionId)) return
               // handle when send a refer fail
               break
             case 'getusermediafailed':
+              console.log('🌸 handle emitter case getusermediafailed')
               if (!softPhone.isSessionExisted(sessionId)) return
               break
             default:
@@ -389,7 +371,7 @@ export const useSoftPhone = () => {
         softPhone.eventSFEmitter.removeAllListeners('listenCall')
       }
     } catch (e) {
-      console.log('listen call error', e)
+      console.log('🔴 listen call error', e)
     }
   }, [
     softPhone,

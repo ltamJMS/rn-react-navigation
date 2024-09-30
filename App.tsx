@@ -1,17 +1,18 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
-import { LogBox, Text, View } from 'react-native'
+import { LogBox } from 'react-native'
 import { NativeBaseProvider } from 'native-base'
 import Toast from 'react-native-toast-message'
 import Navigation from './navigation'
 import BootSplash from 'react-native-bootsplash'
 import messaging from '@react-native-firebase/messaging'
+import { InfinitalkSIP } from './services/usecases/auth/InfinitalkSIP'
 
 LogBox.ignoreAllLogs()
 
 const App = () => {
   useEffect(() => {
-    console.log('=====> APP RUNNING ...')
+    console.log('🍀 APP RUNNING ... ')
 
     const a = async () => await BootSplash.hide({ fade: true })
 
@@ -23,7 +24,7 @@ const App = () => {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL
 
       if (enabled) {
-        console.warn('Permission status:', authStatus)
+        console.warn('🍀 Permission status:', authStatus)
       }
     }
 

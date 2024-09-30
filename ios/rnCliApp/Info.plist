@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>rnCliApp</string>
+	<string>Softphone</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -31,29 +31,16 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>アプリはデバイスに接続するためにBluetoothへのアクセス権が必要です。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Ứng dụng cần quyền truy cập microphone để ghi âm.</string>
-	<key>NSPhotoLibraryUsageDescription</key>  
-	<string>Ứng dụng cần quyền truy cập thư viện ảnh.</string>
-	<key>NSCameraUsageDescription</key>  
-	<string>Ứng dụng cần quyền truy cập camera để chụp ảnh và quay video.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>  
-	<string>Ứng dụng cần quyền truy cập Bluetooth để kết nối thiết bị.</string>
-	<key>UIBackgroundModes</key>  
-	<array>  
-		<string>fetch</string>  
-		<string>processing</string>  
-		<string>voip</string>  
+	<string>アプリは音声を録音するためにマイクへのアクセス権が必要です。</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
-	<key>UIBackgroundModes</key>  
-	<array>  
-		<string>audio</string>  
-		<string>voip</string>  
-	</array>
-	<key>UIBackgroundModes</key>  
-	<array>  
-		<string>remote-notification</string>  
-	</array> 
 	<key>UIAppFonts</key>  
 	<array>  
 		<string>AntDesign.ttf</string>  
@@ -72,9 +59,7 @@
 		<string>Octicons.ttf</string>  
 		<string>Zocial.ttf</string>  
 		<string>Fontisto.ttf</string>  
-	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	</array>  
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>
