@@ -42,9 +42,6 @@ export default function HomeScreen() {
   const [currentCall] = useRecoilState(currentCallState)
   const [holdingCall] = useRecoilState(holdingCallState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
-  const handleDecline = () => {
-    setIsShowIncoming(false)
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -97,7 +94,9 @@ export default function HomeScreen() {
                         <IncomingCallDialog
                           visible={isShowIncoming}
                           onAnswer={() => handleAnswer(currentCall?.sessionId)}
-                          onDecline={handleDecline}
+                          onDecline={() =>
+                            handleTerminate(currentCall?.sessionId)
+                          }
                           phoneNumber={currentCall?.src.num || 'anonymous'}
                           onRequestClose={() => setIsShowIncoming(false)}
                         />

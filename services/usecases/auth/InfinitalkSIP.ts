@@ -142,6 +142,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
       register: true,
       contact_uri: `sip:${account}@${domain};transport=ws`,
       session_timers: false,
+      session_timers_force_refresher: true,
       user_agent: 'InfiniTalk ClientApp Ver1.23.0'
     }
     this.ua = new UA({ ...uaOptionBase, ...this.config.uaOptions })
@@ -155,6 +156,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
   register() {
     this.ua.start()
+    this.isNeedToReInvite = false
   }
 
   unregister(options?: any) {
@@ -451,12 +453,11 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
     })
 
     this.ua.on('registered', () => {
-      if (this.isNeedToReInvite) {
-        const session = this.getCurrentSession()
+      const payload: UAEventEmitterPayload<any> = { event: 'registered' }
+      this.eventSFEmitter.emit('listenUA', payload)
+      const session = this.getCurrentSession()
+      if (session) {
         this.handleReInvite(session)
-      } else {
-        const payload: UAEventEmitterPayload<any> = { event: 'registered' }
-        this.eventSFEmitter.emit('listenUA', payload)
       }
     })
 

@@ -57,12 +57,12 @@ export const useSoftPhone = () => {
   const handleLogin = async (
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    try {
-      const fcmToken = await messaging().getToken()
-      console.log('🍀 FCM TOKEN', fcmToken)
-    } catch (error) {
-      console.error('🔴 Error getting FCM token', error)
-    }
+    // try {
+    //   const fcmToken = await messaging().getToken()
+    //   console.log('🍀 FCM TOKEN', fcmToken)
+    // } catch (error) {
+    //   console.error('🔴 Error getting FCM token', error)
+    // }
     setLoading(true)
     if (!softPhone || !auth) {
       setLoading(false)
@@ -159,12 +159,13 @@ export const useSoftPhone = () => {
     async (sessionId: any) => {
       if (!softPhone) return
       try {
+        setIncomingShow(false)
         await softPhone.terminate(sessionId)
       } catch (e) {
         console.log('🔴 terminate fail', e)
       }
     },
-    [softPhone]
+    [setIncomingShow, softPhone]
   )
 
   const handleRefer = useCallback(
@@ -195,7 +196,8 @@ export const useSoftPhone = () => {
           {
             text: 'OK',
             onPress: async () => {
-              softPhone.unregister()
+              softPhone.unregister({ all: true })
+              await new Promise(resolve => setTimeout(resolve, 2000))
               const resLogoutAgent = await logoutAgent(
                 sipAccount,
                 agent.agentAccount,

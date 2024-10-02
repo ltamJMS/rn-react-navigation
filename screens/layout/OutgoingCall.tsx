@@ -45,7 +45,7 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ handleCall }) => {
           style={styles.input}
           placeholder="電話番号 ..."
           placeholderTextColor="#30363b"
-          defaultValue={'09019747098'} // Set initial value from ref
+          defaultValue={''} // Set initial value from ref
           onChangeText={handlePhoneNumberChange}
           keyboardType="phone-pad"
         />

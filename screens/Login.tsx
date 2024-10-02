@@ -157,14 +157,14 @@ export default function Login() {
             })
           })
           NavigationService.navigate(SCREENS.HOME)
-          // RenderTabNavigation();
         } catch (err) {
           console.error('🔴 AUTH ERROR', err)
         }
       }
       applyTokenAsync()
     }
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authRes])
 
   return (
     <>
