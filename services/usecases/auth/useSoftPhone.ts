@@ -69,7 +69,6 @@ export const useSoftPhone = () => {
       return
     }
     try {
-      softPhone.register()
       const { sipAccount, sipPassword, domain, agent } = sipAccountData
       const response = await loginAgent(
         sipAccount,
@@ -81,7 +80,16 @@ export const useSoftPhone = () => {
       if (response.success) {
         const dataAgent = await getAgents(auth.customerID, auth.username)
         const status = 0
-        await handleChangeStatus(status, auth, dataAgent)()
+        const isChangesStatusSuccess = await handleChangeStatus(
+          status,
+          auth,
+          dataAgent
+        )()
+        console.log('🍀 isChangesStatusSuccess', isChangesStatusSuccess)
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        if (isChangesStatusSuccess) {
+          softPhone.register()
+        }
         await saveTokenToFirestore(
           auth?.customerID || '951a',
           sipAccount,

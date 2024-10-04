@@ -125,7 +125,6 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   ua: UA
   eventSFEmitter: NodeJS.EventEmitter
   callSessionMap: Record<string, CallSession> = {}
-  private currentSession: RTCSession | null = null
   isNeedToReInvite = false
 
   constructor(sip: SipConfig, config?: InfinitalkSIPConfig) {

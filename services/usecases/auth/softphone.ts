@@ -92,7 +92,7 @@ export const getAgents = async (
 export const handleChangeStatus =
   (status: number, auth: any, dataAgent: AgentStatusMap) =>
   async (): Promise<any> => {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       if (status === undefined || status === null) {
         reject('Invalid status')
       }
@@ -111,19 +111,19 @@ export const handleChangeStatus =
         )
           .then(res => {
             if (res.success) {
-              resolve()
+              return resolve(true)
             } else {
               console.error('🔴 Change Status: FAILED ', res.message)
-              reject(res.message)
+              return reject(false)
             }
           })
           .catch(error => {
             console.error('🔴 Change Status: FAILED ', error)
-            reject(error)
+            return reject(false)
           })
       } catch (error) {
         console.error('🔴 Change Status: FAILED ', error)
-        reject(error)
+        return reject(false)
       }
     })
   }
