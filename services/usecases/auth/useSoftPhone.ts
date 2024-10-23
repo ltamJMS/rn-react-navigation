@@ -26,7 +26,6 @@ import {
   SoftPhoneCallInfo,
   SoftPhoneCallState
 } from '../../models/softPhone'
-import messaging from '@react-native-firebase/messaging'
 
 export const useSoftPhone = () => {
   const sipAccountData = useRecoilValue(sipAccountState)
@@ -57,12 +56,6 @@ export const useSoftPhone = () => {
   const handleLogin = async (
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    // try {
-    //   const fcmToken = await messaging().getToken()
-    //   console.log('🍀 FCM TOKEN', fcmToken)
-    // } catch (error) {
-    //   console.error('🔴 Error getting FCM token', error)
-    // }
     setLoading(true)
     if (!softPhone || !auth) {
       setLoading(false)
@@ -90,11 +83,7 @@ export const useSoftPhone = () => {
         if (isChangesStatusSuccess) {
           softPhone.register()
         }
-        await saveTokenToFirestore(
-          auth?.customerID || '951a',
-          sipAccount,
-          'fcmToken'
-        )
+        await saveTokenToFirestore(auth?.customerID || '951a', sipAccount)
         setAgentLoginStatus(true)
         setLoading(false)
       } else {

@@ -6,7 +6,6 @@ import Toast from 'react-native-toast-message'
 import Navigation from './navigation'
 import BootSplash from 'react-native-bootsplash'
 import messaging from '@react-native-firebase/messaging'
-import { InfinitalkSIP } from './services/usecases/auth/InfinitalkSIP'
 
 LogBox.ignoreAllLogs()
 

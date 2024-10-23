@@ -9,9 +9,7 @@
 {
   self.moduleName = @"rnCliApp";
   // Initialize Firebase  
-  if ([FIRApp defaultApp] == nil) {  
     [FIRApp configure];  
-  }
 
   // Register for remote notifications  
   if (@available(iOS 10.0, *)) {

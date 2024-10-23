@@ -6,16 +6,18 @@ import AgentStatus, {
   IncomingUserInfo
 } from '../../models/softPhone'
 import { changeAgentStatus } from '../../agentStatus'
+import messaging from '@react-native-firebase/messaging'
 
 export const saveTokenToFirestore = async (
   customerID: string,
-  sipAccount: string,
-  fcmToken: string
+  sipAccount: string
 ) => {
-  if (!customerID || !sipAccount || !fcmToken) {
+  if (!customerID || !sipAccount) {
     return
   }
   try {
+    const fcmToken = await messaging().getToken()
+    console.log('🍀 FCM TOKEN', fcmToken)
     const deviceRef = firestore()
       .collection('customers')
       .doc(customerID)

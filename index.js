@@ -35,10 +35,15 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
         visibility: AndroidVisibility.PUBLIC,
         category: AndroidCategory.CALL,
         vibrationPattern: [300, 500],
-        loopSound: true,
         pressAction: {
           id: 'default'
         }
+      },
+      ios: {
+        interruptionLevel: 'critical',
+        lockScreen: 1,
+        notificationCenter: 1,
+        sound: 'phoneringtone.wav'
       }
     })
   }
