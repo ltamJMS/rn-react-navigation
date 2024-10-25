@@ -15,8 +15,8 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BF2D9A6DE7B94413A9C4A1EB /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CB6AE3280814EF09C2D8120 /* BootSplash.storyboard */; };
 		CA4DD9BAA3F7D6A906C8336C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3B65B9777563C4E0D2857D71 /* PrivacyInfo.xcprivacy */; };
-		CE61CDEE2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */; };
-		CE61CDEF2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */; };
+		CE61CDEE2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */; settings = {ASSET_TAGS = (New, ); }; };
+		CE61CDEF2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */; settings = {ASSET_TAGS = (New, ); }; };
 		CECC37BE2C9A795800651BC1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CECC37BD2C9A795800651BC1 /* GoogleService-Info.plist */; };
 		D9F5037A141CD942D155DC66 /* Pods_rnCliApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ACBBCE35330A74750D50E /* Pods_rnCliApp.framework */; };
 		E2FE4AD3462D4CB2AF4CD29D /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E39109A379E4E3AB76E2770 /* Colors.xcassets */; };
@@ -338,6 +338,8 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-rnCliApp/Pods-rnCliApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-rnCliApp/Pods-rnCliApp-resources-${CONFIGURATION}-output-files.xcfilelist",
@@ -516,7 +518,7 @@
 			baseConfigurationReference = 19FDDBB10013A04F3546643C /* Pods-rnCliApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = rnCliApp/rnCliApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -532,7 +534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -552,7 +554,7 @@
 			baseConfigurationReference = D6C91FAF00F1B3AE2DB135B9 /* Pods-rnCliApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = rnCliApp/rnCliApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -567,7 +569,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
