@@ -49,8 +49,6 @@ export default function Login() {
   }, [])
 
   const handleLogin = useCallback(async () => {
-    console.log('🍀 Click Login', username, password)
-
     if (password.length < 1 || username.length < 1) {
       Toast.show({
         type: 'error',

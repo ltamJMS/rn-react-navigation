@@ -43,7 +43,7 @@ const useLogout = () => {
       delete axios.defaults.headers.common['Authorization']
       await Promise.all(asyncJob)
     } catch (err) {
-      console.error('🔴 logout error', err)
+      console.error('🔴 LOGOUT ERROR', err)
     } finally {
       NavigationService.navigate(SCREENS.LOGIN)
     }

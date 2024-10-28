@@ -17,7 +17,6 @@ export const saveTokenToFirestore = async (
   }
   try {
     const fcmToken = await messaging().getToken()
-    console.log('🍀 FCM TOKEN', fcmToken)
     const deviceRef = firestore()
       .collection('customers')
       .doc(customerID)
@@ -27,9 +26,9 @@ export const saveTokenToFirestore = async (
     await deviceRef.set({
       fcmTokenSF: fcmToken
     })
-    console.warn('STORE FCM SUCCESS!')
+    console.log('🌸 FCM TOKEN', fcmToken)
   } catch (err: any) {
-    console.error('🔴 Failed to store FCM', sipAccount, err)
+    console.error('🔴 STORE FCM TOKEN FAILED', sipAccount, err)
   }
 }
 
@@ -115,16 +114,16 @@ export const handleChangeStatus =
             if (res.success) {
               return resolve(true)
             } else {
-              console.error('🔴 Change Status: FAILED ', res.message)
+              console.error('🔴 CHANGE STATUS ERROR', res.message)
               return reject(false)
             }
           })
           .catch(error => {
-            console.error('🔴 Change Status: FAILED ', error)
+            console.error('🔴 CHANGE STATUS ERROR ', error)
             return reject(false)
           })
       } catch (error) {
-        console.error('🔴 Change Status: FAILED ', error)
+        console.error('🔴 CHANGE STATUS ERROR ', error)
         return reject(false)
       }
     })

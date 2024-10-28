@@ -3173,6 +3173,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/storage@npm:18.1.0":
+  version: 18.1.0
+  resolution: "@react-native-firebase/storage@npm:18.1.0"
+  peerDependencies:
+    "@react-native-firebase/app": 18.1.0
+  checksum: 65a6a04931b2d2b522f8727b183a96c96978e9d2caf91448a7368a07d8a7d42e0907bc0e87ad1d77a6f21a7e6833e6e818cdfb6ea8fdff84b7fff407edde326b
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.74.87":
   version: 0.74.87
   resolution: "@react-native/assets-registry@npm:0.74.87"
@@ -5050,6 +5059,13 @@ __metadata:
     b4a: ^1.6.6
     streamx: ^2.20.0
   checksum: 17de9dbd5a6d70863b6e55f0acdfe1cb5d2b05f22d87e79986372cc796095eb4882a868ee6ba3dc543243085d27f618b4b81ef2bf384bc1c690dd3a557b6e30d
+  languageName: node
+  linkType: hard
+
+"base-64@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "base-64@npm:0.1.0"
+  checksum: 5a42938f82372ab5392cbacc85a5a78115cbbd9dbef9f7540fa47d78763a3a8bd7d598475f0d92341f66285afd377509851a9bb5c67bbecb89686e9255d5b3eb
   languageName: node
   linkType: hard
 
@@ -10847,6 +10863,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-fs@npm:^2.20.0":
+  version: 2.20.0
+  resolution: "react-native-fs@npm:2.20.0"
+  dependencies:
+    base-64: ^0.1.0
+    utf8: ^3.0.0
+  peerDependencies:
+    react-native: "*"
+    react-native-windows: "*"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 0be9bb9a5c13b501d0a3006efc3aa5c0b5b211456ee04718297f4e522532f3527f1daa220bd67d3b82d819ed8fdab8f64b7d6e0d7b768c1fd1d8ec9122d94316
+  languageName: node
+  linkType: hard
+
 "react-native-gesture-handler@npm:2.10.2":
   version: 2.10.2
   resolution: "react-native-gesture-handler@npm:2.10.2"
@@ -11463,6 +11495,7 @@ __metadata:
     "@react-native-firebase/database": 18.1.0
     "@react-native-firebase/firestore": 18.1.0
     "@react-native-firebase/messaging": 18.1.0
+    "@react-native-firebase/storage": 18.1.0
     "@react-native/babel-preset": 0.74.87
     "@react-native/eslint-config": 0.74.87
     "@react-native/metro-config": 0.74.87
@@ -11494,6 +11527,7 @@ __metadata:
     react-native: 0.74.5
     react-native-bootsplash: ^6.1.1
     react-native-dotenv: ^3.4.11
+    react-native-fs: ^2.20.0
     react-native-gesture-handler: 2.10.2
     react-native-localization: 2.3.1
     react-native-network-logger: ^1.16.1
@@ -12894,6 +12928,13 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: fe07c071c4da3645f112c38c0e57beb479a8838616ff4e92598256ecce527f2888c08febc7f9b2f0ce2f0e18540ba3cde41eb2035e4fafcb4f52955037098a81
+  languageName: node
+  linkType: hard
+
+"utf8@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "utf8@npm:3.0.0"
+  checksum: cb89a69ad9ab393e3eae9b25305b3ff08bebca9adc839191a34f90777eb2942f86a96369d2839925fea58f8f722f7e27031d697f10f5f39690f8c5047303e62d
   languageName: node
   linkType: hard
 

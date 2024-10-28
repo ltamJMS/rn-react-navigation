@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 // import Text from '../shared/components/text-wrapper/TextWrapper'
 import JsSIP from 'jssip'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
   agentLoginState,
@@ -24,6 +24,9 @@ import { useSoftPhone } from '../services/usecases/auth/useSoftPhone'
 import IncomingCallDialog from './layout/IncomingCallDialog'
 import OutgoingCall from './layout/OutgoingCall'
 import { Button } from 'react-native-paper'
+import { uploadLogFile } from '../services/store/logger'
+import { authState } from '../services/store/auth'
+
 JsSIP.debug.enable('JsSIP:*')
 
 export default function HomeScreen() {
@@ -42,6 +45,7 @@ export default function HomeScreen() {
   const [currentCall] = useRecoilState(currentCallState)
   const [holdingCall] = useRecoilState(holdingCallState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const auth = useRecoilValue(authState)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,7 +60,6 @@ export default function HomeScreen() {
           ) : (
             <TouchableWithoutFeedback
               onPress={() => {
-                console.log('Pressed!!!!!!!44')
                 Keyboard.dismiss()
               }}
               accessible={false}
@@ -182,14 +185,24 @@ export default function HomeScreen() {
                     )}
                   </View>
                 </View>
-                <Button
-                  icon="power-standby"
-                  mode="contained"
-                  style={{ backgroundColor: '#333942', marginBottom: 20 }}
-                  onPress={() => handleLogout()}
-                >
-                  Logout
-                </Button>
+                <View>
+                  <Button
+                    icon="arrow-up"
+                    mode="contained"
+                    style={{ backgroundColor: '#333942', marginBottom: 20 }}
+                    onPress={() => uploadLogFile(auth?.customerID || '099a1')}
+                  >
+                    UPLOAD LOG FILE
+                  </Button>
+                  <Button
+                    icon="power-standby"
+                    mode="contained"
+                    style={{ backgroundColor: '#333942', marginBottom: 20 }}
+                    onPress={() => handleLogout()}
+                  >
+                    Logout
+                  </Button>
+                </View>
               </View>
             </TouchableWithoutFeedback>
           )}

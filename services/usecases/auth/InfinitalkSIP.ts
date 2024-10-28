@@ -117,7 +117,22 @@ export interface InfinitalkSipInterface {
   ): Promise<boolean>
   setMute(muted: boolean, sessionId: string, options?: any): Promise<boolean>
   isSessionExisted(sessionId: string): boolean
+  getCurrentNetwork(): void
 }
+
+export const sipDebugLogEmitter = new EventEmitter()
+let jssipLog: string[] = []
+// Enable JsSIP debug logs
+JsSIP.debug.enable('JsSIP:*')
+
+// Override console.debug to capture JsSIP debug logs
+;(function () {
+  const originalDebug = console.debug
+  console.debug = function (...args) {
+    jssipLog.push(args.join(' '))
+    originalDebug.apply(console, args)
+  }
+})()
 
 export class InfinitalkSIP implements InfinitalkSipInterface {
   sip: SipConfig
@@ -274,7 +289,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
     return new Promise((resolve, reject) => {
       if (sessionData) {
-        console.log('🔴 terminate session:', sessionData.session.status)
+        console.log('🔴 TERMINATE SESSION', sessionData.session.status)
         const JSSIP_TERMINATED_CODE = 8
         if (sessionData.session.status !== JSSIP_TERMINATED_CODE) {
           sessionData.session.terminate()
@@ -289,7 +304,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
   // TODO
   clearSession(callSessionId: string) {
-    console.log('🔴 clear session')
+    console.log('🔴 CLEAR SESSION')
 
     // TODO
 
@@ -347,7 +362,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
           reject(false)
         }
       } catch (e) {
-        console.log('🔴 error', e)
+        console.log('🔴 ERROR', e)
         reject(false)
       }
     })
@@ -369,7 +384,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         listener(true)
       } catch (error) {
         listener(false)
-        console.log('🔴 Send dtmf failed.', error)
+        console.log('🔴 DTMF ERROR', error)
       }
     }
   }
@@ -414,7 +429,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
           reject(false)
         }
       } catch (e) {
-        console.log('🔴 error', e)
+        console.log('🔴 ERROR', e)
         reject(false)
       }
     })
@@ -473,7 +488,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
       // If incoming call
       if (session.direction === 'incoming') {
-        console.log('🍄 newRTCSession: incoming')
+        console.log('🌸 UA EVENT - newRTCSession - INCOMING')
         this.callSessionMap[session.id] = {
           session,
           type: CallSessionType.INCOMING_WAITING
@@ -505,7 +520,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         }
 
         session.on('progress', (data: IncomingEvent | OutgoingEvent) => {
-          console.log('🍄 session on progress', sessionId)
+          console.log('🌸 CALL EVENT - progress', sessionId)
           const payload: CallEventEmitterPayload<
             IncomingEvent | OutgoingEvent
           > = {
@@ -531,7 +546,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('confirmed', (data: IncomingEvent | OutgoingEvent) => {
-          console.log('🍄 session on confirmed', sessionId)
+          console.log('🌸 CALL EVENT - confirmed', sessionId)
           const payload: CallEventEmitterPayload<
             IncomingEvent | OutgoingEvent
           > = {
@@ -543,7 +558,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('accepted', (data: IncomingEvent | OutgoingEvent) => {
-          console.log('🍄 session on accepted', sessionId)
+          console.log('🌸 CALL EVENT - accepted', sessionId)
           const payload: CallEventEmitterPayload<
             IncomingEvent | OutgoingEvent
           > = {
@@ -555,7 +570,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('ended', (data: EndEvent) => {
-          console.log('🍄 session on ended', sessionId)
+          console.log('🌸 CALL EVENT - ended', sessionId)
           const payload: CallEventEmitterPayload<EndEvent> = {
             event: 'ended',
             sessionId,
@@ -568,7 +583,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('failed', (data: EndEvent) => {
-          console.log('🍄 session on failed', sessionId)
+          console.log('🌸 CALL EVENT - failed', sessionId)
           const payload: CallEventEmitterPayload<EndEvent> = {
             event: 'failed',
             sessionId,
@@ -580,7 +595,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('hold', (data: HoldEvent) => {
-          console.log('🍄 session on hold', sessionId, data)
+          console.log('🌸 CALL EVENT - hold', sessionId)
           const payload: CallEventEmitterPayload<HoldEvent> = {
             event: 'hold',
             sessionId,
@@ -590,7 +605,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('unhold', (data: HoldEvent) => {
-          console.log('🍄 session on unhold', sessionId, data)
+          console.log('🌸 CALL EVENT - unhold', sessionId, data)
           const payload: CallEventEmitterPayload<HoldEvent> = {
             event: 'unhold',
             sessionId,
@@ -600,7 +615,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('refer', (data: ReferEvent) => {
-          console.log('🍄 session on refer', sessionId, data)
+          console.log('🌸 CALL EVENT - refer', sessionId, data)
           const payload: CallEventEmitterPayload<ReferEvent> = {
             event: 'refer',
             sessionId,
@@ -610,7 +625,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('replaces', (data: ReferEvent) => {
-          console.log('🍄 session on replaces', sessionId, data)
+          console.log('🌸 CALL EVENT - replaces', sessionId, data)
           const payload: CallEventEmitterPayload<ReferEvent> = {
             event: 'replaces',
             sessionId,
@@ -620,7 +635,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         session.on('getusermediafailed', (data: any) => {
-          console.log('🍄 session on getusermediafailed', sessionId, data)
+          console.log('🌸 CALL EVENT - getusermediafailed', sessionId, data)
           const payload: CallEventEmitterPayload<any> = {
             event: 'getusermediafailed',
             sessionId,
@@ -630,7 +645,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         })
 
         return () => {
-          console.log('🍄 Remove listener for sessionId ', sessionId)
+          console.log('🌸 REMOVE LISTENER FOR SESSION', sessionId)
           session.removeAllListeners('progress')
           session.removeAllListeners('confirmed')
           session.removeAllListeners('ended')
@@ -645,12 +660,12 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
       }
 
       return () => {
-        console.log('🍄 Session data not exist. sessionId ', sessionId)
+        console.log('🔴 SESSION NOT EXIST', sessionId)
       }
     } catch (error) {
-      console.error('🍄 Error in listenCall:', error)
+      console.error('🔴 LISTEN CALL ERROR', error)
       return () => {
-        console.log('🍄 Error in listenCall. ', sessionId)
+        console.log('🔴 LISTEN CALL ERROR WITH SESSION_ID', sessionId)
       }
     }
   }
@@ -733,12 +748,11 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   }
 
   handleReInvite(session: RTCSession | undefined) {
-    // console.log('🔴 check session', session.isReadyToReOffer())
     if (!session) {
-      console.error('🔴 Cannot re-INVITE, session is null')
+      console.error('🔴 CAN NOT RE-INVITE, SESSION NULL')
       return
     }
-    console.log('🌼 Start re-INVITE !')
+    console.log('🌸 START RE-INVITE !')
     session.renegotiate(
       {
         useUpdate: false,
@@ -749,9 +763,9 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
       },
       (error: any) => {
         if (error) {
-          console.error('🔴 Re-INVITE failed: ', error)
+          console.error('🔴 RE-INVITE ERROR', error)
         } else {
-          console.log('🌼 Re-INVITE succeeded')
+          console.log('🌸 RE-INVITE SUCCESS')
           this.isNeedToReInvite = false
         }
       }
@@ -760,14 +774,24 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
   setupNetInfoListener() {
     NetInfo.addEventListener((state: any) => {
-      console.log('🌼 Connection type: ', state.type)
-      console.log('🌼 Is connected?: ', state.isConnected)
-      console.log('🌼 Details: ', state.details)
+      const networkLog = {
+        network: state.type,
+        isConnected: state.isConnected,
+        ip: state.details.ipAddress
+      }
+      console.log('🍀 NETWORK', networkLog)
       this.isNeedToReInvite = true
-      // const session = this.getCurrentSession()
-      // if (session) {
-      //   this.handleReInvite(session)
-      // }
+    })
+  }
+
+  getCurrentNetwork() {
+    NetInfo.fetch().then((state: any) => {
+      const networkLog = {
+        network: state.type,
+        isConnected: state.isConnected,
+        ip: state.details.ipAddress
+      }
+      console.log('🍀 NETWORK', networkLog)
     })
   }
 }

@@ -150,7 +150,7 @@ export const changeAgentStatus = async (
       message: 'SUCCESS'
     }
   } catch (err: any) {
-    console.error('🔴 CHANGE STATUS FAILED', err)
+    console.error('🔴 CHANGE STATUS ERROR', err)
     const httpError = new HTTPError(err)
     let messageErr = httpError.getMessage()
     if (httpError.getCode() === 401)

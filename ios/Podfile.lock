@@ -654,6 +654,9 @@ PODS:
   - Firebase/Messaging (10.11.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 10.11.0)
+  - Firebase/Storage (10.11.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 10.11.0)
   - FirebaseAnalytics (10.11.0):
     - FirebaseAnalytics/AdIdSupport (= 10.11.0)
     - FirebaseCore (~> 10.0)
@@ -679,6 +682,7 @@ PODS:
     - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
+  - FirebaseAuthInterop (10.29.0)
   - FirebaseCore (10.11.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
@@ -717,6 +721,12 @@ PODS:
     - GoogleUtilities/Reachability (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - FirebaseStorage (10.11.0):
+    - FirebaseAppCheckInterop (~> 10.0)
+    - FirebaseAuthInterop (~> 10.0)
+    - FirebaseCore (~> 10.0)
+    - FirebaseCoreExtension (~> 10.0)
+    - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - fmt (9.1.0)
   - glog (0.3.5)
   - GoogleAppMeasurement (10.11.0):
@@ -2035,6 +2045,12 @@ PODS:
     - FirebaseCoreExtension (= 10.11.0)
     - React-Core
     - RNFBApp
+  - RNFBStorage (18.1.0):
+    - Firebase/Storage (= 10.11.0)
+    - React-Core
+    - RNFBApp
+  - RNFS (2.20.0):
+    - React-Core
   - RNGestureHandler (2.10.2):
     - React-Core
   - RNNotifee (7.8.2):
@@ -2226,6 +2242,8 @@ DEPENDENCIES:
   - "RNFBDatabase (from `../node_modules/@react-native-firebase/database`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -2243,6 +2261,7 @@ SPEC REPOS:
     - FirebaseAnalytics
     - FirebaseAppCheckInterop
     - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
@@ -2250,6 +2269,7 @@ SPEC REPOS:
     - FirebaseFirestore
     - FirebaseInstallations
     - FirebaseMessaging
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleUtilities
@@ -2392,6 +2412,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/firestore"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNFBStorage:
+    :path: "../node_modules/@react-native-firebase/storage"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNNotifee:
@@ -2419,6 +2443,7 @@ SPEC CHECKSUMS:
   FirebaseAnalytics: 6c6bf99e8854475bf1fa342028841be8ecd236da
   FirebaseAppCheckInterop: 6a1757cfd4067d8e00fccd14fcc1b8fd78cfac07
   FirebaseAuth: 7aabcb00fbf330db49c207c0d645b8b1b62df0e9
+  FirebaseAuthInterop: 17db81e9b198afb0f95ce48c133825727eed55d3
   FirebaseCore: 62fd4d549f5e3f3bd52b7998721c5fa0557fb355
   FirebaseCoreExtension: cacdad57fdb60e0b86dcbcac058ec78237946759
   FirebaseCoreInternal: df84dd300b561c27d5571684f389bf60b0a5c934
@@ -2426,6 +2451,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 09be82b113fbcb225b9797d2c525ae8886abc7a3
   FirebaseInstallations: 913cf60d0400ebd5d6b63a28b290372ab44590dd
   FirebaseMessaging: 06253e9669434df0a40718fc82a90c78090f4704
+  FirebaseStorage: 8d8f23ca3688c2edb1950bd38e44f82a325ceb6f
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   GoogleAppMeasurement: d3dabccdb336fc0ae44b633c8abaa26559893cd9
@@ -2497,6 +2523,8 @@ SPEC CHECKSUMS:
   RNFBDatabase: 0464920901f4d9d1881a88f1c4ac22c463d6280b
   RNFBFirestore: 2e1bebf2b621348e1ae696309297e1f683eb1178
   RNFBMessaging: 854b0ec4b6813c1f2fc09fac52bc3bfee28f225c
+  RNFBStorage: f9c492a95902ad82f4338ce43fa66e1437c403fe
+  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: f75d81410b40aaa99e71ae8f8bb7a88620c95042
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
   RNReanimated: 45f0fd1250364dffec9aabd4a0959f2956a5e78b

@@ -1,33 +1,40 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
-import { LogBox } from 'react-native'
+import { AppState, AppStateStatus, LogBox } from 'react-native'
 import { NativeBaseProvider } from 'native-base'
 import Toast from 'react-native-toast-message'
 import Navigation from './navigation'
 import BootSplash from 'react-native-bootsplash'
 import messaging from '@react-native-firebase/messaging'
+import './services/store/logger.ts'
 
 LogBox.ignoreAllLogs()
 
 const App = () => {
   useEffect(() => {
-    console.log('🍀 APP RUNNING ... ')
+    // Function to handle state change
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      console.log('🍀 APP STATE ...', nextAppState)
+    }
+
+    // Register event listener
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange
+    )
 
     const a = async () => await BootSplash.hide({ fade: true })
 
     a()
     const requestUserPermission = async () => {
-      const authStatus = await messaging().requestPermission()
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL
-
-      if (enabled) {
-        console.warn('🍀 Permission status:', authStatus)
-      }
+      await messaging().requestPermission()
     }
 
     requestUserPermission()
+    // Cleanup listener on unmount
+    return () => {
+      subscription.remove()
+    }
   }, [])
 
   return (

@@ -17,13 +17,11 @@ const getSnapshotData = async (
     documentRef.onSnapshot((snapshot: any) => {
       if (snapshot.exists) {
         const data = snapshot.data()
-        console.log('🍀 Document data:', data)
-      } else {
-        console.log('🔴 No such document!')
+        console.log('🍀 LINKED_ID', data)
       }
     })
   } catch (error) {
-    console.error('🔴 Error getting document snapshot:', error)
+    console.error('🔴 ERROR GETTING LINKED ID', error)
   }
 }
 
