@@ -1,13 +1,11 @@
-import { AppRegistry, AppState } from 'react-native'
-import RecoilApp from './RecoilRoot'
+import { AppRegistry, Platform } from 'react-native'
+import HeadlessCheck from './RecoilRoot'
 import { name as appName } from './app.json'
-import messaging from '@react-native-firebase/messaging'
-import notifee, {
-  AndroidImportance,
-  AndroidVisibility,
-  AndroidCategory
-} from '@notifee/react-native'
 import firebase from '@react-native-firebase/app'
+import RNCallKeep from 'react-native-callkeep'
+import VoipPushNotification from 'react-native-voip-push-notification'
+import * as NavigationService from 'react-navigation-helpers'
+import { SCREENS } from './shared/constants'
 
 if (!firebase.apps.length) {
   // const firebaseDevConfig = {
@@ -31,49 +29,64 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseProConfig)
 }
 
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('🍀 BACKGROUND NOTIFICATION', remoteMessage)
+const handleIncomingCall = async () => {
+  console.log('🍀 🍀 🍀 🍀 🍀 🍀 Incoming call')
+  NavigationService.navigate(SCREENS.HOME)
+  setTimeout(() => {
+    RNCallKeep.endAllCalls()
+  }, 5000)
+}
 
-  if (remoteMessage && remoteMessage.data) {
-    const { customerPhoneNumber } = remoteMessage.data
-    const channelId = await notifee.createChannel({
-      id: 'softphone-channel',
-      name: 'Softphone Channel',
-      sound: 'phoneringtone',
-      importance: AndroidImportance.HIGH,
-      visibility: AndroidVisibility.PUBLIC,
-      badge: true,
-      vibration: true,
-      vibrationPattern: [300, 500]
-    })
+// Function to handle call decline
+const handleDecline = () => {
+  console.log('🍀 🍀 🍀 🍀 🍀 🍀 Call declined')
+}
 
-    await notifee.displayNotification({
-      title: 'Incoming call',
-      body: customerPhoneNumber,
-      android: {
-        channelId,
-        sound: 'phoneringtone',
-        color: '#AACD06',
-        importance: AndroidImportance.HIGH,
-        visibility: AndroidVisibility.PUBLIC,
-        category: AndroidCategory.CALL,
-        vibrationPattern: [300, 500],
-        pressAction: {
-          id: 'default'
-        }
-      },
-      ios: {
-        interruptionLevel: 'critical',
-        lockScreen: 1,
-        notificationCenter: 1,
-        sound: 'phoneringtone.wav'
-      }
-    })
+const options = {
+  ios: {
+    appName: 'InfinitalkPhone'
+  },
+  android: {
+    alertTitle: 'Permissions required',
+    alertDescription: 'This application needs to access your phone accounts',
+    cancelButton: 'Cancel',
+    okButton: 'OK',
+    imageName: 'phone_account_icon',
+    foregroundService: {
+      channelId: 'com.rn.voipdemo',
+      channelName: 'Foreground service for my app',
+      notificationTitle: 'My app is running in the background',
+      notificationIcon: 'Path to the resource icon of the notification'
+    }
   }
+}
+
+RNCallKeep.setup(options).then(accepted => {
+  console.log('🍀 🍀 🍀 🍀 🍀 CallKeep setup completed:', accepted)
 })
 
-notifee.onBackgroundEvent(async ({ type, detail }) => {
-  console.log('🍀 BACKGROUND EVENT', type, detail)
-})
+RNCallKeep.addEventListener('answerCall', async () => handleIncomingCall())
+RNCallKeep.addEventListener('endCall', async () => handleDecline())
 
-AppRegistry.registerComponent(appName, () => RecoilApp)
+if (Platform.OS === 'ios') {
+  VoipPushNotification.addEventListener('notification', notification => {
+    console.log('🍀 🍀 🍀 🍀 🍀 VoIP push notification received:', notification)
+    NavigationService.navigate(SCREENS.HOME)
+  })
+
+  VoipPushNotification.addEventListener('didLoadWithEvents', events => {
+    if (events && Array.isArray(events) && events.length > 0) {
+      events.forEach(voipPushEvent => {
+        const { name, data } = voipPushEvent
+        if (
+          name ===
+          VoipPushNotification.RNVoipPushRemoteNotificationReceivedEvent
+        ) {
+          console.log('🍀 🍀 🍀 🍀 🍀 VoIP push event received:', data)
+        }
+      })
+    }
+  })
+}
+
+AppRegistry.registerComponent(appName, () => HeadlessCheck)

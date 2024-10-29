@@ -10829,6 +10829,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-callkeep@npm:^4.3.14":
+  version: 4.3.14
+  resolution: "react-native-callkeep@npm:4.3.14"
+  peerDependencies:
+    react-native: ">=0.40.0"
+  checksum: b7141a69bbd9cf1c9eef737aae6d22bc413de08692be8e042652cd3951caad0f53df872ebf13d415039c56639a8d0d05b94ca724c94704e86097ceb8bf7b8206
+  languageName: node
+  linkType: hard
+
 "react-native-css-interop@npm:0.0.36":
   version: 0.0.36
   resolution: "react-native-css-interop@npm:0.0.36"
@@ -11018,6 +11027,15 @@ __metadata:
     fa6-upgrade: bin/fa6-upgrade.sh
     generate-icon: bin/generate-icon.js
   checksum: c1e1d7c7ccc110e99caaed4d57324d5331dfa91817183350d2fd4df16d2302e7363da1f7a2b87011da3936b77aac3a7bf8ee11844dd8786b8b7dbc6553494866
+  languageName: node
+  linkType: hard
+
+"react-native-voip-push-notification@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "react-native-voip-push-notification@npm:3.3.2"
+  peerDependencies:
+    react-native: ">=0.60.0"
+  checksum: d151a7cb60b291ba968263918e2a681be135cd56efde8de16bcb99fa8a4af88eaf83ed7d34a17213a4acfd6b4a0654a9aff39613919b9ef5c129113a84d5824e
   languageName: node
   linkType: hard
 
@@ -11526,6 +11544,7 @@ __metadata:
     react-i18next: ^15.0.1
     react-native: 0.74.5
     react-native-bootsplash: ^6.1.1
+    react-native-callkeep: ^4.3.14
     react-native-dotenv: ^3.4.11
     react-native-fs: ^2.20.0
     react-native-gesture-handler: 2.10.2
@@ -11538,6 +11557,7 @@ __metadata:
     react-native-svg: 13.9.0
     react-native-toast-message: 2.1.6
     react-native-vector-icons: ^10.1.0
+    react-native-voip-push-notification: ^3.3.2
     react-native-webrtc: 111.0.0
     react-native-webrtc-web-shim: 1.0.6
     react-navigation-helpers: 2.1.0

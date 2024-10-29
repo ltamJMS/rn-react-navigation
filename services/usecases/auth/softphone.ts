@@ -6,7 +6,7 @@ import AgentStatus, {
   IncomingUserInfo
 } from '../../models/softPhone'
 import { changeAgentStatus } from '../../agentStatus'
-import messaging from '@react-native-firebase/messaging'
+import VoipPushNotification from 'react-native-voip-push-notification'
 
 export const saveTokenToFirestore = async (
   customerID: string,
@@ -16,17 +16,19 @@ export const saveTokenToFirestore = async (
     return
   }
   try {
-    const fcmToken = await messaging().getToken()
+    VoipPushNotification.registerVoipToken()
+
     const deviceRef = firestore()
       .collection('customers')
       .doc(customerID)
       .collection('deviceSF')
       .doc(sipAccount)
-
-    await deviceRef.set({
-      fcmTokenSF: fcmToken
+    VoipPushNotification.addEventListener('register', async token => {
+      await deviceRef.set({
+        fcmTokenSF: token
+      })
+      console.log('🌸 VOIP PUSH TOKEN', token)
     })
-    console.log('🌸 FCM TOKEN', fcmToken)
   } catch (err: any) {
     console.error('🔴 STORE FCM TOKEN FAILED', sipAccount, err)
   }

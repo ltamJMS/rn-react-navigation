@@ -3,7 +3,16 @@ import { RecoilRoot } from 'recoil'
 
 import App from './App'
 
-const RecoilApp = () => {
+const AppFake = () => null
+
+interface HeadlessCheckProps {
+  isHeadless: boolean
+}
+
+const HeadlessCheck: React.FC<HeadlessCheckProps> = ({ isHeadless }) => {
+  if (isHeadless) {
+    return <AppFake />
+  }
   return (
     <RecoilRoot>
       <App />
@@ -11,4 +20,4 @@ const RecoilApp = () => {
   )
 }
 
-export default RecoilApp
+export default HeadlessCheck

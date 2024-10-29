@@ -2,6 +2,10 @@
 #import "RNBootSplash.h"
 #import <Firebase.h>
 #import <React/RCTBundleURLProvider.h>
+#import <RNCallKeep/RNCallKeep.h>
+#import <PushKit/PushKit.h>
+#import "RNFBMessagingModule.h"
+#import "RNVoipPushNotificationManager.h"
 
 @implementation AppDelegate
 
@@ -10,73 +14,25 @@
   self.moduleName = @"rnCliApp";
   // Initialize Firebase  
     [FIRApp configure];  
+    [RNCallKeep setup:@{
+      @"appName": @"InfinitalkPhone",
+      @"maximumCallGroups": @3,
+      @"maximumCallsPerCallGroup": @1,
+      @"supportsVideo": @NO,
+    }];
 
-  // Register for remote notifications  
-  if (@available(iOS 10.0, *)) {
-      [UNUserNotificationCenter currentNotificationCenter].delegate = self;  
-      UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert |  
-                                          UNAuthorizationOptionSound |  
-                                          UNAuthorizationOptionBadge;  
-      [[UNUserNotificationCenter currentNotificationCenter]  
-          requestAuthorizationWithOptions:authOptions  
-          completionHandler:^(BOOL granted, NSError * _Nullable error) {  
-              // Handle errors here  
-          }];  
-  } else {  
-      UIUserNotificationType allNotificationTypes =  
-      (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);  
-      UIUserNotificationSettings *settings =  
-      [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];  
-      [application registerUserNotificationSettings:settings];  
-  }  
-
-  [application registerForRemoteNotifications];  
-
+  self.moduleName = @"rnCliApp";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+    
+  [RNVoipPushNotificationManager voipRegistration];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
-// Handle the device token reception  
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {  
-    [FIRMessaging messaging].APNSToken = deviceToken;  
-}
-
-// Handle errors in notification registration  
-- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {  
-    NSLog(@"Unable to register for remote notifications: %@", error);  
-}
-
-// For iOS 10 and later, handle incoming messages  
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center  
-      willPresentNotification:(UNNotification *)notification  
-      withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {  
-    NSDictionary *userInfo = notification.request.content.userInfo;  
-
-    if ([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {  
-        [FIRMessaging.messaging appDidReceiveMessage:userInfo];  
-    }  
-
-    completionHandler(UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound);  
-} 
-
-// Handle background and foreground messages  
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center  
-didReceiveNotificationResponse:(UNNotificationResponse *)response  
-      withCompletionHandler:(void(^)(void))completionHandler {  
-    NSDictionary *userInfo = response.notification.request.content.userInfo;  
-
-    if ([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {  
-        [FIRMessaging.messaging appDidReceiveMessage:userInfo];  
-    }  
-
-    completionHandler();  
-} 
-
-- (void)customizeRootView:(RCTRootView *)rootView {
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  [FIRMessaging messaging].APNSToken = deviceToken;
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -91,6 +47,55 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> * __nullable restorableObjects))restorationHandler {
+  return [RNCallKeep application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+}
+
+#pragma mark - PushKit
+
+/* Add PushKit delegate method */
+
+// Handle updated push credentials
+- (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type {
+  // Register VoIP push token (a property of PKPushCredentials) with server
+  [RNVoipPushNotificationManager didUpdatePushCredentials:credentials forType:(NSString *)type];
+}
+
+// Handle incoming pushes
+- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
+  // Process the received push
+  [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:payload forType:(NSString *)type];
+}
+
+- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
+  NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
+  NSString *callerName = @"Caller Name";
+  NSString *handle = @"Caller Handle";
+
+  
+  [RNVoipPushNotificationManager addCompletionHandler:uuid completionHandler:completion];
+  [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:payload forType:(NSString *)type];
+  
+  [RNCallKeep reportNewIncomingCall: uuid
+                             handle: handle
+                         handleType: @"generic"
+                           hasVideo: NO
+                localizedCallerName: callerName
+                    supportsHolding: YES
+                       supportsDTMF: YES
+                   supportsGrouping: YES
+                 supportsUngrouping: YES
+                        fromPushKit: YES
+                            payload: nil
+              withCompletionHandler: completion];
+  
+  completion();
+}
+
+- (void)customizeRootView:(RCTRootView *)rootView {
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
 }
 
 @end

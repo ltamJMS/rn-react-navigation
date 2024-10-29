@@ -179,7 +179,7 @@ export default function Login() {
             alt="logo"
             style={{ width: 120, height: 120 }}
           />
-          <Text style={styles.textTitle}>SOFTPHONE</Text>
+          <Text style={styles.textTitle}>InfinitalkPhone</Text>
         </View>
 
         <View
