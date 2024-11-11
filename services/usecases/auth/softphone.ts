@@ -10,9 +10,10 @@ import VoipPushNotification from 'react-native-voip-push-notification'
 
 export const saveTokenToFirestore = async (
   customerID: string,
+  extenNumber: any,
   sipAccount: string
 ) => {
-  if (!customerID || !sipAccount) {
+  if (!customerID || !extenNumber) {
     return
   }
   try {
@@ -22,15 +23,15 @@ export const saveTokenToFirestore = async (
       .collection('customers')
       .doc(customerID)
       .collection('deviceSF')
-      .doc(sipAccount)
+      .doc(extenNumber)
     VoipPushNotification.addEventListener('register', async token => {
       await deviceRef.set({
         fcmTokenSF: token
       })
-      console.log('🌸 VOIP PUSH TOKEN', token)
+      console.log('🌸 VOIP PUSH TOKEN', sipAccount, token)
     })
   } catch (err: any) {
-    console.error('🔴 STORE FCM TOKEN FAILED', sipAccount, err)
+    console.error('🔴 STORE FCM TOKEN FAILED', sipAccount, extenNumber, err)
   }
 }
 

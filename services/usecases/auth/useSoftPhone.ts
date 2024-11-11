@@ -82,12 +82,15 @@ export const useSoftPhone = () => {
           auth,
           dataAgent
         )()
+        const [agentData] = Object.values(dataAgent)
+        const extenNumber = agentData.exten
+        console.log('🌸 extenNumber', extenNumber)
         console.log('🌸 STATUS CHANGED - 待機中')
         await new Promise(resolve => setTimeout(resolve, 2000))
         if (isChangesStatusSuccess) {
           softPhone.register()
         }
-        await saveTokenToFirestore(auth?.customerID || '951a', sipAccount)
+        await saveTokenToFirestore(auth?.customerID, extenNumber, sipAccount)
         setAgentLoginStatus(true)
         setLoading(false)
       } else {

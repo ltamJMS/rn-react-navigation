@@ -68,51 +68,27 @@
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {  
-    NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Received incoming push with payload"); 
+    NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Received incoming push with payload", payload); 
     NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];  
-    NSString *callerName = @"Caller Name";  
+    NSString *callerName = @"InfinitalkPhone";  
     NSString *handle = @"Caller Handle";  
 
-    [RNVoipPushNotificationManager addCompletionHandler:uuid completionHandler:completion];  
-    [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:payload forType:(NSString *)type];
-    NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Processed incoming push payload");  
-  
-    // Assuming you have a method to send SIP messages  
-    NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Attempting to send 180 Ringing signal to Asterisk");
-    // Assuming you have a method to send SIP messages  
-    [self sendSIP180RingingWithUUID:uuid completion:^{  
-        NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Successfully sent 180 Ringing to Asterisk");  
-
-        // Report call to CallKit  
-        [RNCallKeep reportNewIncomingCall: uuid  
-                                   handle: handle  
-                               handleType: @"generic"  
-                                 hasVideo: NO  
-                      localizedCallerName: callerName  
-                          supportsHolding: YES  
-                             supportsDTMF: YES  
-                         supportsGrouping: YES  
-                       supportsUngrouping: YES  
-                              fromPushKit: YES  
-                                  payload: nil  
-                    withCompletionHandler:^{  
-              NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Reported new incoming call to CallKit");  
-              completion(); // Finish the task  
-              NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Completion handler called, task finished");  
-          }];  
+    [RNCallKeep reportNewIncomingCall:uuid  
+                               handle:handle  
+                           handleType:@"generic"  
+                             hasVideo:NO  
+                  localizedCallerName:callerName  
+                      supportsHolding:YES  
+                         supportsDTMF:YES  
+                     supportsGrouping:YES  
+                   supportsUngrouping:YES  
+                          fromPushKit:YES  
+                              payload:nil  
+                withCompletionHandler:^{    
+        NSLog(@"Reported new incoming call to CallKit");  
+        completion(); // Finish the push processing  
     }];  
 }
-
-// Simulated method for sending SIP 180 Ringing  
-- (void)sendSIP180RingingWithUUID:(NSString *)uuid completion:(void (^)(void))completion {  
-    // Simulate network delay  
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{  
-        // Simulating sending a SIP message to Asterisk  
-        NSLog(@"[DEBUG] 🎁🎁🎁🎁🎁🎁🎁🎁 Sending 180 Ringing for UUID: %@", uuid);  
-        // Call the completion to indicate SIP message was sent  
-        completion();  
-    });  
-} 
 
 - (void)customizeRootView:(RCTRootView *)rootView {
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
