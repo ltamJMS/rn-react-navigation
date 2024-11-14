@@ -18,11 +18,14 @@ import { HTTPError } from '../services/models/error'
 import { SCREENS } from '../shared/constants'
 import * as NavigationService from 'react-navigation-helpers'
 import { Button } from 'react-native-paper'
+import useCommonData from '../services/usecases/auth/useCommonData'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  // defaultValue='099aChatOutsideTest2/6628@talk'
+
+  const [username, setUsername] = useState('099aChatOutsideTest2')
+  const [password, setPassword] = useState('6628@talk')
   const [remember, setRemember] = useState<boolean>(false)
   const [authRes, setAuthRes] = useState<AuthUser>()
   const setAuth = useSetRecoilState(authState)
@@ -163,6 +166,7 @@ export default function Login() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authRes])
+  useCommonData()
 
   return (
     <>

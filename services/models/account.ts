@@ -15,6 +15,9 @@ export class Token {
     this.createdAt = Date.now()
   }
 }
+export interface ClientAppLicenseInterface {
+  limitSipAccount: number
+}
 
 export class AuthUser {
   companyId?: string
@@ -23,6 +26,8 @@ export class AuthUser {
   id: number
   name: string
   customerID: string
+  infinitalkCustomerId: string
+  clientAppLicense: ClientAppLicenseInterface
   token: Token
   publicAvatarUrl?: string
 
@@ -33,6 +38,8 @@ export class AuthUser {
     roles: string[],
     name: string,
     customerID: string,
+    infinitalkCustomerId: string,
+    clientAppLicense: ClientAppLicenseInterface,
     companyId?: string,
     publicAvatarUrl?: string
   ) {
@@ -41,7 +48,9 @@ export class AuthUser {
     this.id = id
     this.name = name
     this.customerID = customerID
+    this.infinitalkCustomerId = infinitalkCustomerId
     this.token = accessToken
+    this.clientAppLicense = clientAppLicense
     this.companyId = companyId
     this.publicAvatarUrl = publicAvatarUrl
   }

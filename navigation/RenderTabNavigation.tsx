@@ -1,12 +1,12 @@
 import React from 'react'
 import { Image, Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 // ? Screens
 import HomeScreen from '../screens/HomeScreen'
 import CallHistory from '../screens/CallHistory'
-import ContactList from '../screens/ContactList'
+import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
 import { SCREENS } from '../shared/constants'
 import { palette } from '../shared/theme/themes'
 
@@ -31,23 +31,23 @@ const RenderTabNavigation = () => {
     let iconName
     switch (route.name) {
       case `${SCREENS.HOME}_TAB`:
-        iconName = focused ? 'home' : 'home-outline'
+        iconName = focused ? 'apps' : 'apps'
         break
       case `${SCREENS.CALL_HISTORY}_TAB`:
-        iconName = focused ? 'history' : 'history'
+        iconName = focused ? 'time' : 'time'
         break
-      case `${SCREENS.CONTACT_LIST}_TAB`:
-        iconName = focused ? 'account' : 'account-outline'
+      case `${SCREENS.AGENT_MEMBER}_TAB`:
+        iconName = focused ? 'people' : 'people'
         break
       default:
-        iconName = focused ? 'home' : 'home-outline'
+        iconName = focused ? 'apps' : 'apps'
         break
     }
     return (
-      <MaterialCommunityIcons
+      <Ionicons
         name={iconName}
-        size={26}
-        color={focused ? palette.borderColorDark : 'gray'}
+        size={20}
+        color={focused ? palette.borderColorDark : '#bababa'}
       />
     )
   }
@@ -62,7 +62,7 @@ const RenderTabNavigation = () => {
         headerTitle: () => CustomHeaderTitle(route.name.replace('_TAB', '')),
         tabBarIcon: ({ focused }) => renderTabIcon(route, focused),
         tabBarActiveTintColor: palette.infinitalk,
-        tabBarInactiveTintColor: 'gray',
+        tabBarInactiveTintColor: '#bababa',
         tabBarStyle: {
           backgroundColor: palette.white
         },
@@ -71,12 +71,12 @@ const RenderTabNavigation = () => {
     >
       <Tab.Screen name={`${SCREENS.HOME}_TAB`} component={HomeScreen} />
       <Tab.Screen
-        name={`${SCREENS.CALL_HISTORY}_TAB`}
-        component={CallHistory}
+        name={`${SCREENS.AGENT_MEMBER}_TAB`}
+        component={AgentMemberScreen}
       />
       <Tab.Screen
-        name={`${SCREENS.CONTACT_LIST}_TAB`}
-        component={ContactList}
+        name={`${SCREENS.CALL_HISTORY}_TAB`}
+        component={CallHistory}
       />
     </Tab.Navigator>
   )

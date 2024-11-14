@@ -7,8 +7,8 @@ import { isReadyRef, navigationRef } from 'react-navigation-helpers'
 import LoginScreen from '../screens/Login'
 import RenderTabNavigation from './RenderTabNavigation'
 import CallHistory from '../screens/CallHistory'
-import ContactList from '../screens/ContactList'
 import { SCREENS } from '../shared/constants'
+import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
 
 const Stack = createStackNavigator()
 
@@ -31,7 +31,10 @@ const Navigation = () => {
         <Stack.Screen name={SCREENS.LOGIN} component={LoginScreen} />
         <Stack.Screen name={SCREENS.HOME} component={RenderTabNavigation} />
         <Stack.Screen name={SCREENS.CALL_HISTORY} component={CallHistory} />
-        <Stack.Screen name={SCREENS.CONTACT_LIST} component={ContactList} />
+        <Stack.Screen
+          name={SCREENS.AGENT_MEMBER}
+          component={AgentMemberScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )

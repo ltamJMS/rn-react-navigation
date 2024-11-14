@@ -93,6 +93,10 @@ export interface CallSessionMap {
   [index: string]: CallSession
 }
 
+export interface AgentStatusText {
+  [index: number]: string
+}
+
 export enum AgentType {
   'MANAGER' = 3,
   'NORMAL' = 1
@@ -110,7 +114,6 @@ interface AgentStatus {
   interface: string
   status?: number
   phoneStatus?: number
-  updateTime?: Date
   raiseHandAt?: Date
   contextPrefix?: number
 }
@@ -118,4 +121,39 @@ interface AgentStatus {
 export type AgentStatusMap = {
   [index: string]: AgentStatus
 }
+
+export enum AgentStatusType {
+  'WAITING',
+  'CALLING',
+  'OTHER',
+  'LOGOUT'
+}
+
+export interface StatusConfig {
+  bgColorVal: string
+  statusColor: string
+  borderColor: string
+  icon: string
+  status?: AgentStatusType
+}
+
+export interface Account {
+  sipAccount: string
+  name: string
+  exten: string
+}
+
+export interface CommonSip {
+  sipAccount: string
+  sipPassword: string
+  sipType?: string
+  transport?: string
+  agent?: {
+    agentAccount: string
+    agentPassword: string
+  }
+  domain: string
+  asteriskDomain?: string
+}
+
 export default AgentStatus

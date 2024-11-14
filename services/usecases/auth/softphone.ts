@@ -48,7 +48,6 @@ export const createAgentStatus = (data: any): AgentStatus | null => {
     contextName: data.contextName as string,
     status: data.status < 200 ? data.status : data.status - 200,
     phoneStatus: data.phoneStatus as number,
-    updateTime: new Date(data.updateTime.seconds * 1000),
     sipAccount: data.sipAccount as string,
     type: data.type === 1 ? AgentType.NORMAL : AgentType.MANAGER,
     interface: data.interface as string,
