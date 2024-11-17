@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect } from 'react'
 import { SafeAreaView } from 'react-native'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { agentsState } from '../../services/store/agentStatus'
 import { getAgents, listenAgentStatuses } from '../../services/agentStatus'
 import useAuth from '../../services/usecases/auth/useAuth'
 import AgentList from './AgentList'
-import { styles } from './styles'
 import AgentStatus from '../../services/models/softPhone'
+import StatusBar from './StatusBar'
+import { currentUserState } from '../../services/store/auth'
 
 const AgentMemberScreen = () => {
   const auth = useAuth()
   const [agents, setAgents] = useRecoilState(agentsState)
+  const currentUser = useRecoilValue(currentUserState)
 
   const fetchAndSetAgents = useCallback(async () => {
     if (!auth) return
@@ -62,7 +64,8 @@ const AgentMemberScreen = () => {
   }, [auth, updateAgentStatus, removeAgent])
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
+      <StatusBar currentUser={currentUser} />
       <AgentList agents={agents} />
     </SafeAreaView>
   )

@@ -2,15 +2,10 @@ import axios from 'axios'
 import qs from 'qs'
 import configs from './configs'
 import firebase from '@react-native-firebase/app'
-import AgentStatus, {
-  AgentStatusMap,
-  AgentType,
-  StatusConfig
-} from './models/softPhone'
+import AgentStatus, { AgentStatusMap, AgentType } from './models/softPhone'
 import { FirestoreListenHandler, UnsubscribeListen } from './models/Firebase'
 import { Response } from './models/Response'
 import Tenant from './models/Tenant'
-import { MD3Colors } from 'react-native-paper'
 
 const { apiGatewayDomain } = configs
 const axiosWithoutToken = axios.create({
@@ -545,20 +540,25 @@ export const getDisplayStatus = (
 export const getStatusStyle = (dispStatus: number) => {
   switch (dispStatus) {
     case 0:
-      return { color: '#03c2fc', icon: 'headset' }
+      return { color: '#0564d4', icon: 'headset', size: 12, callable: true }
     case 1:
-      return { color: '#8c8c8c', icon: 'power' }
+      return { color: '#757575', icon: 'power', size: 14, callable: false }
     case 78:
     case 88:
     case 98:
     case 79:
     case 89:
     case 99:
-      return { color: '#00c241', icon: 'call' }
+      return {
+        color: '#1f9900',
+        icon: 'pulse-sharp',
+        size: 12,
+        callable: false
+      }
     case 2:
     case 3:
     default:
-      return { color: '#ff7af8', icon: 'hammer' }
+      return { color: '#d658d0', icon: 'airplane', size: 14, callable: true }
   }
 }
 
