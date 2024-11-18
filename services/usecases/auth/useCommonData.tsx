@@ -8,13 +8,11 @@ import { Context } from '../../models/Context'
 import { listenContexts } from './context'
 import { listenAgentStatus } from '../../agentStatus'
 import { listenTenant } from './tenant'
-import { agentsState } from '../../store/agentStatus'
 
 const useCommonData = () => {
   const auth = useRecoilValue(authState)
   const setCurrentUser = useSetRecoilState(currentUserState)
   const setTenant = useSetRecoilState(tenantState)
-  const agents = useRecoilValue(agentsState)
   const setContexts = useSetRecoilState(contextsState)
   const handleGotTenant = useCallback((t: Tenant) => setTenant(t), [setTenant])
   const handleAddOrModifyAS = useCallback(
@@ -65,9 +63,6 @@ const useCommonData = () => {
     [setContexts]
   )
 
-  useEffect(() => {
-    console.log('🌵 🌵 🌵 🌵 agents', agents)
-  }, [agents])
   useEffect(() => {
     if (!auth) {
       return

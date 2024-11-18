@@ -1,38 +1,17 @@
 import React, { FC } from 'react'
 import { FlatList, View, Text } from 'react-native'
 import { styles } from './styles'
-import { Avatar, IconButton, List } from 'react-native-paper'
+import { Avatar, IconButton } from 'react-native-paper'
 import { MD3Colors } from 'react-native-paper'
 import AgentStatus, { AgentStatusMap } from '../../services/models/softPhone'
-import { getASText, getDisplayStatus } from '../../services/agentStatus'
+import {
+  getASText,
+  getDisplayStatus,
+  getStatusStyle
+} from '../../services/agentStatus'
 import { useRecoilValue } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
 import Icon from 'react-native-vector-icons/Ionicons'
-// Helper function
-const getStatusStyle = (dispStatus: number) => {
-  switch (dispStatus) {
-    case 0:
-      return { color: '#0564d4', icon: 'headset', size: 12, callable: true }
-    case 1:
-      return { color: '#757575', icon: 'power', size: 14, callable: false }
-    case 78:
-    case 88:
-    case 98:
-    case 79:
-    case 89:
-    case 99:
-      return {
-        color: '#1f9900',
-        icon: 'pulse-sharp',
-        size: 12,
-        callable: false
-      }
-    case 2:
-    case 3:
-    default:
-      return { color: '#d658d0', icon: 'airplane', size: 14, callable: true }
-  }
-}
 
 interface Props {
   agents?: AgentStatusMap
@@ -94,6 +73,7 @@ const AgentList: FC<Props> = props => {
 
   return (
     <FlatList
+      contentContainerStyle={{ paddingBottom: 120 }}
       data={agentArray}
       renderItem={renderItem}
       keyExtractor={item => item.userID.toString()}
