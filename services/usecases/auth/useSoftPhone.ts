@@ -228,6 +228,20 @@ export const useSoftPhone = () => {
     }
   }, [agentLoginStatus, logout, sipAccountData, softPhone])
 
+  const handleRegisterSip = useCallback(async () => {
+    if (!softPhone) return
+    softPhone.register()
+
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }, [softPhone])
+
+  //handleQuitSoftphone, useLogoutAgent.tsx
+  const handleUnregisterSip = useCallback(() => {
+    console.log('Request to unregister softphone')
+    if (!softPhone) return
+    softPhone.unregister({ all: true })
+  }, [softPhone])
+
   useEffect(() => {
     if (!softPhone || !auth) return
     try {
@@ -396,6 +410,8 @@ export const useSoftPhone = () => {
     handleUnHold,
     handleRefer,
     handleAnswer,
-    handleLogout
+    handleLogout,
+    handleRegisterSip,
+    handleUnregisterSip
   }
 }

@@ -10861,6 +10861,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-dialog@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "react-native-dialog@npm:9.3.0"
+  peerDependencies:
+    react-native: ">=0.63.0"
+  checksum: 148fcd9e4cb3001a8bbed02f465833329a83bc60efbf763a9bf227ec81208a41e03055e8bc213aea838933878f3cc7c3ca18a15446e819c17509cad75362d7ca
+  languageName: node
+  linkType: hard
+
 "react-native-dotenv@npm:^3.4.11":
   version: 3.4.11
   resolution: "react-native-dotenv@npm:3.4.11"
@@ -11552,6 +11561,7 @@ __metadata:
     react-native: 0.74.5
     react-native-bootsplash: ^6.1.1
     react-native-callkeep: ^4.3.14
+    react-native-dialog: ^9.3.0
     react-native-dotenv: ^3.4.11
     react-native-fs: ^2.20.0
     react-native-gesture-handler: 2.10.2

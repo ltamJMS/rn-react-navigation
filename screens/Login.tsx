@@ -19,6 +19,7 @@ import { SCREENS } from '../shared/constants'
 import * as NavigationService from 'react-navigation-helpers'
 import { Button } from 'react-native-paper'
 import useCommonData from '../services/usecases/auth/useCommonData'
+import { useAgentStatusTool } from '../services/usecases/auth/useAgentStatusTool'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
@@ -167,6 +168,7 @@ export default function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authRes])
   useCommonData()
+  useAgentStatusTool()
 
   return (
     <>
@@ -205,7 +207,7 @@ export default function Login() {
                   <View>
                     <Input
                       bgColor="#E6E3E6"
-                      borderRadius="10"
+                      borderRadius="8"
                       borderWidth={0.5}
                       maxLength={characterMax}
                       w={{
@@ -262,7 +264,7 @@ export default function Login() {
                   <View>
                     <Input
                       bgColor="#E6E3E6"
-                      borderRadius="10"
+                      borderRadius="8"
                       borderWidth={0.5}
                       maxLength={characterMax}
                       w={{
@@ -335,7 +337,7 @@ export default function Login() {
             <Button
               onPress={handleLogin}
               disabled={isLoading}
-              style={{ backgroundColor: '#AACD06', borderRadius: 10 }}
+              style={{ backgroundColor: '#AACD06', borderRadius: 8 }}
             >
               {isLoading ? (
                 <ActivityIndicator size="small" />

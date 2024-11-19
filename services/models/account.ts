@@ -1,3 +1,5 @@
+import { CRMConnectConfig } from './PhoneBook'
+
 export interface Account {
   username: string
   password: string
@@ -54,4 +56,48 @@ export class AuthUser {
     this.companyId = companyId
     this.publicAvatarUrl = publicAvatarUrl
   }
+}
+
+export enum Role {
+  'op:normal' = 'op:normal',
+  'infinitalk:manager' = 'infinitalk:manager',
+  'infinitalk:normal' = 'infinitalk:normal',
+  'chat:normal' = 'chat:normal',
+  'sms:normal' = 'sms:normal',
+  'soft-phone:normal' = 'soft-phone:normal',
+  'chat-outside:normal' = 'chat-outside:normal',
+  'gpt:normal' = 'gpt:normal'
+}
+
+export interface AccountInfo {
+  id: number
+  username: string
+  name: string
+  agreementID: string
+  activate: boolean
+  roles: Role[]
+  infinitalkDomain?: string
+  createdAt: string
+  description?: string
+  chatBetweenOperator?: boolean
+}
+
+export type AccountList = AccountInfo[]
+
+export interface CRMSetting {
+  phoneNumbers?: string[]
+  phoneNumberPrefix?: string
+  crmConnectConfig?: CRMConnectConfig
+}
+
+export interface SpeedDial {
+  contactId: string
+  shortName: string
+  phoneNumber: string
+  prefix: string
+}
+
+export interface DefaultState {
+  userId: number
+  localization: string
 }

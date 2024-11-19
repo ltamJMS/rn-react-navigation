@@ -7,12 +7,8 @@ const Logout = () => {
   return (
     <Button
       icon="power-standby"
-      mode="contained-tonal"
-      style={{
-        backgroundColor: 'rgba(0, 122, 255, 0.15)',
-        width: 120,
-        height: 38
-      }}
+      mode="contained"
+      style={{ backgroundColor: '#444444', marginTop: 20, width: '50%' }}
       onPress={() => handleLogout()}
     >
       Logout

@@ -5,7 +5,7 @@ import AgentStatus, {
   AgentType,
   IncomingUserInfo
 } from '../../models/softPhone'
-import { changeAgentStatus } from '../../agentStatus'
+import { changeAgentStatusCustom } from '../../agentStatus'
 import VoipPushNotification from 'react-native-voip-push-notification'
 
 export const saveTokenToFirestore = async (
@@ -105,7 +105,7 @@ export const handleChangeStatus =
           reject('Invalid data agent')
         }
 
-        changeAgentStatus(
+        changeAgentStatusCustom(
           auth?.customerID || '951a',
           agent.groupNames[0],
           agent.interface,

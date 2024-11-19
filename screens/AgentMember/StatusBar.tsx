@@ -1,24 +1,47 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  ActivityIndicator
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import User from '../../services/models/User'
 import {
+  changeAgentStatus,
   getASText,
   getDisplayStatus,
-  getStatusStyle
+  getStatusStyle,
+  loginAgent
 } from '../../services/agentStatus'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
 import SegmentedControl from 'react-native-segmented-control-2'
 import Logout from './Logout'
 import { CollapsableContainer } from './CollapsableContainer'
-
+import {
+  agentStatusesState,
+  isWebRTCUserState
+} from '../../services/store/agentStatus'
+import {
+  authState,
+  currentUserState,
+  sipAccountState
+} from '../../services/store/auth'
+import { Role } from '../../services/models/account'
+import { Response } from '../../services/models/Response'
+import {
+  agentLoginState,
+  canSFRegisterState
+} from '../../services/store/softphone'
+import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
+import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
+import LoginBtn from './LoginBtn'
+import TestBtn from './TestBtn'
+import * as NavigationService from 'react-navigation-helpers'
+import { SCREENS } from '../../shared/constants'
 /** status to show in segment control
     0	待機中
     1 ログオフ
@@ -29,29 +52,272 @@ import { CollapsableContainer } from './CollapsableContainer'
     6 理論転送オフ
     7 自動ワーク
     **/
+const SHOWABLE_STATUS_MAX = 4
 
-interface StatusBarProps {
-  currentUser: User | null
-}
-const StatusBar: React.FC<StatusBarProps> = ({ currentUser }) => {
+const StatusBar: React.FC = () => {
   const tenant = useRecoilValue(tenantState)
-  const { agentStatus } = currentUser || {}
-  const { phoneStatus, status } = agentStatus || {}
   const [expanded, setExpanded] = useState(false)
   const [index, setIndex] = useState(0)
+  const [isWebRTCUser] = useRecoilState(isWebRTCUserState)
+  const auth = useRecoilValue(authState)
+  const setAgentStatus = useSetRecoilState(agentStatusesState)
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
+  const { agentStatus } = currentUser || {}
+  const setCanSFRegister = useSetRecoilState(canSFRegisterState)
+  const sipAccountData = useRecoilValue(sipAccountState)
+  const { handleRegisterSip, handleLogin } = useSoftPhone()
+  const logoutAgent = useLogoutAgent({ unregisterSip: true })
+  const [availableStatuses, setAvailableStatuses] = useState<number[]>()
+  const [showableStatusMax, setShowableStatusMax] =
+    useState<number>(SHOWABLE_STATUS_MAX)
+  const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const [loading, setLoading] = useState(false)
+
+  // TODO:
 
   // check agentStatus to shoe statusCode
 
+  const isStatusButtonDisabled = useCallback(
+    (statusValue: number): boolean => {
+      // will not be able to change to disabled status
+      // 7: 自動ワーク
+      const statusDisableDefault = [7]
+
+      if (statusDisableDefault.includes(statusValue)) return true
+
+      if (
+        !isWebRTCUser ||
+        (isWebRTCUser && !auth?.roles.includes(Role['soft-phone:normal']))
+      )
+        return true
+      console.log(111111111111, 'isWebRTCUser', isWebRTCUser)
+      console.log(111111111111, 'auth?.roles', auth?.roles)
+      return false
+    },
+    [isWebRTCUser, auth?.roles]
+  )
+
+  // call api to change status
+  const handleChangeStatus = useCallback(
+    (status: number) => async (): Promise<Response> => {
+      console.log(111111111111, 'handleChangeStatus with status = ', status)
+      if (
+        !currentUser ||
+        !currentUser.agentStatus ||
+        !currentUser.agentStatus.groupNames ||
+        !currentUser.agentStatus.interface ||
+        isStatusButtonDisabled(status)
+      ) {
+        console.log(
+          111111111111,
+          'handleChangeStatus false because isStatusButtonDisabled = ',
+          isStatusButtonDisabled(status)
+        )
+        return { success: false }
+      }
+
+      const change = changeAgentStatus(
+        currentUser.customerID.startsWith('CRM') &&
+          currentUser.infinitalkCustomerId
+          ? currentUser.infinitalkCustomerId
+          : currentUser.customerID,
+        currentUser.agentStatus.groupNames[0],
+        currentUser.agentStatus.interface
+      )
+
+      try {
+        let res
+        if (status === 0) {
+          res = await change('0', `${status}`)
+        } else {
+          res = await change('1', `${status}`)
+        }
+        if (res.success) {
+          setTimeout(() => {
+            setAgentStatus((val: any) => {
+              const updateCurrentUserAgentStatusShowOnSeatMap = {
+                ...val[`${currentUser.agentStatus?.userID}`],
+                status
+              }
+              return {
+                ...val,
+                [`${currentUser.agentStatus?.userID}`]:
+                  updateCurrentUserAgentStatusShowOnSeatMap
+              }
+            })
+            setCurrentUser((val: User | null) => {
+              if (!val) {
+                return val
+              }
+              return {
+                ...val,
+                agentStatus: {
+                  ...val.agentStatus,
+                  status
+                }
+              } as User
+            })
+
+            // if sip login successfully then enable sip register
+            if (auth?.roles.includes(Role['soft-phone:normal'])) {
+              setCanSFRegister(true)
+            }
+          }, 1000)
+          setLoading(false)
+          return { success: true }
+        } else {
+          console.error(111111111111, 'change status failed')
+          setLoading(false)
+          return { success: false }
+        }
+      } catch (error: any) {
+        setLoading(false)
+        console.error(111111111111, 'change status failed', error.message)
+        return { success: false }
+      }
+    },
+    [
+      auth?.roles,
+      currentUser,
+      isStatusButtonDisabled,
+      setAgentStatus,
+      setCanSFRegister,
+      setCurrentUser
+    ]
+  )
+
+  // call api to login agent
+  const handleQuickLogin = useCallback(
+    (status: number) => async () => {
+      if (
+        !currentUser?.customerID ||
+        !isWebRTCUser ||
+        isStatusButtonDisabled(status)
+      )
+        return
+
+      try {
+        const { sipAccount, sipPassword, domain, agent } = sipAccountData
+        // call api to login agent
+        const loginAgentRes = await loginAgent(
+          sipAccount,
+          sipPassword,
+          agent.agentAccount,
+          agent.agentPassword,
+          domain
+        )
+
+        if (loginAgentRes.success) {
+          // set agent status
+          const changeStatusRes = await handleChangeStatus(status)()
+
+          await new Promise(resolve => setTimeout(resolve, 2000))
+
+          if (changeStatusRes.success) {
+            // register sip
+            handleRegisterSip()
+          }
+        } else {
+          console.error(111111111111, 'login agent failed')
+        }
+      } catch (error: any) {}
+    },
+    [
+      currentUser?.customerID,
+      handleChangeStatus,
+      handleRegisterSip,
+      isStatusButtonDisabled,
+      isWebRTCUser,
+      sipAccountData
+    ]
+  )
+
+  // handle forced logout from another device
+  useEffect(() => {
+    if (isWebRTCUser && currentUser?.agentStatus?.sipAccount === undefined) {
+      const logout = async () => {
+        await logoutAgent()
+        await new Promise(resolve => setTimeout(resolve, 10000))
+      }
+      logout()
+    }
+  }, [currentUser?.agentStatus?.sipAccount, isWebRTCUser, logoutAgent])
+
+  // set available statuses, available quick login status, handle sm screen
+  useEffect(() => {
+    /** Statuses code
+        0	待機中
+        2	ワーク
+        3	離席
+        4	状態名称４
+        5	状態名称５
+        6	状態名称６
+        7	状態名称７ (default is 自動ワーク. will be disabled by default)
+       */
+    const defaultStatuses = [0, 2, 3, 4, 5, 6, 7]
+
+    // in lg or more screen, order of statuses were sorted same as defaultStatuses and set showable statuses to SHOWABLE_STATUS_MAX
+    const statuses = defaultStatuses.filter(
+      status => tenant?.agentStatusText[status]
+    )
+    const activeStatusIndex: number = statuses.findIndex(
+      status => currentUser?.agentStatus?.status === status
+    )
+
+    // if active status is in expand, then swap it to the last element in the showable statuses list
+    if (activeStatusIndex > -1 && activeStatusIndex >= SHOWABLE_STATUS_MAX) {
+      // eslint-disable-next-line no-extra-semi
+      ;[statuses[SHOWABLE_STATUS_MAX - 1], statuses[activeStatusIndex]] = [
+        statuses[activeStatusIndex],
+        statuses[SHOWABLE_STATUS_MAX - 1]
+      ]
+    }
+
+    setAvailableStatuses(statuses)
+    setShowableStatusMax(SHOWABLE_STATUS_MAX)
+  }, [currentUser?.agentStatus?.status, tenant?.agentStatusText])
+
+  const handleClickLogoutAgent = useCallback(() => {
+    const logout = async () => {
+      try {
+        await logoutAgent()
+      } catch (error) {
+        console.error(111111111111, 'logout agent failed', error)
+      }
+    }
+    logout()
+  }, [logoutAgent])
+
+  const tabs = (availableStatuses &&
+    availableStatuses.slice(0, showableStatusMax).map(status => ({
+      label: tenant?.agentStatusText[status],
+      status
+    }))) || [
+    { label: 'label 1', status: 0 },
+    { label: 'label 3', status: 2 },
+    { label: 'label 4', status: 3 }
+  ]
+
+  const handleSegmentChange = (selectedIndex: number) => {
+    setLoading(true)
+    const selectedStatus = tabs[selectedIndex]?.status
+    console.log(111111111111, 'change selectedIndex', selectedIndex)
+    handleChangeStatus(selectedStatus)().then(res => {
+      if (res.success) {
+        setIndex(selectedIndex)
+        setLoading(false)
+      } else {
+        setLoading(false)
+      }
+    })
+  }
+
+  // TODO: implement logout agent
   const onItemPress = () => {
     setExpanded(!expanded)
   }
-
-  if (!currentUser || !tenant)
-    return (
-      <View>
-        <Text> Loading ...</Text>
-      </View>
-    )
+  if (!currentUser || !tenant) return null
+  const { phoneStatus, status } = agentStatus || {}
 
   const dispStatus = getDisplayStatus(phoneStatus || 0, status || 0)
   const statusText = getASText(phoneStatus || 0, status || 0, tenant)
@@ -94,12 +360,23 @@ const StatusBar: React.FC<StatusBarProps> = ({ currentUser }) => {
                 alignItems: 'center'
               }}
             >
-              <SegmentedControl
-                tabs={['待機中', 'ワーク', '離席', 'ログオフ']}
-                onChange={setIndex}
-                value={index}
-                style={{ width: '100%', marginBottom: 24 }}
-              />
+              <View style={{ width: '100%', marginBottom: 24 }}>
+                {agentLoginStatus ? (
+                  <SegmentedControl
+                    tabs={tabs.map(tab => tab.label)}
+                    onChange={handleSegmentChange}
+                    value={index}
+                    style={{ width: '100%', height: 40 }}
+                  />
+                ) : (
+                  <LoginBtn
+                    handleClick={async () => {
+                      handleLogin(setLoading)
+                    }}
+                    loading={loading}
+                  />
+                )}
+              </View>
               <Logout />
             </View>
           </CollapsableContainer>
@@ -145,7 +422,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5
+    marginTop: 5,
+    height: 20
   }
 })
 

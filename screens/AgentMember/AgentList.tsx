@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { FlatList, View, Text } from 'react-native'
 import { styles } from './styles'
 import { Avatar, IconButton } from 'react-native-paper'
@@ -9,9 +9,11 @@ import {
   getDisplayStatus,
   getStatusStyle
 } from '../../services/agentStatus'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { agentLoginState } from '../../services/store/softphone'
+import DialogView from './DialogView'
 
 interface Props {
   agents?: AgentStatusMap
@@ -20,7 +22,8 @@ interface Props {
 const AgentList: FC<Props> = props => {
   const { agents } = props
   const tenant = useRecoilValue(tenantState)
-
+  const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const [dialogVisible, setDialogVisible] = useState(false)
   if (!agents || Object.keys(agents).length === 0) {
     return <Text> </Text>
   }
@@ -65,21 +68,32 @@ const AgentList: FC<Props> = props => {
           icon="phone"
           size={22}
           style={styles.iconButton}
-          iconColor={`${callable ? '#0564d4' : '#cfcfcf'}`}
+          iconColor={`${callable ? '#007AFF' : '#cfcfcf'}`}
+          onPress={() => setDialogVisible(true)}
+          disabled={!callable}
         />
       </View>
     )
   }
 
   return (
-    <FlatList
-      contentContainerStyle={{ paddingBottom: 120 }}
-      data={agentArray}
-      renderItem={renderItem}
-      keyExtractor={item => item.userID.toString()}
-      // eslint-disable-next-line react/no-unstable-nested-components
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-    />
+    <>
+      <FlatList
+        contentContainerStyle={{ paddingBottom: 120 }}
+        data={agentArray}
+        renderItem={renderItem}
+        keyExtractor={item => item.userID.toString()}
+        // eslint-disable-next-line react/no-unstable-nested-components
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+      {dialogVisible && (
+        <DialogView
+          visible={dialogVisible}
+          onDismiss={() => setDialogVisible(false)}
+          agentLoginStatus={agentLoginStatus}
+        />
+      )}
+    </>
   )
 }
 

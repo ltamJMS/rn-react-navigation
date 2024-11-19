@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CustomError, HTTPError } from './Error'
 
 export interface Response<T = undefined> {

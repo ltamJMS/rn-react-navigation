@@ -211,7 +211,7 @@ export const listenAgentStatus = (
 
 // end
 
-export const changeAgentStatus = async (
+export const changeAgentStatusCustom = async (
   customerId: string,
   queue: string,
   asInterface: string,
@@ -251,6 +251,41 @@ export const changeAgentStatus = async (
     }
   }
 }
+
+export const changeAgentStatus =
+  (customerId: string, queue: string, asInterface: string) =>
+  async (paused: string, reason?: string): Promise<Response> => {
+    const uri = `${
+      configs.apiRoot
+    }/v1/ami/agent/status?serverNumber=${customerId.slice(0, 3)}`
+
+    try {
+      const data = {
+        Action: 'QueuePause',
+        Queue: queue,
+        Interface: asInterface,
+        Paused: paused,
+        Reason: reason
+      }
+
+      await axios.post(uri, data, { timeout: 60000 })
+
+      return {
+        success: true,
+        message: 'SUCCESS'
+      }
+    } catch (err: any) {
+      const httpError = new HTTPError(err)
+      let messageErr = httpError.getMessage()
+      if (httpError.getCode() === 401)
+        messageErr =
+          'セッションがタイムアウトしました。再度サインインしてください'
+      return {
+        success: false,
+        message: messageErr
+      }
+    }
+  }
 
 export const checkAgentLogin = async (
   sipaccount: string,
@@ -314,11 +349,14 @@ export const loginAgent = async (
   account: string,
   password: string,
   domain: string
-): Promise<any> => {
+): Promise<Response> => {
   const domainFull = `https://${domain}`
-  const url = `https://api.infinitalk.net/infinitalk/agentstatus/login?domain=${domainFull}`
+  const url = `${configs.apiGatewayDomain}/infinitalk/agentstatus/login?domain=${domainFull}`
 
   try {
+    // check if sip account is logged in on another pc, then forced logout this
+    await checkAgentLogin(sipaccount, sippassword, account, password, domain)
+
     // login agent
     const data = qs.stringify({
       sipaccount,
@@ -339,20 +377,19 @@ export const loginAgent = async (
     await new Promise(resolve =>
       setTimeout(resolve, asteriskDatabaseUpdateTimout)
     )
+
     return {
       success: true
     }
   } catch (err: any) {
     const httpError = new HTTPError(err)
     let messageErr = httpError.getMessage()
-    if (httpError.getCode() === 401) {
+    if (httpError.getCode() === 401)
       messageErr =
         'セッションがタイムアウトしました。再度サインインしてください'
-    }
     return {
       success: false,
-      message: messageErr,
-      error: { ...httpError, message: messageErr }
+      message: messageErr
     }
   }
 }
@@ -540,7 +577,7 @@ export const getDisplayStatus = (
 export const getStatusStyle = (dispStatus: number) => {
   switch (dispStatus) {
     case 0:
-      return { color: '#0564d4', icon: 'headset', size: 12, callable: true }
+      return { color: '#007AFF', icon: 'headset', size: 12, callable: true }
     case 1:
       return { color: '#757575', icon: 'power', size: 14, callable: false }
     case 78:

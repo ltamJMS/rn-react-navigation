@@ -1,7 +1,6 @@
-import { atom, selector } from 'recoil'
-import { Account, AgentStatusMap } from '../models/softPhone'
+import { atom } from 'recoil'
+import { Account, AgentStatusMap, CommonSip } from '../models/softPhone'
 import { GroupData } from '../models/Group'
-import { authState, currentUserState } from './auth'
 
 const initState: AgentStatusMap = {}
 
@@ -23,4 +22,14 @@ export const groupsState = atom<GroupData>({
 export const agentsState = atom<AgentStatusMap>({
   key: 'agentsState',
   default: initState
+})
+
+export const isWebRTCUserState = atom<boolean>({
+  key: 'isWebRTCUserState',
+  default: false
+})
+
+export const sipAccountsAvailableState = atom<CommonSip[]>({
+  key: 'sipAccountsAvailableState',
+  default: []
 })
