@@ -7,10 +7,12 @@
         "Infinitalk",
         "Ionicons",
         "JSSIP",
+        "PQRS",
         "RNFS",
         "Showable",
         "SOFTPHONE",
         "usecases",
-        "webrtc"
+        "webrtc",
+        "WXYZ"
     ]
 }

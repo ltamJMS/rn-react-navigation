@@ -6,7 +6,7 @@ import { isReadyRef, navigationRef } from 'react-navigation-helpers'
 // ? Screens
 import LoginScreen from '../screens/Login'
 import RenderTabNavigation from './RenderTabNavigation'
-import CallHistory from '../screens/CallHistory'
+import Keypad from '../screens/Keypad'
 import { SCREENS } from '../shared/constants'
 import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
 
@@ -30,7 +30,7 @@ const Navigation = () => {
       >
         <Stack.Screen name={SCREENS.LOGIN} component={LoginScreen} />
         <Stack.Screen name={SCREENS.HOME} component={RenderTabNavigation} />
-        <Stack.Screen name={SCREENS.CALL_HISTORY} component={CallHistory} />
+        <Stack.Screen name={SCREENS.CALL_HISTORY} component={Keypad} />
         <Stack.Screen
           name={SCREENS.AGENT_MEMBER}
           component={AgentMemberScreen}

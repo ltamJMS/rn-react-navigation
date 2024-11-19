@@ -1,18 +1,20 @@
 import React from 'react'
-import { Image, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-// ? Screens
+// Screens
 import HomeScreen from '../screens/HomeScreen'
-import CallHistory from '../screens/CallHistory'
+import Keypad from '../screens/Keypad'
 import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
 import { SCREENS } from '../shared/constants'
 import { palette } from '../shared/theme/themes'
 
+type ScreenRoute = keyof typeof SCREENS
+
 const Tab = createBottomTabNavigator()
 
-const CustomHeaderTitle = (title: string) => (
+const CustomHeaderTitle = ({ title }: { title: string }) => (
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
     <Text
       numberOfLines={1}
@@ -27,20 +29,20 @@ const CustomHeaderTitle = (title: string) => (
 )
 
 const RenderTabNavigation = () => {
-  const renderTabIcon = (route: any, focused: boolean) => {
-    let iconName
-    switch (route.name) {
+  const renderTabIcon = (route: ScreenRoute, focused: boolean) => {
+    let iconName: string
+    switch (route) {
       case `${SCREENS.HOME}_TAB`:
-        iconName = focused ? 'apps' : 'apps'
+        iconName = 'apps'
         break
       case `${SCREENS.CALL_HISTORY}_TAB`:
-        iconName = focused ? 'time' : 'time'
+        iconName = 'time'
         break
       case `${SCREENS.AGENT_MEMBER}_TAB`:
-        iconName = focused ? 'people' : 'people'
+        iconName = 'people'
         break
       default:
-        iconName = focused ? 'apps' : 'apps'
+        iconName = 'apps'
         break
     }
     return (
@@ -59,14 +61,26 @@ const RenderTabNavigation = () => {
         headerStyle: {
           backgroundColor: '#AACD06'
         },
-        headerTitle: () => CustomHeaderTitle(route.name.replace('_TAB', '')),
-        tabBarIcon: ({ focused }) => renderTabIcon(route, focused),
+        headerTitle: () => (
+          <CustomHeaderTitle title={route.name.replace('_TAB', '')} />
+        ),
+        tabBarIcon: ({ focused }) =>
+          renderTabIcon(route.name as ScreenRoute, focused),
         tabBarActiveTintColor: palette.infinitalk,
         tabBarInactiveTintColor: '#bababa',
         tabBarStyle: {
           backgroundColor: palette.white
         },
-        tabBarLabel: () => null
+        tabBarLabel: ({ focused }) => (
+          <Text
+            style={{
+              color: focused ? palette.borderColorDark : '#bababa',
+              fontSize: 12
+            }}
+          >
+            {route.name.replace('_TAB', '')}
+          </Text>
+        )
       })}
     >
       <Tab.Screen name={`${SCREENS.HOME}_TAB`} component={HomeScreen} />
@@ -74,10 +88,7 @@ const RenderTabNavigation = () => {
         name={`${SCREENS.AGENT_MEMBER}_TAB`}
         component={AgentMemberScreen}
       />
-      <Tab.Screen
-        name={`${SCREENS.CALL_HISTORY}_TAB`}
-        component={CallHistory}
-      />
+      <Tab.Screen name={`${SCREENS.CALL_HISTORY}_TAB`} component={Keypad} />
     </Tab.Navigator>
   )
 }
