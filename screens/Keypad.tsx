@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-
+import Fontisto from 'react-native-vector-icons/Fontisto'
+import Feather from 'react-native-vector-icons/Feather'
+import { IconButton, MD3Colors } from 'react-native-paper'
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
 
@@ -14,25 +16,26 @@ const Keypad = () => {
 
   const handleCall = () => {
     if (phoneNumber) {
-      console.log('Calling', phoneNumber)
+      console.log('Calling:', phoneNumber)
     }
   }
 
   return (
     <View style={styles.container}>
-      {/* Phone Number Display */}
       <View style={styles.phoneNumberContainer}>
         <Text style={styles.phoneNumberText} numberOfLines={2}>
           {phoneNumber}
         </Text>
         {phoneNumber.length > 0 && (
-          <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteText}>Delete</Text>
-          </TouchableOpacity>
+          <IconButton
+            icon="backspace"
+            iconColor={MD3Colors.neutralVariant70}
+            size={24}
+            onPress={handleDelete}
+          />
         )}
       </View>
 
-      {/* Keypad */}
       <View style={styles.keypad}>
         {createKeypadRow(['1', '2', '3'], ['', 'ABC', 'DEF'], handlePress)}
         <Divider />
@@ -40,10 +43,29 @@ const Keypad = () => {
         <Divider />
         {createKeypadRow(['7', '8', '9'], ['PQRS', 'TUV', 'WXYZ'], handlePress)}
         <Divider />
-        {createKeypadRow(['*', '0', '#'], ['', '+', ''], handlePress)}
+        <View style={styles.keypadRow}>
+          <TouchableOpacity
+            onPress={() => handlePress('*')}
+            style={styles.keypadButton}
+          >
+            <Fontisto name="asterisk" size={15} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('0')}
+            style={styles.keypadButton}
+          >
+            <Text style={styles.buttonText}>0</Text>
+            <Text style={styles.lettersText}>＋</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('#')}
+            style={styles.keypadButton}
+          >
+            <Fontisto name="hashtag" size={15} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Call Button */}
       <TouchableOpacity onPress={handleCall} style={styles.callButton}>
         <Text style={styles.callText}>Call</Text>
       </TouchableOpacity>
@@ -96,16 +118,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     textAlign: 'center'
   },
-  deleteButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    backgroundColor: '#ccc',
-    borderRadius: 5
-  },
-  deleteText: {
-    fontSize: 16,
-    color: '#fff'
-  },
   keypad: {
     width: '92%'
   },
@@ -138,7 +150,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#8CC835',
     borderRadius: 5,
-    marginBottom: 20,
+    marginBottom: 30,
     alignItems: 'center'
   },
   callText: {
