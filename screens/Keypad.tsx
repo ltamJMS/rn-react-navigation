@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import Feather from 'react-native-vector-icons/Feather'
 import { IconButton, MD3Colors } from 'react-native-paper'
+import * as NavigationService from 'react-navigation-helpers'
+import { SCREENS } from '../shared/constants'
+
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
 
@@ -17,6 +20,7 @@ const Keypad = () => {
   const handleCall = () => {
     if (phoneNumber) {
       console.log('Calling:', phoneNumber)
+      NavigationService.navigate(SCREENS.CALL_SCREEN)
     }
   }
 
@@ -147,7 +151,7 @@ const styles = StyleSheet.create({
   },
   callButton: {
     width: '90%',
-    paddingVertical: 10,
+    paddingVertical: 15,
     backgroundColor: '#8CC835',
     borderRadius: 5,
     marginBottom: 30,

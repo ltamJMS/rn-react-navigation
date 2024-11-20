@@ -4,7 +4,8 @@ export const SCREENS = {
   LOGIN: 'Login',
   HOME: 'DialPad',
   AGENT_MEMBER: 'Agent Member',
-  CALL_HISTORY: 'Call History'
+  CALL_HISTORY: 'Call History',
+  CALL_SCREEN: 'Call'
 }
 export const firebaseDevConfig = {
   apiKey: 'AIzaSyAyy5XNS9_-QRhKGSJQE5GbKnXULhEtDKU',

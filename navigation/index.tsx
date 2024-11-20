@@ -9,6 +9,7 @@ import RenderTabNavigation from './RenderTabNavigation'
 import Keypad from '../screens/Keypad'
 import { SCREENS } from '../shared/constants'
 import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
+import CallScreen from '../screens/CallCenter/CallScreen'
 
 const Stack = createStackNavigator()
 
@@ -35,6 +36,7 @@ const Navigation = () => {
           name={SCREENS.AGENT_MEMBER}
           component={AgentMemberScreen}
         />
+        <Stack.Screen name={SCREENS.CALL_SCREEN} component={CallScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
