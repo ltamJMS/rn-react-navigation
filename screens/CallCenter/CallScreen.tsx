@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -9,20 +9,38 @@ import {
 import * as NavigationService from 'react-navigation-helpers'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fontisto from 'react-native-vector-icons/Fontisto'
-import Foundation from 'react-native-vector-icons/Foundation'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
+import { useRecoilState } from 'recoil'
+import {
+  currentCallState,
+  holdingCallState
+} from '../../services/store/softphone'
 
 const CallScreen = () => {
   const [micActive, setMicActive] = useState(false)
   const [speakerActive, setSpeakerActive] = useState(false)
-  const [holdActive, setHoldActive] = useState(false)
   const [keypadActive, setKeypadActive] = useState(false)
   const [transferActive, setTransferActive] = useState(false)
+  //
+  const { handleCall, handleHold, handleUnHold, handleRefer, handleTerminate } =
+    useSoftPhone()
+  const [currentCall] = useRecoilState(currentCallState)
+  const [holdingCall] = useRecoilState(holdingCallState)
 
-  const handleEndCall = () => {
-    NavigationService.goBack()
+  useEffect(() => {
+    if (!currentCall && !holdingCall) {
+      NavigationService.goBack()
+    }
+  }, [currentCall, holdingCall])
+
+  const handleHoldClick = () => {
+    if (holdingCall) {
+      handleUnHold(holdingCall.sessionId)
+    } else {
+      handleHold(currentCall?.sessionId)
+    }
   }
-
   return (
     <ImageBackground
       source={require('../../assets/images/bgOverlay.png')}
@@ -30,20 +48,32 @@ const CallScreen = () => {
     >
       <View style={styles.overlay}>
         <View style={styles.callDetails}>
-          <View style={styles.holdingCard}>
-            <Text style={styles.holdingText}>Customer A</Text>
-            <Text style={styles.holdingText}>保留 - 1:24</Text>
-          </View>
-          <View style={styles.callingCard}>
-            <View style={styles.callingLeft}>
-              <Text style={styles.nameText}>202_OPa002</Text>
-              <Text style={styles.phoneNumberText}>202</Text>
+          {holdingCall && (
+            <View style={styles.holdingCard}>
+              <Text style={styles.holdingText}>Customer A</Text>
+              <Text style={styles.holdingText}>保留 - 1:24</Text>
             </View>
-            <View style={styles.callingRight}>
-              <Text style={styles.callStatusText}>通話中</Text>
-              <Text style={styles.callTimeText}>0:07</Text>
+          )}
+          {currentCall && (
+            <View style={styles.callingCard}>
+              <View style={styles.callingLeft}>
+                <Text style={styles.nameText}>{`${
+                  currentCall.dst.displayName || currentCall.callEndTime
+                }`}</Text>
+                <Text style={styles.phoneNumberText}>
+                  {currentCall.dst.num}
+                </Text>
+              </View>
+              <View style={styles.callingRight}>
+                <Text style={styles.callStatusText}>{`${
+                  currentCall?.state || '呼出中'
+                }`}</Text>
+                <Text style={styles.callTimeText}>{`${
+                  currentCall?.dst.num || '...'
+                }`}</Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         <View style={styles.overlayUnder}>
@@ -85,20 +115,20 @@ const CallScreen = () => {
                 <TouchableOpacity
                   style={[
                     styles.functionButton,
-                    holdActive ? styles.activeButton : {}
+                    holdingCall ? styles.activeButton : {}
                   ]}
-                  onPress={() => setHoldActive(!holdActive)}
+                  onPress={() => handleHoldClick()}
                 >
                   <MaterialCommunityIcons
                     name={
-                      holdActive ? 'hand-back-right-off' : 'hand-back-right'
+                      holdingCall ? 'hand-back-right-off' : 'hand-back-right'
                     }
                     size={22}
                     color="#fff"
                   />
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>
-                  {holdActive ? 'Unhold' : 'Hold'}
+                  {holdingCall ? 'Unhold' : 'Hold'}
                 </Text>
               </View>
             </View>
@@ -149,7 +179,7 @@ const CallScreen = () => {
           </View>
 
           <TouchableOpacity
-            onPress={handleEndCall}
+            onPress={() => handleTerminate(currentCall?.sessionId)}
             style={styles.endCallButton}
           >
             <MaterialCommunityIcons

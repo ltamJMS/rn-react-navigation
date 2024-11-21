@@ -4,8 +4,7 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableWithoutFeedback,
-  ActivityIndicator
+  TouchableWithoutFeedback
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import User from '../../services/models/User'
@@ -13,8 +12,7 @@ import {
   changeAgentStatus,
   getASText,
   getDisplayStatus,
-  getStatusStyle,
-  loginAgent
+  getStatusStyle
 } from '../../services/agentStatus'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
@@ -25,11 +23,7 @@ import {
   agentStatusesState,
   isWebRTCUserState
 } from '../../services/store/agentStatus'
-import {
-  authState,
-  currentUserState,
-  sipAccountState
-} from '../../services/store/auth'
+import { authState, currentUserState } from '../../services/store/auth'
 import { Role } from '../../services/models/account'
 import { Response } from '../../services/models/Response'
 import {
@@ -39,9 +33,6 @@ import {
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
 import LoginBtn from './LoginBtn'
-import TestBtn from './TestBtn'
-import * as NavigationService from 'react-navigation-helpers'
-import { SCREENS } from '../../shared/constants'
 /** status to show in segment control
     0	待機中
     1 ログオフ
@@ -64,8 +55,7 @@ const StatusBar: React.FC = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
   const { agentStatus } = currentUser || {}
   const setCanSFRegister = useSetRecoilState(canSFRegisterState)
-  const sipAccountData = useRecoilValue(sipAccountState)
-  const { handleRegisterSip, handleLogin } = useSoftPhone()
+  const { handleLogin } = useSoftPhone()
   const logoutAgent = useLogoutAgent({ unregisterSip: true })
   const [availableStatuses, setAvailableStatuses] = useState<number[]>()
   const [showableStatusMax, setShowableStatusMax] =
@@ -186,52 +176,6 @@ const StatusBar: React.FC = () => {
     ]
   )
 
-  // call api to login agent
-  const handleQuickLogin = useCallback(
-    (status: number) => async () => {
-      if (
-        !currentUser?.customerID ||
-        !isWebRTCUser ||
-        isStatusButtonDisabled(status)
-      )
-        return
-
-      try {
-        const { sipAccount, sipPassword, domain, agent } = sipAccountData
-        // call api to login agent
-        const loginAgentRes = await loginAgent(
-          sipAccount,
-          sipPassword,
-          agent.agentAccount,
-          agent.agentPassword,
-          domain
-        )
-
-        if (loginAgentRes.success) {
-          // set agent status
-          const changeStatusRes = await handleChangeStatus(status)()
-
-          await new Promise(resolve => setTimeout(resolve, 2000))
-
-          if (changeStatusRes.success) {
-            // register sip
-            handleRegisterSip()
-          }
-        } else {
-          console.error(111111111111, 'login agent failed')
-        }
-      } catch (error: any) {}
-    },
-    [
-      currentUser?.customerID,
-      handleChangeStatus,
-      handleRegisterSip,
-      isStatusButtonDisabled,
-      isWebRTCUser,
-      sipAccountData
-    ]
-  )
-
   // handle forced logout from another device
   useEffect(() => {
     if (isWebRTCUser && currentUser?.agentStatus?.sipAccount === undefined) {
@@ -276,17 +220,6 @@ const StatusBar: React.FC = () => {
     setAvailableStatuses(statuses)
     setShowableStatusMax(SHOWABLE_STATUS_MAX)
   }, [currentUser?.agentStatus?.status, tenant?.agentStatusText])
-
-  const handleClickLogoutAgent = useCallback(() => {
-    const logout = async () => {
-      try {
-        await logoutAgent()
-      } catch (error) {
-        console.error(111111111111, 'logout agent failed', error)
-      }
-    }
-    logout()
-  }, [logoutAgent])
 
   const tabs = (availableStatuses &&
     availableStatuses.slice(0, showableStatusMax).map(status => ({

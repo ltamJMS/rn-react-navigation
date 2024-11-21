@@ -184,7 +184,8 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         mediaConstraints: { audio: true, video: false }
       }
       const target = `sip:${phoneNumber}@${this.sip.domain}`
-
+      console.log('🌸🌸🌸🌸🌸🌸 CALL TO phoneNumber', phoneNumber)
+      console.log('🌸🌸🌸🌸🌸🌸 CALL TO target', target)
       const resSession: RTCSession = this.ua.call(target, options)
 
       // add session to map
@@ -192,16 +193,18 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
         session: resSession,
         type: CallSessionType.CURRENT
       }
+      console.log('🌸🌸🌸🌸🌸🌸 callSessionMap done')
 
       // listen event
       if (this.config.listenCall) {
         const removeListener = this.listenCall(resSession.id)
         this.callSessionMap[resSession.id].removeListener = removeListener
       }
+      console.log('🌸🌸🌸🌸🌸🌸 call resSession')
 
       return resSession
     } catch (error) {
-      console.error('Call error', error)
+      console.error('🌸🌸🌸🌸🌸🌸 Call error', error)
       throw error
     }
   }

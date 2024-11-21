@@ -5,10 +5,11 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { IconButton, MD3Colors } from 'react-native-paper'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
+import { useSoftPhone } from '../services/usecases/auth/useSoftPhone'
 
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
-
+  const { handleCall } = useSoftPhone()
   const handlePress = (value: string) => {
     setPhoneNumber(prev => prev + value)
   }
@@ -17,10 +18,11 @@ const Keypad = () => {
     setPhoneNumber(prev => prev.slice(0, -1))
   }
 
-  const handleCall = () => {
+  const handleCallClick = () => {
     if (phoneNumber) {
       console.log('Calling:', phoneNumber)
-      NavigationService.navigate(SCREENS.CALL_SCREEN)
+      handleCall(phoneNumber)
+      // NavigationService.navigate(SCREENS.CALL_SCREEN)
     }
   }
 
@@ -56,6 +58,7 @@ const Keypad = () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handlePress('0')}
+            onLongPress={() => handlePress('+')}
             style={styles.keypadButton}
           >
             <Text style={styles.buttonText}>0</Text>
@@ -70,7 +73,7 @@ const Keypad = () => {
         </View>
       </View>
 
-      <TouchableOpacity onPress={handleCall} style={styles.callButton}>
+      <TouchableOpacity onPress={handleCallClick} style={styles.callButton}>
         <FontAwesome name="phone" size={26} color="#fff" />
       </TouchableOpacity>
     </View>

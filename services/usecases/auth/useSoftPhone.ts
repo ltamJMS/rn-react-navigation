@@ -107,7 +107,7 @@ export const useSoftPhone = () => {
       try {
         if (!softPhone || !auth || !phoneNumber) return
         const callSession: RTCSession = await softPhone.call(phoneNumber)
-
+        console.log('🔴 useSF -> Calling:', phoneNumber, softPhone)
         const outgoingCall: SoftPhoneCallInfo = {
           direction: CallDirection.OUTGOING,
           dst: { num: phoneNumber },
@@ -116,6 +116,7 @@ export const useSoftPhone = () => {
           sessionId: callSession.id,
           media: { audio: true }
         }
+        console.log('🔴 useSF -> outgoingCall:', outgoingCall)
 
         setCurrentCall(outgoingCall)
       } catch (error) {
