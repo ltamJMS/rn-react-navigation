@@ -1,5 +1,4 @@
-// CallScreen.js
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -7,13 +6,19 @@ import {
   StyleSheet,
   ImageBackground
 } from 'react-native'
-import Feather from 'react-native-vector-icons/Feather'
 import * as NavigationService from 'react-navigation-helpers'
-import { SCREENS } from '../../shared/constants'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Fontisto from 'react-native-vector-icons/Fontisto'
+import Foundation from 'react-native-vector-icons/Foundation'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
-const phoneNumber = 111
 const CallScreen = () => {
+  const [micActive, setMicActive] = useState(false)
+  const [speakerActive, setSpeakerActive] = useState(false)
+  const [holdActive, setHoldActive] = useState(false)
+  const [keypadActive, setKeypadActive] = useState(false)
+  const [transferActive, setTransferActive] = useState(false)
+
   const handleEndCall = () => {
     NavigationService.goBack()
   }
@@ -25,34 +30,121 @@ const CallScreen = () => {
     >
       <View style={styles.overlay}>
         <View style={styles.callDetails}>
-          <Text style={styles.phoneNumberText}>{phoneNumber}</Text>
-          <Text style={styles.callingText}>Calling...</Text>
+          <View style={styles.holdingCard}>
+            <Text style={styles.holdingText}>Customer A</Text>
+            <Text style={styles.holdingText}>保留 - 1:24</Text>
+          </View>
+          <View style={styles.callingCard}>
+            <View style={styles.callingLeft}>
+              <Text style={styles.nameText}>202_OPa002</Text>
+              <Text style={styles.phoneNumberText}>202</Text>
+            </View>
+            <View style={styles.callingRight}>
+              <Text style={styles.callStatusText}>通話中</Text>
+              <Text style={styles.callTimeText}>0:07</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.overlayUnder}>
           <View style={styles.buttonsContainer}>
             <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.functionButton}>
-                <Feather name="mic" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <Feather name="volume-2" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <Feather name="pause" size={24} color="#fff" />
-              </TouchableOpacity>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[
+                    styles.functionButton,
+                    micActive ? styles.activeButton : {}
+                  ]}
+                  onPress={() => setMicActive(!micActive)}
+                >
+                  <MaterialCommunityIcons
+                    name={micActive ? 'microphone-off' : 'microphone'}
+                    size={26}
+                    color="#fff"
+                  />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>
+                  {micActive ? 'Unmute' : 'Mic'}
+                </Text>
+              </View>
+
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[
+                    styles.functionButton,
+                    speakerActive ? styles.activeButton : {}
+                  ]}
+                  onPress={() => setSpeakerActive(!speakerActive)}
+                >
+                  <Ionicons name="volume-medium" size={26} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Speaker</Text>
+              </View>
+
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[
+                    styles.functionButton,
+                    holdActive ? styles.activeButton : {}
+                  ]}
+                  onPress={() => setHoldActive(!holdActive)}
+                >
+                  <MaterialCommunityIcons
+                    name={
+                      holdActive ? 'hand-back-right-off' : 'hand-back-right'
+                    }
+                    size={22}
+                    color="#fff"
+                  />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>
+                  {holdActive ? 'Unhold' : 'Hold'}
+                </Text>
+              </View>
             </View>
 
             <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.functionButton}>
-                <Feather name="mic" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <Ionicons name="keypad" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.functionButton}>
-                <Feather name="corner-up-right" size={24} color="#fff" />
-              </TouchableOpacity>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[styles.functionButton, { borderColor: '#606060' }]}
+                  disabled={true}
+                >
+                  <MaterialCommunityIcons
+                    name="record-circle-outline"
+                    size={24}
+                    color="#606060"
+                  />
+                </TouchableOpacity>
+                <Text style={[styles.buttonText, { color: '#606060' }]}>
+                  Record
+                </Text>
+              </View>
+
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[
+                    styles.functionButton,
+                    keypadActive ? styles.activeButton : {}
+                  ]}
+                  onPress={() => setKeypadActive(!keypadActive)}
+                >
+                  <Ionicons name="keypad" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Keypad</Text>
+              </View>
+
+              <View style={styles.button}>
+                <TouchableOpacity
+                  style={[
+                    styles.functionButton,
+                    transferActive ? styles.activeButton : {}
+                  ]}
+                  onPress={() => setTransferActive(!transferActive)}
+                >
+                  <Fontisto name="share-a" size={20} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Transfer</Text>
+              </View>
             </View>
           </View>
 
@@ -60,7 +152,11 @@ const CallScreen = () => {
             onPress={handleEndCall}
             style={styles.endCallButton}
           >
-            <Text style={styles.endCallText}>End Call</Text>
+            <MaterialCommunityIcons
+              name="phone-hangup"
+              size={26}
+              color="#fff"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -75,32 +171,72 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Black overlay with 50% opacity
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
     padding: 10
   },
-
   callDetails: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
     marginBottom: 10,
     marginTop: 20,
-    width: '92%',
-    backgroundColor: '#ff3b30',
+    width: '96%',
     height: '30%'
   },
-  phoneNumberText: {
-    fontSize: 32,
+  holdingCard: {
+    padding: 20,
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(142, 142, 142, 0.09)'
+  },
+  holdingText: {
+    fontSize: 18,
+    color: '#fff'
+  },
+  callingCard: {
+    padding: 20,
+    marginBottom: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(142, 142, 142, 0.09)'
+  },
+  callingLeft: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center'
+  },
+  callingRight: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  nameText: {
+    fontSize: 28,
     color: '#fff',
     marginRight: 10,
     marginBottom: 10
   },
-  callingText: {
+  phoneNumberText: {
     fontSize: 18,
-    color: '#aaa'
+    color: '#fff',
+    marginRight: 10,
+    marginBottom: 10
+  },
+  callStatusText: {
+    fontSize: 18,
+    color: '#fff',
+    marginRight: 10,
+    marginBottom: 10
+  },
+  callTimeText: {
+    fontSize: 18,
+    color: '#fff',
+    marginRight: 10,
+    marginBottom: 10
   },
   overlayUnder: {
     flex: 1,
@@ -109,21 +245,33 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   buttonsContainer: {
-    width: '80%',
-    backgroundColor: 'blue'
+    width: '80%'
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: 'green',
     marginBottom: 24
   },
-  functionButton: {
-    padding: 30,
+  button: {
     alignItems: 'center',
-    borderRadius: 50,
+    flexDirection: 'column'
+  },
+  functionButton: {
+    width: 90,
+    height: 90,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 100,
     borderColor: '#fff',
     borderWidth: 1
+  },
+  activeButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+  },
+  buttonText: {
+    marginTop: 5,
+    color: '#fff',
+    textAlign: 'center'
   },
   endCallButton: {
     width: '90%',
@@ -132,10 +280,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 30,
     alignItems: 'center'
-  },
-  endCallText: {
-    fontSize: 18,
-    color: '#fff'
   }
 })
 

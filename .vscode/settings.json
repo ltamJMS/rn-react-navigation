@@ -4,6 +4,7 @@
         "disp",
         "exten",
         "Firestore",
+        "Fontisto",
         "Infinitalk",
         "Ionicons",
         "JSSIP",
@@ -11,6 +12,7 @@
         "RNFS",
         "Showable",
         "SOFTPHONE",
+        "Unhold",
         "usecases",
         "webrtc",
         "WXYZ"

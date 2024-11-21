@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
-import Feather from 'react-native-vector-icons/Feather'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { IconButton, MD3Colors } from 'react-native-paper'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
@@ -71,7 +71,7 @@ const Keypad = () => {
       </View>
 
       <TouchableOpacity onPress={handleCall} style={styles.callButton}>
-        <Text style={styles.callText}>Call</Text>
+        <FontAwesome name="phone" size={26} color="#fff" />
       </TouchableOpacity>
     </View>
   )
@@ -156,10 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 30,
     alignItems: 'center'
-  },
-  callText: {
-    fontSize: 18,
-    color: '#fff'
   }
 })
 
