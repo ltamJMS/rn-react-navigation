@@ -106,6 +106,8 @@ export const useSoftPhone = () => {
     async (phoneNumber: string) => {
       try {
         if (!softPhone || !auth || !phoneNumber) return
+        softPhone.register()
+        await new Promise(resolve => setTimeout(resolve, 500))
         const callSession: RTCSession = await softPhone.call(phoneNumber)
         console.log('🔴 useSF -> Calling:', phoneNumber, softPhone)
         const outgoingCall: SoftPhoneCallInfo = {

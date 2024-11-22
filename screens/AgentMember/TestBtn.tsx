@@ -4,22 +4,23 @@ import { Button } from 'react-native-paper'
 
 interface TestBtnProps {
   handleClick: () => void
+  btnName: string
 }
-const TestBtn: React.FC<TestBtnProps> = ({ handleClick }) => {
+const TestBtn: React.FC<TestBtnProps> = ({ handleClick, btnName }) => {
   return (
     <View>
-      <Text style={{ fontSize: 15 }}>電話機を起動しますか？</Text>
       <Button
         icon="power-standby"
         mode="contained-tonal"
         style={{
           backgroundColor: 'rgba(0, 122, 255, 0.15)',
           width: 120,
-          height: 38
+          height: 38,
+          marginVertical: 10
         }}
         onPress={() => handleClick()}
       >
-        Test Btn
+        {btnName}
       </Button>
     </View>
   )

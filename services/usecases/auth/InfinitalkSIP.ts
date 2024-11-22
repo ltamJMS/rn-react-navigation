@@ -180,6 +180,10 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
 
   async call(phoneNumber: string, callOptions?: any): Promise<RTCSession> {
     try {
+      if (!this.ua.isConnected()) {
+        console.error('Cannot make a call, UA is not connected to the network.')
+        throw new Error('UA is not connected')
+      }
       const options = {
         mediaConstraints: { audio: true, video: false }
       }

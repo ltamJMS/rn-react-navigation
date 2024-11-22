@@ -24,6 +24,8 @@ const AgentList: FC<Props> = props => {
   const tenant = useRecoilValue(tenantState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
   const [dialogVisible, setDialogVisible] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState<AgentStatus | null>(null)
+
   if (!agents || Object.keys(agents).length === 0) {
     return <Text> </Text>
   }
@@ -69,7 +71,10 @@ const AgentList: FC<Props> = props => {
           size={22}
           style={styles.iconButton}
           iconColor={`${callable ? '#007AFF' : '#cfcfcf'}`}
-          onPress={() => setDialogVisible(true)}
+          onPress={() => {
+            setSelectedAgent(item)
+            setDialogVisible(true)
+          }}
           disabled={!callable}
         />
       </View>
@@ -86,11 +91,15 @@ const AgentList: FC<Props> = props => {
         // eslint-disable-next-line react/no-unstable-nested-components
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-      {dialogVisible && (
+      {dialogVisible && selectedAgent && (
         <DialogView
           visible={dialogVisible}
-          onDismiss={() => setDialogVisible(false)}
+          onDismiss={() => {
+            setDialogVisible(false)
+            setSelectedAgent(null)
+          }}
           agentLoginStatus={agentLoginStatus}
+          agent={selectedAgent}
         />
       )}
     </>

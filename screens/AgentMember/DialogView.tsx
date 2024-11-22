@@ -4,6 +4,10 @@ import { ActivityIndicator, View } from 'react-native'
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../../shared/constants'
+import AgentStatus, { SipConfig } from '../../services/models/softPhone'
+import { useSoftPhoneContext } from '../../SoftPhoneProvider'
+import { useRecoilValue } from 'recoil'
+import { sipAccountState } from '../../services/store/auth'
 enum DialogText {
   MakeACallTitle = 'Make a Call',
   LoginRequiredTitle = 'Agent Login Required',
@@ -18,15 +22,29 @@ interface DialogViewProps {
   visible: boolean
   onDismiss: () => void
   agentLoginStatus: boolean
+  agent: AgentStatus | null
 }
 
 const DialogView: React.FC<DialogViewProps> = ({
   visible,
   onDismiss,
-  agentLoginStatus
+  agentLoginStatus,
+  agent
 }) => {
   const { handleRegisterSip, handleLogin } = useSoftPhone()
   const [loading, setLoading] = useState(false)
+  const sipAccountData = useRecoilValue(sipAccountState)
+  const { setupSoftPhone } = useSoftPhoneContext()
+
+  const setupSF = () => {
+    const sipConfig: SipConfig = {
+      account: sipAccountData.sipAccount,
+      password: sipAccountData.sipPassword,
+      domain: sipAccountData.domain,
+      port: 8089
+    }
+    setupSoftPhone(sipConfig)
+  }
 
   const handleCallClick = () => {
     console.log('handleCallClick invoked')
@@ -51,8 +69,8 @@ const DialogView: React.FC<DialogViewProps> = ({
             : DialogText.LoginRequiredTitle}
         </Dialog.Title>
         <Dialog.Description>
-          {agentLoginStatus
-            ? DialogText.CallDescription
+          {agentLoginStatus && agent
+            ? `Do you want to call ${agent.name} at extension ${agent.exten}?`
             : DialogText.LoginDescription}
         </Dialog.Description>
         <Dialog.Button
@@ -72,6 +90,7 @@ const DialogView: React.FC<DialogViewProps> = ({
               handleRegisterSip().then(() => {
                 handleLogin(setLoading)
                   .then(() => {
+                    setupSF()
                     setLoading(false)
                   })
                   .catch(() => {

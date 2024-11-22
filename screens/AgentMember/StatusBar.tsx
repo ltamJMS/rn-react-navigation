@@ -23,16 +23,24 @@ import {
   agentStatusesState,
   isWebRTCUserState
 } from '../../services/store/agentStatus'
-import { authState, currentUserState } from '../../services/store/auth'
+import {
+  authState,
+  currentUserState,
+  sipAccountState
+} from '../../services/store/auth'
 import { Role } from '../../services/models/account'
 import { Response } from '../../services/models/Response'
 import {
   agentLoginState,
-  canSFRegisterState
+  canSFRegisterState,
+  currentCallState
 } from '../../services/store/softphone'
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
 import LoginBtn from './LoginBtn'
+import TestBtn from './TestBtn'
+import { useSoftPhoneContext } from '../../SoftPhoneProvider'
+import { SipConfig } from '../../services/models/softPhone'
 /** status to show in segment control
     0	待機中
     1 ログオフ
@@ -55,17 +63,29 @@ const StatusBar: React.FC = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
   const { agentStatus } = currentUser || {}
   const setCanSFRegister = useSetRecoilState(canSFRegisterState)
-  const { handleLogin } = useSoftPhone()
+  const { handleLogin, handleCall } = useSoftPhone()
   const logoutAgent = useLogoutAgent({ unregisterSip: true })
   const [availableStatuses, setAvailableStatuses] = useState<number[]>()
   const [showableStatusMax, setShowableStatusMax] =
     useState<number>(SHOWABLE_STATUS_MAX)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
   const [loading, setLoading] = useState(false)
+  const sipAccountData = useRecoilValue(sipAccountState)
+  const [currentCall] = useRecoilState(currentCallState)
 
   // TODO:
-
+  const { setupSoftPhone } = useSoftPhoneContext()
   // check agentStatus to shoe statusCode
+  // Khởi tạo softphone với config
+  const setupSF = () => {
+    const sipConfig: SipConfig = {
+      account: sipAccountData.sipAccount,
+      password: sipAccountData.sipPassword,
+      domain: sipAccountData.domain,
+      port: 8089
+    }
+    setupSoftPhone(sipConfig)
+  }
 
   const isStatusButtonDisabled = useCallback(
     (statusValue: number): boolean => {
@@ -304,12 +324,18 @@ const StatusBar: React.FC = () => {
                 ) : (
                   <LoginBtn
                     handleClick={async () => {
-                      handleLogin(setLoading)
+                      await handleLogin(setLoading)
+                      setupSF()
                     }}
                     loading={loading}
                   />
                 )}
               </View>
+              {currentCall && (
+                <View>
+                  <Text>Current Call: {currentCall.dst.num}</Text>
+                </View>
+              )}
               <Logout />
             </View>
           </CollapsableContainer>

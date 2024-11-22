@@ -7,10 +7,15 @@ import Navigation from './navigation'
 import BootSplash from 'react-native-bootsplash'
 import messaging from '@react-native-firebase/messaging'
 import './services/store/logger.ts'
+import LoginBtn from './screens/AgentMember/LoginBtn.tsx'
+import { useSoftPhone } from './services/usecases/auth/useSoftPhone.ts'
+import { SoftPhoneProvider } from './SoftPhoneProvider.tsx'
 
 LogBox.ignoreAllLogs()
 
 const App = () => {
+  const [loading, setLoading] = React.useState(false)
+  const { handleLogin } = useSoftPhone()
   useEffect(() => {
     // Function to handle state change
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
@@ -38,15 +43,12 @@ const App = () => {
   }, [])
 
   return (
-    <>
+    <SoftPhoneProvider>
       <NativeBaseProvider>
         <Navigation />
       </NativeBaseProvider>
       <Toast position="top" bottomOffset={20} />
-      {/* <View>
-        <Text style={{ color: 'red' }}>Hello World!</Text>
-      </View> */}
-    </>
+    </SoftPhoneProvider>
   )
 }
 
