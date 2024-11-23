@@ -5,9 +5,9 @@
     "hello": "こんにちは {{name}}"
   },
   "validator": {
-    "emptyEmail": "メールアドレスを入力して下さい。",
+    "emptyUsername": "メールアドレスを入力して下さい。",
     "invalidEmailFormat": "メールアドレスの形式で入力して下さい。",
-    "maxLengthEmail": "メールアドレスは100文字以内で入力して下さい。",
+    "maxLengthUsername": "メールアドレスは100文字以内で入力して下さい。",
     "emptyPassword": "パスワードを入力して下さい。",
     "maxLengthPassword": "パスワードは100文字以内で入力して下さい。"
   }

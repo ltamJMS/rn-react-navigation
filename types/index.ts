@@ -1,29 +1,29 @@
 export type User = {
-  address: Address;
-  company: Company;
-  email: string;
-  id: number;
-  name: string;
-  phone: string;
-  username: string;
-  website: string;
-};
+  accountID: number
+  accessToken: string
+  firebaseAccessToken: string
+  agreementID: string
+  username: string
+  name: string
+  roles: string[]
+  activate: boolean
+  publicAvatarUrl: string
+  infinitalkCustomerId: string
+}
 
-export type Address = {
-  city: string;
-  geo: Geo;
-  street: string;
-  suite: string;
-  zipcode: string;
-};
+export type TokenBulk = {
+  accessToken: string
+  refreshToken: string
+}
 
-export type Geo = {
-  lat: string;
-  lng: string;
-};
-
-export type Company = {
-  bs: string;
-  catchPhrase: string;
-  name: string;
-};
+export type SipAccount = {
+  agent: {
+    agentAccount: string
+    agentPassword: string
+  }
+  domain: string
+  sipAccount: string
+  sipPassword: string
+  sipType: string
+  transport: string
+}

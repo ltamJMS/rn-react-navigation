@@ -9,7 +9,7 @@ import {
   UseQueryResult
 } from '@tanstack/react-query'
 import { AxiosRequestConfig } from 'axios'
-import axiosInstance from '../libs/axiosInstance'
+import axiosInstance from '../libs/axios_instance'
 
 export function useQuery<
   TQueryFnData = unknown,
@@ -28,20 +28,24 @@ export function useQuery<
     options
 
   const defaultQueryFn: QueryFunction<TQueryFnData, TQueryKey> = async ({
-    queryKey
+    queryKey: key
   }: QueryFunctionContext): Promise<TQueryFnData> => {
     try {
-      const data = await axiosInstance<TError, TQueryFnData>({
+      const data = await axiosInstance<TError, { data: TQueryFnData }>({
         ...config,
-        url: `${queryKey?.[0]}`,
+        url: `${key?.[0]}`,
         method: config?.method || 'GET'
-      })
+      }).then(response => response.data)
 
-      onSuccess && onSuccess(data)
+      if (onSuccess) {
+        await onSuccess(data)
+      }
 
       return data
     } catch (error) {
-      onError && onError(error)
+      if (onError) {
+        await onError(error)
+      }
 
       throw error
     }

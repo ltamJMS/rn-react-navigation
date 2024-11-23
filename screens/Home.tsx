@@ -1,38 +1,21 @@
-import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import { Button } from 'react-native-paper'
-import { MainTabsProps } from '../navigators/tabs/MainTabs'
-import { useQueryClient } from '@tanstack/react-query'
-import useBoundStore from '../store'
-import { User } from '../types'
-import { useQuery } from '../hooks/useQuery'
 import { useTranslation } from 'react-i18next'
+import { StyleSheet, Text, View } from 'react-native'
+import { Button } from 'react-native-paper'
+import useBoundStore from '../stores'
 
-export default function Home({ navigation }: MainTabsProps) {
+export default function Home() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
-  // const unAuthenticate = useBoundStore(state => state.unAuthenticate)
-
-  const { data } = useQuery<User>({
-    queryKey: ['users/2'],
-    enabled: false
-  })
-
-  const handleLogout = () => {
-    // unAuthenticate()
-    queryClient.setQueryData(['users/2'], null)
-    queryClient.removeQueries()
-  }
+  const user = useBoundStore(state => state.user)
+  const unAuthenticate = useBoundStore(state => state.unAuthenticate)
 
   return (
     <View className="flex-1 justify-center gap-y-6" style={styles.container}>
       <Text className="text-2xl text-center text-red-600">
-        {t('common.hello', { name: data?.name })}👋
+        {t('common.hello', { name: user?.name })}👋
       </Text>
-      <Button onPress={() => navigation.navigate('Setting')} mode="outlined">
-        Go to Explore
-      </Button>
-      <Button mode="contained" onPress={handleLogout}>
+
+      <Button mode="contained" onPress={unAuthenticate}>
         Logout
       </Button>
     </View>

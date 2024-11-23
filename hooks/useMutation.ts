@@ -7,7 +7,7 @@ import {
   UseMutationResult
 } from '@tanstack/react-query'
 import { AxiosRequestConfig } from 'axios'
-import axiosInstance from '../libs/axiosInstance'
+import axiosInstance from '../libs/axios_instance'
 
 export default function useMutation<
   TData = unknown,
@@ -17,21 +17,21 @@ export default function useMutation<
 >(
   options: UseMutationOptions<TData, TError, TVariables, TContext> & {
     config?: AxiosRequestConfig
-    url: string
+    endpoint: string
   },
   queryClient?: QueryClient
 ): UseMutationResult<TData, TError, TVariables, TContext> {
-  const { mutationFn, config, url, ...restOptions } = options
+  const { mutationFn, config, endpoint, ...restOptions } = options
 
   const defaultMutationFn: MutationFunction<TData, TVariables> = async (
     variables: TVariables
   ): Promise<TData> =>
-    axiosInstance<TError, TData>({
+    axiosInstance<TError, { data: TData }>({
       ...config,
-      url,
+      url: endpoint,
       method: config?.method || 'POST',
       data: variables
-    })
+    }).then(response => response.data)
 
   return RQUseMutation(
     {

@@ -1,24 +1,20 @@
-import { QueryClient } from '@tanstack/react-query'
+import { API_ROOT } from '@env'
 import axios, {
   AxiosError,
   AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios'
-import { clearTokens, getTokens, storeTokens } from '../utils'
-import useBoundStore from '../store'
-import { API_URL } from '@env'
-
-const apiDomain = API_URL
+import useBoundStore from '../stores'
+import { getTokens, storeTokens } from '../utils/token_storage'
 
 let refreshTokenRequest: null | Promise<void> = null
-export const queryClient = new QueryClient()
 
 const defaultHeaders = {
   'Content-Type': 'application/json'
 }
 
 const axiosInstance = axios.create({
-  baseURL: apiDomain,
+  baseURL: API_ROOT,
   headers: defaultHeaders
 })
 
@@ -26,21 +22,16 @@ const refresh = async () => {
   try {
     const { refreshToken } = await getTokens()
 
-    const response = await axios.post(`${apiDomain}v1/auth/token/refresh`, {
+    const response = await axios.post(`${API_ROOT}token/refresh`, {
       refreshToken
     })
     storeTokens(response.data.data)
 
     return response.data.data.accessToken
-  } catch (error: unknown) {
+  } catch (error) {
     refreshTokenRequest = null
-    clearTokens()
 
-    if (error instanceof AxiosError && error.response?.status === 401) {
-      // useBoundStore.getState().unAuthenticate()
-      queryClient.setQueryData(['users/2'], null)
-      queryClient.removeQueries()
-    }
+    useBoundStore.getState().unAuthenticate()
 
     return Promise.reject(error)
   }
