@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { StatusBar, useColorScheme } from 'react-native'
 
 import {
@@ -15,8 +15,8 @@ import {
   PaperProvider
 } from 'react-native-paper'
 import { useQuery } from './hooks/useQuery'
-import AuthStacks from './navigators/stacks/AuthStacks'
-import MainTabs from './navigators/tabs/MainTabs'
+import AuthStacks from './navigators/AuthStacks'
+import MainTabs from './navigators/MainTabs'
 import useBoundStore from './stores'
 import auth from '@react-native-firebase/auth'
 
@@ -25,6 +25,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import NetworkLogger from 'react-native-network-logger'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { SipAccount } from './types'
+import useFirestore from './hooks/useFirestore'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -49,7 +50,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppContent />
-      <NetworkLogger />
+      {/* <NetworkLogger /> */}
     </QueryClientProvider>
   )
 }
@@ -57,11 +58,10 @@ export default function App() {
 function AppContent() {
   const colorScheme = useColorScheme()
   const user = useBoundStore(state => state.user)
-  const sipAccount = useBoundStore(state => state.sipAccount)
+  const isAuthenticated = useBoundStore(state => state.sipAccount)
   const setSipAccount = useBoundStore(state => state.setSipAccount)
 
-  const isDarkTheme = colorScheme === 'dark'
-  const theme = isDarkTheme ? CombinedDarkTheme : CombinedDefaultTheme
+  useFirestore()
 
   useQuery<SipAccount>({
     queryKey: [
@@ -81,10 +81,8 @@ function AppContent() {
     }
   })
 
-  // Debug
-  useEffect(() => {
-    BootSplash.hide({ fade: true })
-  }, [])
+  const isDarkTheme = colorScheme === 'dark'
+  const theme = isDarkTheme ? CombinedDarkTheme : CombinedDefaultTheme
 
   return (
     <SafeAreaProvider>
@@ -101,7 +99,7 @@ function AppContent() {
               headerShown: false
             }}
           >
-            {sipAccount ? (
+            {isAuthenticated ? (
               <Stack.Screen name="main" component={MainTabs} />
             ) : (
               <Stack.Screen name="auth" component={AuthStacks} />

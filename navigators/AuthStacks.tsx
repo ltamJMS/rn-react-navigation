@@ -3,7 +3,7 @@ import {
   NativeStackScreenProps
 } from '@react-navigation/native-stack'
 import React from 'react'
-import Login from '../../screens/Login'
+import Login from '../screens/login'
 
 export type AuthStacksParamList = {
   Login: undefined
@@ -19,7 +19,6 @@ export default function AuthStacks() {
       screenOptions={{
         headerShown: false
       }}
-      initialRouteName="Login"
     >
       <Stack.Screen name="Login" component={Login} />
     </Stack.Navigator>

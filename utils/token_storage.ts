@@ -1,24 +1,20 @@
-import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TokenBulk } from '../types'
 import { TOKEN_KEYS } from '../constants'
 
 export const storeTokens = async (tokenBundle: TokenBulk): Promise<void> => {
   await Promise.all([
-    RNSecureStorage.setItem(TOKEN_KEYS.accessToken, tokenBundle.accessToken, {
-      accessible: ACCESSIBLE.WHEN_UNLOCKED
-    }),
-    RNSecureStorage.setItem(TOKEN_KEYS.refreshToken, tokenBundle.refreshToken, {
-      accessible: ACCESSIBLE.WHEN_UNLOCKED
-    })
+    AsyncStorage.setItem(TOKEN_KEYS.accessToken, tokenBundle.accessToken),
+    AsyncStorage.setItem(TOKEN_KEYS.refreshToken, tokenBundle.refreshToken)
   ])
 }
 
 export const getTokens = async (): Promise<TokenBulk> => {
-  const accessToken: string | null = await RNSecureStorage.getItem(
+  const accessToken: string | null = await AsyncStorage.getItem(
     TOKEN_KEYS.accessToken
   ).catch(() => null)
 
-  const refreshToken: string | null = await RNSecureStorage.getItem(
+  const refreshToken: string | null = await AsyncStorage.getItem(
     TOKEN_KEYS.refreshToken
   ).catch(() => null)
 
@@ -27,7 +23,7 @@ export const getTokens = async (): Promise<TokenBulk> => {
 
 export const clearTokens = async (): Promise<void> => {
   await Promise.all([
-    RNSecureStorage.removeItem(TOKEN_KEYS.accessToken),
-    RNSecureStorage.removeItem(TOKEN_KEYS.refreshToken)
+    AsyncStorage.removeItem(TOKEN_KEYS.accessToken),
+    AsyncStorage.removeItem(TOKEN_KEYS.refreshToken)
   ])
 }

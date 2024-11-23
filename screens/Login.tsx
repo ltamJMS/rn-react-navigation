@@ -52,7 +52,9 @@ export default function Login() {
     onSuccess: user => {
       authenticate(user)
       queryClient.invalidateQueries({
-        queryKey: ['/v1/agents/users/']
+        queryKey: [
+          `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
+        ]
       })
     }
   })
@@ -67,9 +69,9 @@ export default function Login() {
       <Portal>
         <Dialog dismissable={false} visible={isPending}>
           <Dialog.Content className="py-8">
-            <ActivityIndicator size="large" animating={true} />
+            <ActivityIndicator size="large" animating />
             <View className="h-4" />
-            <Text className="text-center" variant="bodyLarge">
+            <Text className="!text-center" variant="bodyLarge">
               Please wait …
             </Text>
           </Dialog.Content>

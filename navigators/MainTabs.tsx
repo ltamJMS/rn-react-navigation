@@ -3,8 +3,9 @@ import {
   BottomTabScreenProps,
   createBottomTabNavigator
 } from '@react-navigation/bottom-tabs'
-import Home from '../../screens/Home'
-import Setting from '../../screens/Setting'
+import Home from '../screens/home'
+import CallHistory from '../screens/call-history'
+import Agents from '../screens/agents'
 
 export type IconProps = {
   color: string
@@ -13,7 +14,8 @@ export type IconProps = {
 
 export type MainTabsParamList = {
   Home: undefined
-  Setting: undefined
+  CallHistory: undefined
+  Agents: undefined
 }
 
 export type MainTabsProps = BottomTabScreenProps<MainTabsParamList>
@@ -41,11 +43,20 @@ export default function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Setting"
-        component={Setting}
+        name="CallHistory"
+        component={CallHistory}
         options={{
           tabBarIcon: settingTabIcon,
-          tabBarLabel: 'Setting'
+          tabBarLabel: 'Call History'
+        }}
+      />
+
+      <Tab.Screen
+        name="Agents"
+        component={Agents}
+        options={{
+          tabBarIcon: settingTabIcon,
+          tabBarLabel: 'Agents'
         }}
       />
     </Tab.Navigator>

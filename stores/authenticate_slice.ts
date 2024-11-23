@@ -15,8 +15,15 @@ export const createAuthenticateSlice: StateCreator<
   AuthenticateState
 > = (_set, get) => ({
   authenticate: (user: User) => {
+    const customerId =
+      user.agreementID.startsWith('CRM') && user.infinitalkCustomerId
+        ? user.infinitalkCustomerId
+        : user.agreementID
+
+    const serverNumber = customerId.slice(0, 3)
+
     storeTokens({ accessToken: user.accessToken, refreshToken: '' })
-    get().setUser(user)
+    get().setUser({ ...user, customerId, serverNumber })
   },
   unAuthenticate: () => {
     get().setSipAccount(null)

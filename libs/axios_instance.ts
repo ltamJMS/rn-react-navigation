@@ -1,41 +1,20 @@
-import { API_ROOT } from '@env'
 import axios, {
   AxiosError,
   AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios'
 import useBoundStore from '../stores'
-import { getTokens, storeTokens } from '../utils/token_storage'
-
-let refreshTokenRequest: null | Promise<void> = null
+import { getTokens } from '../utils/token_storage'
+import { DOMAINS } from '../constants'
 
 const defaultHeaders = {
   'Content-Type': 'application/json'
 }
 
 const axiosInstance = axios.create({
-  baseURL: API_ROOT,
+  baseURL: DOMAINS.API_ROOT,
   headers: defaultHeaders
 })
-
-const refresh = async () => {
-  try {
-    const { refreshToken } = await getTokens()
-
-    const response = await axios.post(`${API_ROOT}token/refresh`, {
-      refreshToken
-    })
-    storeTokens(response.data.data)
-
-    return response.data.data.accessToken
-  } catch (error) {
-    refreshTokenRequest = null
-
-    useBoundStore.getState().unAuthenticate()
-
-    return Promise.reject(error)
-  }
-}
 
 const onRequest = async (
   config: InternalAxiosRequestConfig
@@ -56,21 +35,7 @@ const onResponseError = async (
   error: AxiosError
 ): Promise<AxiosResponse | AxiosError> => {
   if (error.response?.status === 401) {
-    refreshTokenRequest = refreshTokenRequest || refresh()
-
-    const newAccessToken = await refreshTokenRequest
-
-    const axiosConfig = {
-      ...error.config,
-      headers: {
-        ...error.config?.headers,
-        authorization: `Bearer ${newAccessToken}`
-      }
-    }
-
-    refreshTokenRequest = null
-
-    return axiosInstance(axiosConfig)
+    useBoundStore.getState().unAuthenticate()
   }
   return Promise.reject(error)
 }

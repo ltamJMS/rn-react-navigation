@@ -5,13 +5,18 @@ import {
   AuthenticateState,
   createAuthenticateSlice
 } from './authenticate_slice'
+import createFirestoreSlice, { FirestoreState } from './firestore_slice'
 
-export type BoundState = UserState & SipAccountState & AuthenticateState
+export type BoundState = UserState &
+  SipAccountState &
+  AuthenticateState &
+  FirestoreState
 
 const useBoundStore = create<BoundState>((...args) => ({
   ...createUserSlice(...args),
   ...createSipAccountSlice(...args),
-  ...createAuthenticateSlice(...args)
+  ...createAuthenticateSlice(...args),
+  ...createFirestoreSlice(...args)
 }))
 
 export default useBoundStore
