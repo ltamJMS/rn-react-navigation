@@ -22,7 +22,7 @@ export const STATUSES: Status[] = [
   { value: '7', label: '自動ワーク' }
 ]
 
-export const SHOWABLE_STATUS_MAX = 4
+export const SHOWABLE_STATUS_MAX = 8
 
 export const DOMAINS = {
   API_ROOT,

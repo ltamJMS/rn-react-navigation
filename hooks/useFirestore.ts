@@ -2,6 +2,7 @@ import firestore from '@react-native-firebase/firestore'
 import { useEffect } from 'react'
 import useBoundStore from '../stores'
 import { Agent, Customer } from '../types'
+import auth from '@react-native-firebase/auth'
 
 export default function useFirestore() {
   const user = useBoundStore(state => state.user)
@@ -11,42 +12,63 @@ export default function useFirestore() {
 
   const customerId = user?.customerId
   const userName = user?.username
+  const customToken = user?.firebaseAccessToken
 
   useEffect(() => {
-    if (!customerId) {
+    if (!customerId || !customToken) {
       return undefined
     }
 
-    const agentSubscriber = firestore()
-      .collection('customers')
-      .doc(customerId)
-      .collection('agentStatuses')
-      .onSnapshot(agentQuerySnapshot => {
-        const data: Agent[] = []
-        agentQuerySnapshot.forEach(agentsDocumentSnapshot => {
-          const agent = agentsDocumentSnapshot.data() as Agent
-          data.push(agent)
+    let agentSubscriber: Function | undefined
+    let customerSubscriber: Function | undefined
 
-          if (agent.username === userName) {
-            setCurrentAgent(agent)
-          }
-        })
+    const initialize = async () => {
+      try {
+        await auth().signInWithCustomToken(customToken)
 
-        setAgents(data)
-      })
+        agentSubscriber = firestore()
+          .collection('customers')
+          .doc(customerId)
+          .collection('agentStatuses')
+          .onSnapshot(agentQuerySnapshot => {
+            const data: Agent[] = []
+            agentQuerySnapshot.forEach(agentsDocumentSnapshot => {
+              const agent = agentsDocumentSnapshot.data() as Agent
+              data.push(agent)
 
-    const customerSubscriber = firestore()
-      .collection('customers')
-      .doc(customerId)
-      .onSnapshot(customerQuerySnapshot => {
-        const customer = customerQuerySnapshot.data() as Customer
+              if (agent.username === userName) {
+                setCurrentAgent(agent)
+              }
+            })
 
-        setCustomer(customer)
-      })
+            setAgents(data)
+          })
+
+        customerSubscriber = firestore()
+          .collection('customers')
+          .doc(customerId)
+          .onSnapshot(customerQuerySnapshot => {
+            const customer = customerQuerySnapshot.data() as Customer
+
+            setCustomer(customer)
+          })
+      } catch (error) {
+        // do something
+      }
+    }
+
+    initialize()
 
     return () => {
-      agentSubscriber()
-      customerSubscriber()
+      agentSubscriber && agentSubscriber()
+      customerSubscriber && customerSubscriber()
     }
-  }, [customerId, userName, setAgents, setCustomer, setCurrentAgent])
+  }, [
+    customerId,
+    userName,
+    customToken,
+    setAgents,
+    setCustomer,
+    setCurrentAgent
+  ])
 }

@@ -6,6 +6,8 @@ import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme
 } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import merge from 'deepmerge'
 import BootSplash from 'react-native-bootsplash'
 import {
@@ -14,18 +16,13 @@ import {
   MD3LightTheme,
   PaperProvider
 } from 'react-native-paper'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import useFirestore from './hooks/useFirestore'
 import { useQuery } from './hooks/useQuery'
 import AuthStacks from './navigators/AuthStacks'
 import MainTabs from './navigators/MainTabs'
 import useBoundStore from './stores'
-import auth from '@react-native-firebase/auth'
-
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import NetworkLogger from 'react-native-network-logger'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { SipAccount } from './types'
-import useFirestore from './hooks/useFirestore'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -70,9 +67,6 @@ function AppContent() {
     enabled: !!user,
     onSuccess: async data => {
       setSipAccount(data)
-      if (user?.firebaseAccessToken) {
-        await auth().signInWithCustomToken(user.firebaseAccessToken)
-      }
       await BootSplash.hide({ fade: true })
     },
     onError: async () => {

@@ -35,3 +35,17 @@ export const segmentedButtonsCalculator = (statusText?: AgentStatusText) => {
 
   return buttons
 }
+
+export const encodeFormData = <T extends Record<string, string | undefined>>(
+  data: T
+): string => {
+  const formData = new URLSearchParams()
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value)
+    }
+  })
+
+  return formData.toString()
+}

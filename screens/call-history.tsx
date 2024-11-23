@@ -1,12 +1,17 @@
 import { DefaultError } from '@tanstack/react-query'
 import React from 'react'
 import { View } from 'react-native'
-import { Button, SegmentedButtons } from 'react-native-paper'
+import {
+  ActivityIndicator,
+  Button,
+  Dialog,
+  SegmentedButtons
+} from 'react-native-paper'
 import { DOMAINS } from '../constants'
 import useMutation from '../hooks/useMutation'
 import useBoundStore from '../stores'
 import { ChangeStatusFormValues, LoginAgentFormValues } from '../types'
-import { segmentedButtonsCalculator } from '../utils'
+import { encodeFormData, segmentedButtonsCalculator } from '../utils'
 
 export default function CallHistory() {
   const statusText = useBoundStore(state => state.customer?.agentStatusText)
@@ -22,7 +27,7 @@ export default function CallHistory() {
     password: sipAccount?.agent?.agentPassword
   }
 
-  const { mutate: changeStatus } = useMutation<
+  const { isPending, mutate: changeStatus } = useMutation<
     unknown,
     DefaultError,
     ChangeStatusFormValues
@@ -33,46 +38,68 @@ export default function CallHistory() {
   const { mutate: checkAgentLogin } = useMutation<
     unknown,
     DefaultError,
-    Omit<LoginAgentFormValues, 'webrtcflg'>
+    string
   >({
     endpoint: `/infinitalk/agentstatus/logincheck?domain=https://${sipAccount?.domain}`,
     config: {
-      baseURL: DOMAINS.API_GATEWAY_DOMAIN
+      baseURL: DOMAINS.API_GATEWAY_DOMAIN,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     },
-    onSuccess: () =>
-      loginAgent({
+    onSuccess: () => {
+      const data = encodeFormData<LoginAgentFormValues>({
         ...sipInfo,
         webrtcflg: 1
       })
+      loginAgent(data)
+    }
   })
 
-  const { mutate: loginAgent } = useMutation<
-    unknown,
-    DefaultError,
-    LoginAgentFormValues
-  >({
+  const { mutate: loginAgent } = useMutation<unknown, DefaultError, string>({
     endpoint: `/infinitalk/agentstatus/login?domain=https://${sipAccount?.domain}`,
     config: {
-      baseURL: DOMAINS.API_GATEWAY_DOMAIN
-    }
+      baseURL: DOMAINS.API_GATEWAY_DOMAIN,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    },
+    onSuccess: () =>
+      changeStatus({
+        Action: 'QueuePause',
+        Queue: currentAgent?.groupNames?.[0],
+        Interface: currentAgent?.interface,
+        Paused: '0',
+        Reason: '0'
+      })
   })
 
   const buttons = segmentedButtonsCalculator(statusText)
 
   const handleStatusChange = (selectedValue: string) => {
+    const paused = selectedValue === '0' ? '0' : '1'
     changeStatus({
       Action: 'QueuePause',
       Queue: currentAgent?.groupNames?.[0],
       Interface: currentAgent?.interface,
-      Paused: selectedValue,
+      Paused: paused,
       Reason: selectedValue
     })
   }
 
-  const handleLoginAgent = () => checkAgentLogin(sipInfo)
+  const handleLoginAgent = () => {
+    const data =
+      encodeFormData<Omit<LoginAgentFormValues, 'webrtcflg'>>(sipInfo)
+    checkAgentLogin(data)
+  }
 
   return (
     <View className="flex-1 justify-center items-center">
+      <Dialog dismissable={false} visible={isPending}>
+        <Dialog.Content>
+          <ActivityIndicator size="large" animating />
+        </Dialog.Content>
+      </Dialog>
       <Button mode="contained" onPress={handleLoginAgent}>
         Login Agent
       </Button>
