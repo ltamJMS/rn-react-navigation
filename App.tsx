@@ -23,6 +23,7 @@ import useBoundStore from './stores'
 import { SipAccount } from './types'
 import NetworkLogger from 'react-native-network-logger'
 import useSoftPhone from './hooks/useSoftPhone'
+import LottieSplashScreen from '@attarchi/react-native-lottie-splash-screen'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -66,10 +67,13 @@ function AppContent() {
       `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
     ],
     enabled: !!user,
-    onSuccess: async data => {
+    onSuccess: data => {
       createSoftPhone(data)
+      LottieSplashScreen.hide()
     },
-    onError: async () => {}
+    onError: () => {
+      LottieSplashScreen.hide()
+    }
   })
 
   const isDarkTheme = colorScheme === 'dark'
