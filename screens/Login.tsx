@@ -158,7 +158,7 @@ export default function Login() {
               asteriskDomain: result.data?.asteriskDomain
             })
           })
-          NavigationService.navigate(SCREENS.HOME)
+          NavigationService.navigate(SCREENS.AGENT_MEMBER)
         } catch (err) {
           console.error('🔴 AUTH ERROR', err)
         }

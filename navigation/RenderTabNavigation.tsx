@@ -32,11 +32,11 @@ const RenderTabNavigation = () => {
   const renderTabIcon = (route: ScreenRoute, focused: boolean) => {
     let iconName: string
     switch (route) {
-      case `${SCREENS.HOME}_TAB`:
-        iconName = 'apps'
-        break
       case `${SCREENS.CALL_HISTORY}_TAB`:
-        iconName = 'time'
+        iconName = 'time-sharp'
+        break
+      case `${SCREENS.KEYPAD}_TAB`:
+        iconName = 'apps'
         break
       case `${SCREENS.AGENT_MEMBER}_TAB`:
         iconName = 'people'
@@ -61,6 +61,7 @@ const RenderTabNavigation = () => {
         headerStyle: {
           backgroundColor: '#AACD06'
         },
+        // eslint-disable-next-line react/no-unstable-nested-components
         headerTitle: () => (
           <CustomHeaderTitle title={route.name.replace('_TAB', '')} />
         ),
@@ -71,11 +72,13 @@ const RenderTabNavigation = () => {
         tabBarStyle: {
           backgroundColor: palette.white
         },
+        // eslint-disable-next-line react/no-unstable-nested-components
         tabBarLabel: ({ focused }) => (
           <Text
             style={{
               color: focused ? palette.borderColorDark : '#bababa',
-              fontSize: 12
+              fontSize: 12,
+              marginBottom: 5
             }}
           >
             {route.name.replace('_TAB', '')}
@@ -83,12 +86,12 @@ const RenderTabNavigation = () => {
         )
       })}
     >
-      <Tab.Screen name={`${SCREENS.HOME}_TAB`} component={HomeScreen} />
       <Tab.Screen
         name={`${SCREENS.AGENT_MEMBER}_TAB`}
         component={AgentMemberScreen}
       />
-      <Tab.Screen name={`${SCREENS.CALL_HISTORY}_TAB`} component={Keypad} />
+      <Tab.Screen name={`${SCREENS.KEYPAD}_TAB`} component={Keypad} />
+      <Tab.Screen name={`${SCREENS.CALL_HISTORY}_TAB`} component={HomeScreen} />
     </Tab.Navigator>
   )
 }

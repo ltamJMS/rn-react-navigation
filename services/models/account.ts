@@ -101,3 +101,8 @@ export interface DefaultState {
   userId: number
   localization: string
 }
+
+export interface CallRequest {
+  phoneNumber: string
+  isOutbound: boolean
+}

@@ -2,45 +2,95 @@ import axios from 'axios'
 import { useCallback, useMemo } from 'react'
 import { useResetRecoilState } from 'recoil'
 import * as NavigationService from 'react-navigation-helpers'
-import { authState, sipAccountState } from '../../store/auth'
+import { authState, currentUserState, sipAccountState } from '../../store/auth'
 import {
   agentLoginState,
+  callRequestState,
+  canSFRegisterState,
   currentCallState,
   holdingCallState,
   incomingShowState
 } from '../../store/softphone'
 import { SCREENS } from '../../../shared/constants'
+import {
+  agentsState,
+  agentStatusesState,
+  isWebRTCUserState,
+  sipAccountsAvailableState
+} from '../../store/agentStatus'
+import { contextsState, tenantState } from '../../store/tenant'
 
 const useLogout = () => {
+  // agentStatus store
+  const resetAgentsState = useResetRecoilState(agentsState)
+  const resetAgentStatusesState = useResetRecoilState(agentStatusesState)
+  const resetIsWebRTCUserState = useResetRecoilState(isWebRTCUserState)
+  const resetSipAccountsAvailableState = useResetRecoilState(
+    sipAccountsAvailableState
+  )
+  // auth store
   const resetAuth = useResetRecoilState(authState)
   const resetAgentLogin = useResetRecoilState(agentLoginState)
+  const resetCurrentUserState = useResetRecoilState(currentUserState)
+  // softphone store
   const resetSipAccount = useResetRecoilState(sipAccountState)
   const resetIncomingShow = useResetRecoilState(incomingShowState)
   const resetCurrentCall = useResetRecoilState(currentCallState)
   const resetHoldingCall = useResetRecoilState(holdingCallState)
+  const resetCanSFRegisterState = useResetRecoilState(canSFRegisterState)
+  const resetCallRequestState = useResetRecoilState(callRequestState)
+  // tenant store
+  const resetTenantState = useResetRecoilState(tenantState)
+  const resetContextsState = useResetRecoilState(contextsState)
   const resetStore = useMemo(() => {
     return () => {
+      // agentStatus store
+      resetAgentsState()
+      resetAgentStatusesState()
+      resetIsWebRTCUserState()
+      resetSipAccountsAvailableState()
+      // auth store
       resetAuth()
       resetAgentLogin()
+      resetCurrentUserState()
+      // softphone store
       resetSipAccount()
       resetIncomingShow()
       resetCurrentCall()
       resetHoldingCall()
+      resetCanSFRegisterState()
+      resetCallRequestState()
+      // tenant store
+      resetTenantState()
+      resetContextsState()
     }
   }, [
-    resetAgentLogin,
+    // agentStatus store
+    resetAgentsState,
+    resetAgentStatusesState,
+    resetIsWebRTCUserState,
+    resetSipAccountsAvailableState,
+    // auth store
     resetAuth,
+    resetAgentLogin,
+    resetCurrentUserState,
+    // softphone store
     resetCurrentCall,
     resetHoldingCall,
     resetIncomingShow,
-    resetSipAccount
+    resetSipAccount,
+    resetCanSFRegisterState,
+    resetCallRequestState,
+    // tenant store
+    resetTenantState,
+    resetContextsState
   ])
 
   return useCallback(async () => {
     try {
       const asyncJob: Promise<unknown>[] = []
       resetStore()
-      delete axios.defaults.headers.common['Authorization']
+      delete axios.defaults.headers.common.Authorization
       await Promise.all(asyncJob)
     } catch (err) {
       console.error('🔴 LOGOUT ERROR', err)

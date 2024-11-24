@@ -188,48 +188,59 @@ export const useSoftPhone = () => {
     [softPhone]
   )
 
-  const handleLogout = useCallback(() => {
-    const { sipAccount, domain, agent } = sipAccountData
-    if (!softPhone) return
-    if (agentLoginStatus) {
-      Alert.alert(
-        'ログアウト',
-        'エージェントもログアウトされますが、よろしいでしょうか？',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel'
-          },
-          {
-            text: 'OK',
-            onPress: async () => {
-              softPhone.unregister({ all: true })
-              await new Promise(resolve => setTimeout(resolve, 2000))
-              const resLogoutAgent = await logoutAgent(
-                sipAccount,
-                agent.agentAccount,
-                domain
-              )
-              if (resLogoutAgent.success) {
-                Toast.show({
-                  type: 'success',
-                  text1: 'エージェントログアウトしました!'
-                })
-                logout()
-              } else {
-                Alert.alert(
-                  'Logout',
-                  `ログアウトに失敗しました: ${resLogoutAgent.message}`
+  const handleLogout = useCallback(
+    (setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+      if (!softPhone || !auth) {
+        setLoading(false)
+        return
+      }
+      const { sipAccount, domain, agent } = sipAccountData
+      if (agentLoginStatus) {
+        Alert.alert(
+          'ログアウト',
+          'エージェントもログアウトされますが、よろしいでしょうか？',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel'
+            },
+            {
+              text: 'OK',
+              onPress: async () => {
+                setLoading(true)
+                softPhone.unregister({ all: true })
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                const resLogoutAgent = await logoutAgent(
+                  sipAccount,
+                  agent.agentAccount,
+                  domain
                 )
+                if (resLogoutAgent.success) {
+                  Toast.show({
+                    type: 'success',
+                    text1: 'エージェントログアウトしました!'
+                  })
+                  logout()
+                  setLoading(false)
+                } else {
+                  setLoading(false)
+                  Alert.alert(
+                    'Logout',
+                    `ログアウトに失敗しました: ${resLogoutAgent.message}`
+                  )
+                }
               }
             }
-          }
-        ]
-      )
-    } else {
-      logout()
-    }
-  }, [agentLoginStatus, logout, sipAccountData, softPhone])
+          ]
+        )
+      } else {
+        setLoading(true)
+        logout()
+        setLoading(false)
+      }
+    },
+    [agentLoginStatus, auth, logout, sipAccountData, softPhone]
+  )
 
   const handleRegisterSip = useCallback(async () => {
     if (!softPhone) return

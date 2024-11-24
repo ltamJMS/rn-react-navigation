@@ -17,12 +17,12 @@ const LoginBtn: React.FC<LoginBtnProps> = ({ handleClick, loading }) => {
         width: '100%'
       }}
     >
-      <Text style={{ fontSize: 15 }}>電話機を起動しますか？</Text>
+      <Text style={{ fontSize: 15 }}>アプリログアウト？</Text>
       {loading ? (
         <ActivityIndicator size="small" />
       ) : (
         <Button
-          icon="cached"
+          icon="power"
           mode="contained"
           style={{
             backgroundColor: '#444444',
@@ -31,7 +31,7 @@ const LoginBtn: React.FC<LoginBtnProps> = ({ handleClick, loading }) => {
           }}
           onPress={() => handleClick()}
         >
-          起動する
+          Logout
         </Button>
       )}
     </View>

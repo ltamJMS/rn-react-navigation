@@ -13,7 +13,7 @@ if (!firebase.apps.length) {
 
 const handleIncomingCall = async () => {
   console.log('🍀🍀🍀🍀🍀🍀 Click accept')
-  NavigationService.navigate(SCREENS.HOME)
+  NavigationService.navigate(SCREENS.AGENT_MEMBER)
   setTimeout(() => {
     RNCallKeep.endAllCalls()
   }, 6000)
@@ -42,7 +42,7 @@ RNCallKeep.addEventListener('endCall', async () => handleDecline())
 if (Platform.OS === 'ios') {
   VoipPushNotification.addEventListener('notification', notification => {
     console.log('🍀🍀🍀🍀🍀VoIP push notification received:', notification)
-    NavigationService.navigate(SCREENS.HOME)
+    NavigationService.navigate(SCREENS.AGENT_MEMBER)
   })
 
   VoipPushNotification.addEventListener('didLoadWithEvents', events => {

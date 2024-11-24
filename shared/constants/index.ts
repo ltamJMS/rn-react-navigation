@@ -2,10 +2,10 @@
 export const SCREENS = {
   SPLASH: 'Splash',
   LOGIN: 'Login',
-  HOME: 'DialPad',
   AGENT_MEMBER: 'Agent Member',
-  CALL_HISTORY: 'Call History',
-  CALL_SCREEN: 'Call'
+  KEYPAD: 'Keypad',
+  CALL_SCREEN: 'Call',
+  CALL_HISTORY: 'Call History'
 }
 export const firebaseDevConfig = {
   apiKey: 'AIzaSyAyy5XNS9_-QRhKGSJQE5GbKnXULhEtDKU',

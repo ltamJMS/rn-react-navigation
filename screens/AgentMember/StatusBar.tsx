@@ -17,7 +17,6 @@ import {
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
 import SegmentedControl from 'react-native-segmented-control-2'
-import Logout from './Logout'
 import { CollapsableContainer } from './CollapsableContainer'
 import {
   agentStatusesState,
@@ -38,9 +37,10 @@ import {
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
 import LoginBtn from './LoginBtn'
-import TestBtn from './TestBtn'
 import { useSoftPhoneContext } from '../../SoftPhoneProvider'
 import { SipConfig } from '../../services/models/softPhone'
+import LogoutBtn from './LogoutBtn'
+
 /** status to show in segment control
     0	待機中
     1 ログオフ
@@ -63,20 +63,18 @@ const StatusBar: React.FC = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
   const { agentStatus } = currentUser || {}
   const setCanSFRegister = useSetRecoilState(canSFRegisterState)
-  const { handleLogin, handleCall } = useSoftPhone()
+  const { handleLogin, handleLogout } = useSoftPhone()
   const logoutAgent = useLogoutAgent({ unregisterSip: true })
   const [availableStatuses, setAvailableStatuses] = useState<number[]>()
   const [showableStatusMax, setShowableStatusMax] =
     useState<number>(SHOWABLE_STATUS_MAX)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
   const [loading, setLoading] = useState(false)
+  const [loadingLogout, setLoadingLogout] = useState(false)
   const sipAccountData = useRecoilValue(sipAccountState)
   const [currentCall] = useRecoilState(currentCallState)
-
-  // TODO:
   const { setupSoftPhone } = useSoftPhoneContext()
-  // check agentStatus to shoe statusCode
-  // Khởi tạo softphone với config
+
   const setupSF = () => {
     const sipConfig: SipConfig = {
       account: sipAccountData.sipAccount,
@@ -89,8 +87,6 @@ const StatusBar: React.FC = () => {
 
   const isStatusButtonDisabled = useCallback(
     (statusValue: number): boolean => {
-      // will not be able to change to disabled status
-      // 7: 自動ワーク
       const statusDisableDefault = [7]
 
       if (statusDisableDefault.includes(statusValue)) return true
@@ -100,17 +96,13 @@ const StatusBar: React.FC = () => {
         (isWebRTCUser && !auth?.roles.includes(Role['soft-phone:normal']))
       )
         return true
-      console.log(111111111111, 'isWebRTCUser', isWebRTCUser)
-      console.log(111111111111, 'auth?.roles', auth?.roles)
       return false
     },
     [isWebRTCUser, auth?.roles]
   )
 
-  // call api to change status
   const handleChangeStatus = useCallback(
     (status: number) => async (): Promise<Response> => {
-      console.log(111111111111, 'handleChangeStatus with status = ', status)
       if (
         !currentUser ||
         !currentUser.agentStatus ||
@@ -118,11 +110,6 @@ const StatusBar: React.FC = () => {
         !currentUser.agentStatus.interface ||
         isStatusButtonDisabled(status)
       ) {
-        console.log(
-          111111111111,
-          'handleChangeStatus false because isStatusButtonDisabled = ',
-          isStatusButtonDisabled(status)
-        )
         return { success: false }
       }
 
@@ -207,7 +194,6 @@ const StatusBar: React.FC = () => {
     }
   }, [currentUser?.agentStatus?.sipAccount, isWebRTCUser, logoutAgent])
 
-  // set available statuses, available quick login status, handle sm screen
   useEffect(() => {
     /** Statuses code
         0	待機中
@@ -228,7 +214,6 @@ const StatusBar: React.FC = () => {
       status => currentUser?.agentStatus?.status === status
     )
 
-    // if active status is in expand, then swap it to the last element in the showable statuses list
     if (activeStatusIndex > -1 && activeStatusIndex >= SHOWABLE_STATUS_MAX) {
       // eslint-disable-next-line no-extra-semi
       ;[statuses[SHOWABLE_STATUS_MAX - 1], statuses[activeStatusIndex]] = [
@@ -254,7 +239,6 @@ const StatusBar: React.FC = () => {
   const handleSegmentChange = (selectedIndex: number) => {
     setLoading(true)
     const selectedStatus = tabs[selectedIndex]?.status
-    console.log(111111111111, 'change selectedIndex', selectedIndex)
     handleChangeStatus(selectedStatus)().then(res => {
       if (res.success) {
         setIndex(selectedIndex)
@@ -275,6 +259,7 @@ const StatusBar: React.FC = () => {
   const dispStatus = getDisplayStatus(phoneStatus || 0, status || 0)
   const statusText = getASText(phoneStatus || 0, status || 0, tenant)
   const { color, icon, size } = getStatusStyle(dispStatus)
+
   return (
     <View style={styles.wrapper}>
       <TouchableWithoutFeedback onPress={onItemPress}>
@@ -286,15 +271,27 @@ const StatusBar: React.FC = () => {
             />
             <View style={styles.textContainer}>
               <Text style={styles.name}>{currentUser.name}</Text>
-              <View style={styles.descriptionContainer}>
-                <Icon
-                  name={icon}
-                  color={color}
-                  style={{ marginRight: 4 }}
-                  size={size}
-                />
-                <Text style={{ color }}>{statusText}</Text>
-              </View>
+              {agentLoginStatus ? (
+                <View style={styles.descriptionContainer}>
+                  <Icon
+                    name={icon}
+                    color={color}
+                    style={{ marginRight: 4 }}
+                    size={size}
+                  />
+                  <Text style={{ color }}>{statusText}</Text>
+                </View>
+              ) : (
+                <View style={styles.descriptionContainer}>
+                  <Icon
+                    name="power"
+                    color="#757575"
+                    style={{ marginRight: 4 }}
+                    size={size}
+                  />
+                  <Text style={{ color: '#757575' }}>ログオフ</Text>
+                </View>
+              )}
             </View>
             <Icon
               name={'settings-outline'}
@@ -336,7 +333,12 @@ const StatusBar: React.FC = () => {
                   <Text>Current Call: {currentCall.dst.num}</Text>
                 </View>
               )}
-              <Logout />
+              <LogoutBtn
+                handleClick={async () => {
+                  handleLogout(setLoadingLogout)
+                }}
+                loading={loadingLogout}
+              />
             </View>
           </CollapsableContainer>
         </View>

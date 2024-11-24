@@ -8,7 +8,7 @@ import LoginScreen from '../screens/Login'
 import RenderTabNavigation from './RenderTabNavigation'
 import Keypad from '../screens/Keypad'
 import { SCREENS } from '../shared/constants'
-import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
+import HomeScreen from '../screens/HomeScreen'
 import CallScreen from '../screens/CallCenter/CallScreen'
 
 const Stack = createStackNavigator()
@@ -30,13 +30,13 @@ const Navigation = () => {
         initialRouteName={SCREENS.LOGIN}
       >
         <Stack.Screen name={SCREENS.LOGIN} component={LoginScreen} />
-        <Stack.Screen name={SCREENS.HOME} component={RenderTabNavigation} />
-        <Stack.Screen name={SCREENS.CALL_HISTORY} component={Keypad} />
         <Stack.Screen
           name={SCREENS.AGENT_MEMBER}
-          component={AgentMemberScreen}
+          component={RenderTabNavigation}
         />
+        <Stack.Screen name={SCREENS.KEYPAD} component={Keypad} />
         <Stack.Screen name={SCREENS.CALL_SCREEN} component={CallScreen} />
+        <Stack.Screen name={SCREENS.CALL_HISTORY} component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

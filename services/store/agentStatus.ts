@@ -4,19 +4,9 @@ import { GroupData } from '../models/Group'
 
 const initState: AgentStatusMap = {}
 
-export const sipAccountsMapNameState = atom<Account[]>({
-  key: 'sipAccountsMapNameState',
-  default: []
-})
-
 export const agentStatusesState = atom<AgentStatusMap>({
   key: 'agentStatusesSate',
   default: initState
-})
-
-export const groupsState = atom<GroupData>({
-  key: 'groupsState',
-  default: {}
 })
 
 export const agentsState = atom<AgentStatusMap>({

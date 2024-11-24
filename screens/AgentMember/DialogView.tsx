@@ -6,16 +6,16 @@ import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../../shared/constants'
 import AgentStatus, { SipConfig } from '../../services/models/softPhone'
 import { useSoftPhoneContext } from '../../SoftPhoneProvider'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { sipAccountState } from '../../services/store/auth'
+import { callRequestState } from '../../services/store/softphone'
+
 enum DialogText {
-  MakeACallTitle = 'Make a Call',
-  LoginRequiredTitle = 'Agent Login Required',
-  CallDescription = 'Do you want to Call by exten number?',
-  LoginDescription = 'You are not logged in. Please login first.',
-  CancelButton = 'Cancel',
-  CallButton = 'Call',
-  LoginButton = 'Agent Login'
+  CallDescription = '内線番号で電話をかけますか？',
+  LoginDescription = '電話機が起動されていないようです。\n 起動してもよろしいでしょうか？',
+  CancelButton = 'キャンセル',
+  CallButton = '発信',
+  LoginButton = 'OK'
 }
 
 interface DialogViewProps {
@@ -35,6 +35,7 @@ const DialogView: React.FC<DialogViewProps> = ({
   const [loading, setLoading] = useState(false)
   const sipAccountData = useRecoilValue(sipAccountState)
   const { setupSoftPhone } = useSoftPhoneContext()
+  const [, setCallRequest] = useRecoilState(callRequestState)
 
   const setupSF = () => {
     const sipConfig: SipConfig = {
@@ -46,10 +47,16 @@ const DialogView: React.FC<DialogViewProps> = ({
     setupSoftPhone(sipConfig)
   }
 
-  const handleCallClick = () => {
-    console.log('handleCallClick invoked')
-    NavigationService.push(SCREENS.HOME)
-    onDismiss()
+  const handleCallClick = (phoneNumber: string) => {
+    if (phoneNumber) {
+      console.log('Calling:', phoneNumber)
+      setCallRequest({
+        phoneNumber: phoneNumber,
+        isOutbound: true
+      })
+      NavigationService.push(SCREENS.CALL_SCREEN)
+      onDismiss()
+    }
   }
   let buttonLabel
 
@@ -63,14 +70,9 @@ const DialogView: React.FC<DialogViewProps> = ({
   return (
     <View>
       <Dialog.Container visible={visible}>
-        <Dialog.Title>
-          {agentLoginStatus
-            ? DialogText.MakeACallTitle
-            : DialogText.LoginRequiredTitle}
-        </Dialog.Title>
         <Dialog.Description>
           {agentLoginStatus && agent
-            ? `Do you want to call ${agent.name} at extension ${agent.exten}?`
+            ? `内線番号で電話をかけますか？\n \n ${agent.name} - ${agent.exten}`
             : DialogText.LoginDescription}
         </Dialog.Description>
         <Dialog.Button
@@ -83,8 +85,8 @@ const DialogView: React.FC<DialogViewProps> = ({
         <Dialog.Button
           label={buttonLabel}
           onPress={() => {
-            if (agentLoginStatus) {
-              handleCallClick()
+            if (agentLoginStatus && agent) {
+              handleCallClick(agent?.exten || '')
             } else {
               setLoading(true)
               handleRegisterSip().then(() => {

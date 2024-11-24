@@ -2,42 +2,72 @@ import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { IconButton, MD3Colors } from 'react-native-paper'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
-import { useSoftPhone } from '../services/usecases/auth/useSoftPhone'
+import { useRecoilState } from 'recoil'
+import {
+  callRequestState,
+  currentCallState,
+  holdingCallState
+} from '../services/store/softphone'
+import { Button } from 'react-native-paper'
 
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
-  const { handleCall } = useSoftPhone()
+  const [, setCallRequest] = useRecoilState(callRequestState)
+  const [currentCall] = useRecoilState(currentCallState)
+  const [holdingCall] = useRecoilState(holdingCallState)
+  const isCallButtonDisabled = !phoneNumber || !!currentCall
   const handlePress = (value: string) => {
     setPhoneNumber(prev => prev + value)
-  }
-
-  const handleDelete = () => {
-    setPhoneNumber(prev => prev.slice(0, -1))
   }
 
   const handleCallClick = () => {
     if (phoneNumber) {
       console.log('Calling:', phoneNumber)
-      handleCall(phoneNumber)
-      // NavigationService.navigate(SCREENS.CALL_SCREEN)
+      setCallRequest({
+        phoneNumber: phoneNumber,
+        isOutbound: true
+      })
+      NavigationService.push(SCREENS.CALL_SCREEN)
     }
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.phoneNumberContainer}>
-        <Text style={styles.phoneNumberText} numberOfLines={2}>
+      <View
+        style={[styles.phoneNumberContainer, { height: 50, paddingTop: 10 }]}
+      >
+        {(currentCall || holdingCall) && (
+          <Button
+            mode="contained"
+            style={{
+              backgroundColor: '#8CC835',
+              width: '38%',
+              height: 38
+            }}
+            onPress={() => NavigationService.navigate(SCREENS.CALL_SCREEN)}
+          >
+            通話に戻る
+          </Button>
+        )}
+        {(currentCall || holdingCall) && (
+          <Ionicons name="caret-forward-outline" size={20} color="#8CC835" />
+        )}
+      </View>
+      <View style={[styles.phoneNumberContainer, { alignItems: 'flex-start' }]}>
+        <Text style={styles.phoneNumberText} numberOfLines={1}>
           {phoneNumber}
         </Text>
         {phoneNumber.length > 0 && (
           <IconButton
             icon="backspace"
             iconColor={MD3Colors.neutralVariant70}
-            size={24}
-            onPress={handleDelete}
+            size={22}
+            onPress={() => setPhoneNumber(prev => prev.slice(0, -1))}
+            onLongPress={() => setPhoneNumber('')}
           />
         )}
       </View>
@@ -54,7 +84,7 @@ const Keypad = () => {
             onPress={() => handlePress('*')}
             style={styles.keypadButton}
           >
-            <Fontisto name="asterisk" size={15} />
+            <Fontisto name="asterisk" size={13} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handlePress('0')}
@@ -68,12 +98,15 @@ const Keypad = () => {
             onPress={() => handlePress('#')}
             style={styles.keypadButton}
           >
-            <Fontisto name="hashtag" size={15} />
+            <Fontisto name="hashtag" size={13} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <TouchableOpacity onPress={handleCallClick} style={styles.callButton}>
+      <TouchableOpacity
+        onPress={() => handleCallClick()}
+        style={styles.callButton}
+      >
         <FontAwesome name="phone" size={26} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -113,39 +146,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    marginBottom: 10,
-    marginTop: 20,
     width: '92%',
-    height: 100
+    height: 80
   },
   phoneNumberText: {
-    fontSize: 32,
+    fontSize: 28,
     flex: 1,
     flexWrap: 'wrap',
     marginRight: 10,
     textAlign: 'center'
   },
   keypad: {
-    width: '92%'
+    width: '90%'
   },
   keypadRow: {
     flexDirection: 'row',
     justifyContent: 'space-between'
-    // marginBottom: 8
   },
   keypadButton: {
     width: '33%',
     padding: 14,
     alignItems: 'center',
-    // backgroundColor: '#ddd',
     borderRadius: 5
   },
   buttonText: {
-    fontSize: 32
+    fontSize: 28
   },
   lettersText: {
     fontSize: 12,
-    color: '#555'
+    color: '#6b6b6b'
   },
   divider: {
     height: 0.5,
@@ -154,10 +183,10 @@ const styles = StyleSheet.create({
   },
   callButton: {
     width: '90%',
-    paddingVertical: 15,
+    paddingVertical: 12,
     backgroundColor: '#8CC835',
     borderRadius: 5,
-    marginBottom: 30,
+    marginVertical: '5%',
     alignItems: 'center'
   }
 })

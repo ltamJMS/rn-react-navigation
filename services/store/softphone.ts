@@ -1,6 +1,6 @@
 import { atom } from 'recoil'
 import { SoftPhoneCallInfo } from '../models/softPhone'
-import { SpeedDial } from '../models/account'
+import { CallRequest, SpeedDial } from '../models/account'
 
 export const incomingShowState = atom<boolean>({
   key: 'incomingShowState',
@@ -22,12 +22,15 @@ export const agentLoginState = atom<boolean>({
   default: false
 })
 
-export const speedDialState = atom<SpeedDial[]>({
-  key: 'speedDialState',
-  default: []
-})
-
 export const canSFRegisterState = atom<boolean>({
   key: 'canSFRegisterState',
   default: false
+})
+
+export const callRequestState = atom<CallRequest>({
+  key: 'callRequestState',
+  default: {
+    phoneNumber: '',
+    isOutbound: false
+  }
 })
