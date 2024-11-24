@@ -8,7 +8,6 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import merge from 'deepmerge'
-import BootSplash from 'react-native-bootsplash'
 import {
   adaptNavigationTheme,
   MD3DarkTheme,
@@ -69,11 +68,8 @@ function AppContent() {
     enabled: !!user,
     onSuccess: async data => {
       createSoftPhone(data)
-      await BootSplash.hide({ fade: true })
     },
-    onError: async () => {
-      await BootSplash.hide({ fade: true })
-    }
+    onError: async () => {}
   })
 
   const isDarkTheme = colorScheme === 'dark'

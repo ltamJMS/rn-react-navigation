@@ -99,7 +99,7 @@ export default function CallHistory() {
   }
 
   return (
-    <View className="flex-1 justify-center items-center">
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Dialog dismissable={false} visible={isPending}>
         <Dialog.Content>
           <ActivityIndicator size="large" animating />

@@ -9,7 +9,7 @@ export default function Agents() {
     <FlatList
       data={agents}
       keyExtractor={item => `${item.userID}`}
-      ItemSeparatorComponent={() => <View className="!h-5" />}
+      ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       contentContainerStyle={{ paddingVertical: 20, paddingHorizontal: 10 }}
       renderItem={({ item }) => (
         <Card>

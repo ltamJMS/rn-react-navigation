@@ -68,10 +68,10 @@ export default function Login() {
     <View style={styles.background}>
       <Portal>
         <Dialog dismissable={false} visible={isPending}>
-          <Dialog.Content className="py-8">
+          <Dialog.Content>
             <ActivityIndicator size="large" animating />
-            <View className="h-4" />
-            <Text className="!text-center" variant="bodyLarge">
+            <View style={{ height: 5 }} />
+            <Text style={{ textAlign: 'center' }} variant="bodyLarge">
               Please wait …
             </Text>
           </Dialog.Content>
@@ -129,11 +129,7 @@ export default function Login() {
           )}
         </View>
 
-        <Button
-          className="w-full"
-          mode="contained"
-          onPress={handleSubmit(onSubmit)}
-        >
+        <Button mode="contained" onPress={handleSubmit(onSubmit)}>
           LOGIN
         </Button>
       </KeyboardAvoidingView>

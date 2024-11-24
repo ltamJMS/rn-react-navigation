@@ -8,10 +8,19 @@ export default function Home() {
   const { t } = useTranslation()
   const user = useBoundStore(state => state.user)
   const unAuthenticate = useBoundStore(state => state.unAuthenticate)
+  const softPhone = useBoundStore(state => state.softPhone)
+
+  const handleCall = () => {
+    softPhone?.call('08032418093')
+  }
 
   return (
-    <View className="flex-1 justify-center gap-y-6" style={styles.container}>
-      <Text className="text-2xl text-center text-red-600">
+    <View style={styles.container}>
+      <Button mode="contained" onPress={handleCall}>
+        Call
+      </Button>
+
+      <Text style={{ textAlign: 'center', fontSize: 20, color: 'red' }}>
         {t('common.hello', { name: user?.name })}👋
       </Text>
 
