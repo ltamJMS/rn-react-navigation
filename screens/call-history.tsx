@@ -18,6 +18,7 @@ export default function CallHistory() {
   const serverNumber = useBoundStore(state => state.user?.serverNumber)
   const sipAccount = useBoundStore(state => state.sipAccount)
   const currentAgent = useBoundStore(state => state.currentAgent)
+  const softPhone = useBoundStore(state => state.softPhone)
 
   const status = `${currentAgent?.status}`
   const sipInfo = {
@@ -93,6 +94,10 @@ export default function CallHistory() {
     checkAgentLogin(data)
   }
 
+  const handleCall = () => {
+    softPhone?.call('08032418093')
+  }
+
   return (
     <View className="flex-1 justify-center items-center">
       <Dialog dismissable={false} visible={isPending}>
@@ -100,6 +105,11 @@ export default function CallHistory() {
           <ActivityIndicator size="large" animating />
         </Dialog.Content>
       </Dialog>
+
+      <Button mode="contained" onPress={handleCall}>
+        Call
+      </Button>
+
       <Button mode="contained" onPress={handleLoginAgent}>
         Login Agent
       </Button>

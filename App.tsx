@@ -1,6 +1,5 @@
 import React from 'react'
 import { StatusBar, useColorScheme } from 'react-native'
-
 import {
   NavigationContainer,
   DarkTheme as NavigationDarkTheme,
@@ -23,6 +22,8 @@ import AuthStacks from './navigators/AuthStacks'
 import MainTabs from './navigators/MainTabs'
 import useBoundStore from './stores'
 import { SipAccount } from './types'
+import NetworkLogger from 'react-native-network-logger'
+import useSoftPhone from './hooks/useSoftPhone'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -55,10 +56,11 @@ export default function App() {
 function AppContent() {
   const colorScheme = useColorScheme()
   const user = useBoundStore(state => state.user)
-  const isAuthenticated = useBoundStore(state => state.sipAccount)
-  const setSipAccount = useBoundStore(state => state.setSipAccount)
+  const isAuthenticated = useBoundStore(state => state.softPhone)
+  const createSoftPhone = useBoundStore(state => state.createSoftPhone)
 
   useFirestore()
+  useSoftPhone()
 
   useQuery<SipAccount>({
     queryKey: [
@@ -66,11 +68,10 @@ function AppContent() {
     ],
     enabled: !!user,
     onSuccess: async data => {
-      setSipAccount(data)
+      createSoftPhone(data)
       await BootSplash.hide({ fade: true })
     },
     onError: async () => {
-      setSipAccount(null)
       await BootSplash.hide({ fade: true })
     }
   })

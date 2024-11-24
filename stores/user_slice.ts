@@ -6,7 +6,7 @@ import { User } from '../types'
 
 export type UserState = {
   user: User | null
-  setUser: (user: User | null) => void
+  setUser: (user: User) => void
 }
 
 type UserPersist = StateCreator<
@@ -19,7 +19,7 @@ type UserPersist = StateCreator<
 const createUserSlice: UserPersist = persist(
   set => ({
     user: null,
-    setUser: (user: User | null) => set({ user })
+    setUser: (user: User) => set({ user })
   }),
   {
     name: 'user-storage',
