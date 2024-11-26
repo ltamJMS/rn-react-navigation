@@ -6,8 +6,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { IconButton, MD3Colors } from 'react-native-paper'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import {
+  agentLoginState,
   callRequestState,
   currentCallState,
   holdingCallState
@@ -19,7 +20,8 @@ const Keypad = () => {
   const [, setCallRequest] = useRecoilState(callRequestState)
   const [currentCall] = useRecoilState(currentCallState)
   const [holdingCall] = useRecoilState(holdingCallState)
-  const isCallButtonDisabled = !phoneNumber || !!currentCall
+  const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const isCallButtonDisabled = !phoneNumber || !agentLoginStatus
   const handlePress = (value: string) => {
     setPhoneNumber(prev => prev + value)
   }
@@ -105,7 +107,11 @@ const Keypad = () => {
 
       <TouchableOpacity
         onPress={() => handleCallClick()}
-        style={styles.callButton}
+        style={[
+          styles.callButton,
+          { backgroundColor: isCallButtonDisabled ? '#ccc' : '#8CC835' }
+        ]}
+        disabled={isCallButtonDisabled}
       >
         <FontAwesome name="phone" size={26} color="#fff" />
       </TouchableOpacity>

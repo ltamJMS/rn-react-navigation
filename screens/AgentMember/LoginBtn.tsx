@@ -17,7 +17,7 @@ const LoginBtn: React.FC<LoginBtnProps> = ({ handleClick, loading }) => {
         width: '100%'
       }}
     >
-      <Text style={{ fontSize: 15 }}>電話機を起動しますか？</Text>
+      <Text style={{ fontSize: 15 }}>電話機を起動しますか</Text>
       {loading ? (
         <ActivityIndicator size="small" />
       ) : (

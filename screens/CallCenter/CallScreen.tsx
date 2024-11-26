@@ -59,11 +59,11 @@ const CallScreen = () => {
   }, [currentCall, holdingCall, isOutbound])
 
   useEffect(() => {
-    console.log('0000000 currentCall', currentCall)
+    console.log('======================= currentCall', currentCall)
   }, [currentCall])
 
   useEffect(() => {
-    console.log('0000000 holdingCall', holdingCall)
+    console.log('======================= holdingCall', holdingCall)
   }, [holdingCall])
 
   useEffect(() => {
@@ -170,6 +170,7 @@ const CallScreen = () => {
                   </Text>
                 </View>
 
+                {/* hold - unhold */}
                 <View style={styles.button}>
                   <TouchableOpacity
                     style={[
@@ -183,6 +184,7 @@ const CallScreen = () => {
                   <Text style={styles.buttonText}>Speaker</Text>
                 </View>
 
+                {/* hold - unhold */}
                 <View style={styles.button}>
                   <TouchableOpacity
                     style={[
@@ -205,6 +207,7 @@ const CallScreen = () => {
                 </View>
               </View>
 
+              {/* call record */}
               <View style={styles.buttonRow}>
                 <View style={styles.button}>
                   <TouchableOpacity
@@ -242,6 +245,7 @@ const CallScreen = () => {
                       transferModalVisible ? styles.activeButton : {}
                     ]}
                     onPress={() => setTransferModalVisible(true)}
+                    disabled={!holdingCall}
                   >
                     <Fontisto name="share-a" size={16} color="#fff" />
                   </TouchableOpacity>
@@ -256,6 +260,14 @@ const CallScreen = () => {
                   console.log(`Transferring to ${extenNumber}`)
                   handleTransfer(extenNumber)
                 }}
+                onCall={extenNumber => {
+                  console.log(`Calling ${extenNumber}`)
+                  setCallRequest({
+                    phoneNumber: extenNumber,
+                    isOutbound: true
+                  })
+                  setTransferModalVisible(false)
+                }}
               />
             </View>
           )}
@@ -269,7 +281,7 @@ const CallScreen = () => {
               setEndCallTime(formatTime(elapsedTime))
               handleTerminate(currentCall?.sessionId)
             }}
-            disabled={!currentCall}
+            disabled={!currentCall && !holdingCall}
           >
             <MaterialCommunityIcons
               name="phone-hangup"
