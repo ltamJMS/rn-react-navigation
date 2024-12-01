@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -14,26 +14,34 @@ import {
   holdingCallState
 } from '../services/store/softphone'
 import { Button } from 'react-native-paper'
+import { useSoftPhone } from '../services/usecases/auth/useSoftPhone'
 
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [, setCallRequest] = useRecoilState(callRequestState)
   const [currentCall] = useRecoilState(currentCallState)
   const [holdingCall] = useRecoilState(holdingCallState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const [, setCallRequest] = useRecoilState(callRequestState)
+  const { handleCall } = useSoftPhone()
+  const { handleSendDTMF } = useSoftPhone()
+  const isCallButtonDisabled =
+    !phoneNumber || !agentLoginStatus || !!currentCall
 
-  const isCallButtonDisabled = !phoneNumber || !agentLoginStatus
-  const handlePress = (value: string) => {
-    setPhoneNumber(prev => prev + value)
-  }
+  const handlePress = useCallback(
+    (value: string) => {
+      if (!currentCall) {
+        setPhoneNumber(prev => prev + value)
+      } else if (currentCall && !holdingCall) {
+        handleSendDTMF({ tone: value, sessionId: currentCall?.sessionId })
+      }
+    },
+    [currentCall, holdingCall, setPhoneNumber, handleSendDTMF]
+  )
 
   const handleCallClick = () => {
     if (phoneNumber) {
-      console.log('Calling:', phoneNumber)
-      setCallRequest({
-        phoneNumber: phoneNumber,
-        isOutbound: true
-      })
+      setCallRequest({ phoneNumber, isOutbound: true })
+      handleCall(phoneNumber)
       NavigationService.push(SCREENS.CALL_SCREEN)
     }
   }
@@ -41,7 +49,10 @@ const Keypad = () => {
   return (
     <View style={styles.container}>
       <View
-        style={[styles.phoneNumberContainer, { height: 50, paddingTop: 10 }]}
+        style={[
+          styles.phoneNumberContainer,
+          { height: 50, paddingTop: 10, marginTop: 10 }
+        ]}
       >
         {(currentCall || holdingCall) && (
           <Button
@@ -65,13 +76,15 @@ const Keypad = () => {
           {phoneNumber}
         </Text>
         {phoneNumber.length > 0 && (
-          <IconButton
-            icon="backspace"
-            iconColor={MD3Colors.neutralVariant70}
-            size={22}
-            onPress={() => setPhoneNumber(prev => prev.slice(0, -1))}
-            onLongPress={() => setPhoneNumber('')}
-          />
+          <View>
+            <IconButton
+              icon="backspace"
+              iconColor={MD3Colors.neutralVariant70}
+              size={22}
+              onPress={() => setPhoneNumber(prev => prev.slice(0, -1))}
+              onLongPress={() => setPhoneNumber('')}
+            />
+          </View>
         )}
       </View>
       <View style={styles.keypad}>
@@ -160,7 +173,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: 'wrap',
     marginRight: 10,
-    textAlign: 'center'
+    textAlign: 'center',
+    margin: 8
   },
   keypad: {
     width: '90%'

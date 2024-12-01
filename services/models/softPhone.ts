@@ -157,3 +157,8 @@ export interface CommonSip {
 }
 
 export default AgentStatus
+
+export interface SendDTMFRequest {
+  tone: string
+  sessionId: string
+}

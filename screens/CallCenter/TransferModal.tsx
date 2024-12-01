@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#007BFF',
-    padding: 4,
+    padding: 6,
     width: 80,
     alignItems: 'center',
     borderRadius: 2
@@ -170,8 +170,8 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   touchableArea: {
-    paddingVertical: 10,
-    paddingHorizontal: 5
+    paddingVertical: 12,
+    paddingHorizontal: 6
   }
 })
 

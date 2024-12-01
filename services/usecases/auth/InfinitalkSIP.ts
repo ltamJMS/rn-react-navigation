@@ -396,7 +396,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
       try {
         rtcSession.sendDTMF(tone, {
           duration: 200,
-          transportType: DTMF_TRANSPORT.RFC2833
+          transportType: DTMF_TRANSPORT.INFO
         })
         listener(true)
       } catch (error) {

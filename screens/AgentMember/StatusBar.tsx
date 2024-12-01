@@ -22,11 +22,7 @@ import {
   agentStatusesState,
   isWebRTCUserState
 } from '../../services/store/agentStatus'
-import {
-  authState,
-  currentUserState,
-  sipAccountState
-} from '../../services/store/auth'
+import { authState, currentUserState } from '../../services/store/auth'
 import { Role } from '../../services/models/account'
 import { Response } from '../../services/models/Response'
 import {
@@ -37,8 +33,6 @@ import {
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
 import LoginBtn from './LoginBtn'
-import { useSoftPhoneContext } from '../../SoftPhoneProvider'
-import { SipConfig } from '../../services/models/softPhone'
 import LogoutBtn from './LogoutBtn'
 
 /** status to show in segment control
@@ -71,19 +65,7 @@ const StatusBar: React.FC = () => {
   const [agentLoginStatus] = useRecoilState(agentLoginState)
   const [loading, setLoading] = useState(false)
   const [loadingLogout, setLoadingLogout] = useState(false)
-  const sipAccountData = useRecoilValue(sipAccountState)
   const [currentCall] = useRecoilState(currentCallState)
-  const { setupSoftPhone } = useSoftPhoneContext()
-
-  const setupSF = () => {
-    const sipConfig: SipConfig = {
-      account: sipAccountData.sipAccount,
-      password: sipAccountData.sipPassword,
-      domain: sipAccountData.domain,
-      port: 8089
-    }
-    setupSoftPhone(sipConfig)
-  }
 
   const isStatusButtonDisabled = useCallback(
     (statusValue: number): boolean => {

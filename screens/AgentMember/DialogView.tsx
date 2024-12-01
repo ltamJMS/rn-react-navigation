@@ -4,10 +4,8 @@ import { ActivityIndicator, View } from 'react-native'
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../../shared/constants'
-import AgentStatus, { SipConfig } from '../../services/models/softPhone'
-import { useSoftPhoneContext } from '../../SoftPhoneProvider'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { sipAccountState } from '../../services/store/auth'
+import AgentStatus from '../../services/models/softPhone'
+import { useRecoilState } from 'recoil'
 import { callRequestState } from '../../services/store/softphone'
 
 enum DialogText {
@@ -33,19 +31,8 @@ const DialogView: React.FC<DialogViewProps> = ({
 }) => {
   const { handleRegisterSip, handleLogin } = useSoftPhone()
   const [loading, setLoading] = useState(false)
-  const sipAccountData = useRecoilValue(sipAccountState)
-  const { setupSoftPhone } = useSoftPhoneContext()
   const [, setCallRequest] = useRecoilState(callRequestState)
-
-  const setupSF = () => {
-    const sipConfig: SipConfig = {
-      account: sipAccountData.sipAccount,
-      password: sipAccountData.sipPassword,
-      domain: sipAccountData.domain,
-      port: 8089
-    }
-    setupSoftPhone(sipConfig)
-  }
+  const { handleCall } = useSoftPhone()
 
   const handleCallClick = (phoneNumber: string) => {
     if (phoneNumber) {
@@ -54,6 +41,7 @@ const DialogView: React.FC<DialogViewProps> = ({
         phoneNumber: phoneNumber,
         isOutbound: true
       })
+      handleCall(phoneNumber)
       NavigationService.push(SCREENS.CALL_SCREEN)
       onDismiss()
     }
@@ -92,7 +80,6 @@ const DialogView: React.FC<DialogViewProps> = ({
               handleRegisterSip().then(() => {
                 handleLogin(setLoading)
                   .then(() => {
-                    // setupSF()
                     setLoading(false)
                   })
                   .catch(() => {

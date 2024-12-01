@@ -13,6 +13,7 @@ import {
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { authState } from './services/store/auth'
 import {
+  callRequestState,
   currentCallState,
   holdingCallState,
   incomingRequestState,
@@ -51,6 +52,7 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
   const setIncomingShow = useSetRecoilState(incomingShowState)
   const [auth] = useRecoilState(authState)
   const [, setIncomingRequest] = useRecoilState(incomingRequestState)
+  const [, setCallRequest] = useRecoilState(callRequestState)
 
   const setupSoftPhone = (sipConfig: SipConfig) => {
     const newSoftPhone = new InfinitalkSIP(sipConfig, {
@@ -122,7 +124,14 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
             setHoldingCall(undefined)
           }
           softPhone.clearSession(sessionId)
-
+          setCallRequest({
+            isOutbound: false,
+            phoneNumber: ''
+          })
+          setIncomingRequest({
+            isIncomingCall: false,
+            incomingUserInfo: {}
+          })
           break
         }
         case 'incoming': {
@@ -159,12 +168,14 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
           setCurrentCall(incomingCall)
           const sessionDataMap = softPhone?.getCallSessionMap()
           console.log('00000 sessionDataMap', sessionDataMap)
-          setIncomingRequest((currVal: any) => ({
-            ...currVal,
-            isIncomingCall: true,
-            incomingUserInfo
-          }))
-          NavigationService.push(SCREENS.CALL_SCREEN)
+          if (!currentCall) {
+            setIncomingRequest((currVal: any) => ({
+              ...currVal,
+              isIncomingCall: true,
+              incomingUserInfo
+            }))
+            NavigationService.push(SCREENS.CALL_SCREEN)
+          }
           break
         }
         case 'custom':
@@ -194,7 +205,16 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
           if (!softPhone.isSessionExisted(sessionId)) return
           setHoldingCall(undefined)
           setCurrentCall(undefined)
+          setCallRequest({
+            isOutbound: false,
+            phoneNumber: ''
+          })
+          setIncomingRequest({
+            isIncomingCall: false,
+            incomingUserInfo: {}
+          })
           break
+
         case 'send-refer-failed':
           console.log('🌸 HANDLE EVENT - send-refer-failed')
           if (!softPhone.isSessionExisted(sessionId)) return
@@ -223,7 +243,8 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
     setIncomingShow,
     setIncomingRequest,
     currentCall,
-    holdingCall
+    holdingCall,
+    setCallRequest
   ])
 
   return (

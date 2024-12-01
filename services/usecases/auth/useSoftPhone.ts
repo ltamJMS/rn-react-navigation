@@ -18,6 +18,7 @@ import {
 import { loginAgent, logoutAgent } from '../../agentStatus'
 import {
   CallDirection,
+  SendDTMFRequest,
   SoftPhoneCallInfo,
   SoftPhoneCallState
 } from '../../models/softPhone'
@@ -242,6 +243,20 @@ export const useSoftPhone = () => {
     softPhone.unregister({ all: true })
   }, [softPhone])
 
+  const handleSendDTMF = useCallback(
+    (data: SendDTMFRequest) => {
+      if (!auth || !softPhone) return
+      const { tone, sessionId } = data
+      softPhone.sendDTMF(tone, sessionId, (success: boolean) => {
+        if (success) {
+          // playDTMFTone()
+          console.log('🌸 DTMF TONE: ', tone)
+        }
+      })
+    },
+    [auth, softPhone]
+  )
+
   return {
     handleLogin,
     handleCall,
@@ -252,6 +267,7 @@ export const useSoftPhone = () => {
     handleAnswer,
     handleLogout,
     handleRegisterSip,
-    handleUnregisterSip
+    handleUnregisterSip,
+    handleSendDTMF
   }
 }
