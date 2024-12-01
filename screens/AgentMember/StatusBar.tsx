@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import User from '../../services/models/User'
@@ -12,7 +14,8 @@ import {
   changeAgentStatus,
   getASText,
   getDisplayStatus,
-  getStatusStyle
+  getStatusStyle,
+  logoutAgent
 } from '../../services/agentStatus'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { tenantState } from '../../services/store/tenant'
@@ -22,35 +25,34 @@ import {
   agentStatusesState,
   isWebRTCUserState
 } from '../../services/store/agentStatus'
-import { authState, currentUserState } from '../../services/store/auth'
+import {
+  authState,
+  currentUserState,
+  sipAccountState
+} from '../../services/store/auth'
 import { Role } from '../../services/models/account'
 import { Response } from '../../services/models/Response'
 import {
   agentLoginState,
-  canSFRegisterState,
-  currentCallState
+  canSFRegisterState
 } from '../../services/store/softphone'
 import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
-import useLogoutAgent from '../../services/usecases/auth/useLogoutAgent'
 import LoginBtn from './LoginBtn'
 import LogoutBtn from './LogoutBtn'
+import Popover, { PopoverPlacement } from 'react-native-popover-view'
+import Feather from 'react-native-vector-icons/Feather'
+import { useSoftPhoneContext } from '../../SoftPhoneProvider'
 
-/** status to show in segment control
-    0	待機中
-    1 ログオフ
-    2	ワーク
-    3	離席
-    4 昼食
-    5 web会議中
-    6 理論転送オフ
-    7 自動ワーク
-    **/
 const SHOWABLE_STATUS_MAX = 4
 
 const StatusBar: React.FC = () => {
+  const { softPhone } = useSoftPhoneContext()
+  const sipAccountData = useRecoilValue(sipAccountState)
   const tenant = useRecoilValue(tenantState)
   const [expanded, setExpanded] = useState(false)
   const [index, setIndex] = useState(0)
+  const [showMorePopover, setShowMorePopover] = useState(false)
+  const moreButtonRef = useRef(null)
   const [isWebRTCUser] = useRecoilState(isWebRTCUserState)
   const auth = useRecoilValue(authState)
   const setAgentStatus = useSetRecoilState(agentStatusesState)
@@ -58,21 +60,18 @@ const StatusBar: React.FC = () => {
   const { agentStatus } = currentUser || {}
   const setCanSFRegister = useSetRecoilState(canSFRegisterState)
   const { handleLogin, handleLogout } = useSoftPhone()
-  const logoutAgent = useLogoutAgent({ unregisterSip: true })
   const [availableStatuses, setAvailableStatuses] = useState<number[]>()
   const [showableStatusMax, setShowableStatusMax] =
     useState<number>(SHOWABLE_STATUS_MAX)
-  const [agentLoginStatus] = useRecoilState(agentLoginState)
+  const [agentLoginStatus, setAgentLoginStatus] =
+    useRecoilState(agentLoginState)
   const [loading, setLoading] = useState(false)
   const [loadingLogout, setLoadingLogout] = useState(false)
-  const [currentCall] = useRecoilState(currentCallState)
 
   const isStatusButtonDisabled = useCallback(
     (statusValue: number): boolean => {
       const statusDisableDefault = [7]
-
       if (statusDisableDefault.includes(statusValue)) return true
-
       if (
         !isWebRTCUser ||
         (isWebRTCUser && !auth?.roles.includes(Role['soft-phone:normal']))
@@ -94,7 +93,6 @@ const StatusBar: React.FC = () => {
       ) {
         return { success: false }
       }
-
       const change = changeAgentStatus(
         currentUser.customerID.startsWith('CRM') &&
           currentUser.infinitalkCustomerId
@@ -103,7 +101,6 @@ const StatusBar: React.FC = () => {
         currentUser.agentStatus.groupNames[0],
         currentUser.agentStatus.interface
       )
-
       try {
         let res
         if (status === 0) {
@@ -137,7 +134,6 @@ const StatusBar: React.FC = () => {
               } as User
             })
 
-            // if sip login successfully then enable sip register
             if (auth?.roles.includes(Role['soft-phone:normal'])) {
               setCanSFRegister(true)
             }
@@ -145,13 +141,11 @@ const StatusBar: React.FC = () => {
           setLoading(false)
           return { success: true }
         } else {
-          console.error(111111111111, 'change status failed')
           setLoading(false)
           return { success: false }
         }
       } catch (error: any) {
         setLoading(false)
-        console.error(111111111111, 'change status failed', error.message)
         return { success: false }
       }
     },
@@ -164,31 +158,27 @@ const StatusBar: React.FC = () => {
       setCurrentUser
     ]
   )
-
-  // handle forced logout from another device
-  useEffect(() => {
-    if (isWebRTCUser && currentUser?.agentStatus?.sipAccount === undefined) {
-      const logout = async () => {
-        await logoutAgent()
-        await new Promise(resolve => setTimeout(resolve, 10000))
+  const handleStatusChange = (status: number, isFromPopover = false) => {
+    setLoading(true)
+    handleChangeStatus(status)().then(res => {
+      if (res.success) {
+        if (isFromPopover) {
+          // Find index of the selected status in the tabs array
+          const tabIndex = tabs.findIndex(tab => tab.status === status)
+          // Update the segment control index if status is part of the visible tabs
+          if (tabIndex !== -1) {
+            setIndex(tabIndex)
+          }
+          setShowMorePopover(false)
+        }
+        setLoading(false)
+      } else {
+        setLoading(false)
       }
-      logout()
-    }
-  }, [currentUser?.agentStatus?.sipAccount, isWebRTCUser, logoutAgent])
-
+    })
+  }
   useEffect(() => {
-    /** Statuses code
-        0	待機中
-        2	ワーク
-        3	離席
-        4	状態名称４
-        5	状態名称５
-        6	状態名称６
-        7	状態名称７ (default is 自動ワーク. will be disabled by default)
-       */
-    const defaultStatuses = [0, 2, 3, 4, 5, 6, 7]
-
-    // in lg or more screen, order of statuses were sorted same as defaultStatuses and set showable statuses to SHOWABLE_STATUS_MAX
+    const defaultStatuses = [0, 2, 3, 4, 5, 6, 1] // Removed ログオフ (1)
     const statuses = defaultStatuses.filter(
       status => tenant?.agentStatusText[status]
     )
@@ -197,7 +187,6 @@ const StatusBar: React.FC = () => {
     )
 
     if (activeStatusIndex > -1 && activeStatusIndex >= SHOWABLE_STATUS_MAX) {
-      // eslint-disable-next-line no-extra-semi
       ;[statuses[SHOWABLE_STATUS_MAX - 1], statuses[activeStatusIndex]] = [
         statuses[activeStatusIndex],
         statuses[SHOWABLE_STATUS_MAX - 1]
@@ -213,10 +202,16 @@ const StatusBar: React.FC = () => {
       label: tenant?.agentStatusText[status],
       status
     }))) || [
-    { label: 'label 1', status: 0 },
-    { label: 'label 3', status: 2 },
-    { label: 'label 4', status: 3 }
+    { label: '待機中', status: 0 },
+    { label: 'ワーク', status: 2 },
+    { label: '離席', status: 3 }
   ]
+
+  const moreTabs =
+    availableStatuses?.slice(showableStatusMax).map(status => ({
+      label: tenant?.agentStatusText[status],
+      status
+    })) || []
 
   const handleSegmentChange = (selectedIndex: number) => {
     setLoading(true)
@@ -231,10 +226,42 @@ const StatusBar: React.FC = () => {
     })
   }
 
-  // TODO: implement logout agent
+  const handlePopoverStatusChange = async (status: number) => {
+    setLoading(true)
+    setShowMorePopover(false)
+    if (status === 1) {
+      // SFログアウト
+
+      const { sipAccount, domain, agent } = sipAccountData
+
+      if (!softPhone) {
+        setLoading(false)
+        return
+      }
+      softPhone.unregister({ all: true })
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const resLogoutAgent = await logoutAgent(
+        sipAccount,
+        agent.agentAccount,
+        domain
+      )
+      if (resLogoutAgent.success) {
+        setLoading(false)
+        setAgentLoginStatus(false)
+      } else {
+        setLoading(false)
+      }
+      return
+    } else {
+      handleStatusChange(status, true)
+      setIndex(3)
+    }
+  }
+
   const onItemPress = () => {
     setExpanded(!expanded)
   }
+
   if (!currentUser || !tenant) return null
   const { phoneStatus, status } = agentStatus || {}
 
@@ -292,29 +319,66 @@ const StatusBar: React.FC = () => {
                 alignItems: 'center'
               }}
             >
-              <View style={{ width: '100%', marginBottom: 24 }}>
+              <View style={styles.segmentAndMoreContainer}>
                 {agentLoginStatus ? (
-                  <SegmentedControl
-                    tabs={tabs.map(tab => tab.label)}
-                    onChange={handleSegmentChange}
-                    value={index}
-                    style={{ width: '100%', height: 40 }}
-                  />
+                  <>
+                    <SegmentedControl
+                      tabs={tabs.map(tab => tab.label)}
+                      onChange={selectedIndex => {
+                        handleSegmentChange(selectedIndex)
+                      }}
+                      value={index}
+                      style={{ flex: 1, height: 40 }}
+                    />
+                    <TouchableOpacity
+                      ref={moreButtonRef}
+                      onPress={() => setShowMorePopover(true)}
+                      style={{
+                        paddingLeft: 8
+                      }}
+                    >
+                      {loading ? (
+                        <ActivityIndicator size="small" />
+                      ) : (
+                        <Feather
+                          name="more-vertical"
+                          size={22}
+                          color="#414141"
+                        />
+                      )}
+                    </TouchableOpacity>
+                    <Popover
+                      isVisible={showMorePopover}
+                      from={moreButtonRef}
+                      onRequestClose={() => setShowMorePopover(false)}
+                      placement={PopoverPlacement.BOTTOM}
+                    >
+                      <View style={styles.popoverContainer}>
+                        {moreTabs.map(tab => (
+                          <TouchableOpacity
+                            key={tab.status}
+                            style={styles.popoverButton}
+                            onPress={() =>
+                              handlePopoverStatusChange(tab.status)
+                            }
+                          >
+                            <Text style={styles.popoverButtonText}>
+                              {tab.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </Popover>
+                  </>
                 ) : (
                   <LoginBtn
                     handleClick={async () => {
                       handleLogin(setLoading)
-                      // setupSF()
                     }}
                     loading={loading}
                   />
                 )}
               </View>
-              {currentCall && (
-                <View>
-                  <Text>Current Call: {currentCall.dst.num}</Text>
-                </View>
-              )}
               <LogoutBtn
                 handleClick={async () => {
                   handleLogout(setLoadingLogout)
@@ -367,6 +431,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 5,
     height: 20
+  },
+  segmentAndMoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 24
+  },
+  popoverContainer: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 8
+  },
+  popoverButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16
+  },
+  popoverButtonText: {
+    color: 'black',
+    fontSize: 16
   }
 })
 
