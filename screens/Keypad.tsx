@@ -6,7 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { IconButton, MD3Colors } from 'react-native-paper'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import {
   agentLoginState,
   callRequestState,
@@ -21,6 +21,7 @@ const Keypad = () => {
   const [currentCall] = useRecoilState(currentCallState)
   const [holdingCall] = useRecoilState(holdingCallState)
   const [agentLoginStatus] = useRecoilState(agentLoginState)
+
   const isCallButtonDisabled = !phoneNumber || !agentLoginStatus
   const handlePress = (value: string) => {
     setPhoneNumber(prev => prev + value)
@@ -73,7 +74,6 @@ const Keypad = () => {
           />
         )}
       </View>
-
       <View style={styles.keypad}>
         {createKeypadRow(['1', '2', '3'], ['', 'ABC', 'DEF'], handlePress)}
         <Divider />

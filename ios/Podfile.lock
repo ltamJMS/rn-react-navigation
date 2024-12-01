@@ -2020,7 +2020,7 @@ PODS:
     - React-utils (= 0.74.5)
   - ReactNativeLocalization (2.3.1):
     - React-Core
-  - RNBootSplash (6.3.1):
+  - RNBootSplash (6.3.2):
     - React-Core
   - RNCallKeep (4.3.16):
     - React
@@ -2060,7 +2060,7 @@ PODS:
     - RNNotifee/NotifeeCore (= 7.8.2)
   - RNNotifee/NotifeeCore (7.8.2):
     - React-Core
-  - RNReanimated (3.16.2):
+  - RNReanimated (3.16.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2080,10 +2080,10 @@ PODS:
     - React-utils
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.16.2)
-    - RNReanimated/worklets (= 3.16.2)
+    - RNReanimated/reanimated (= 3.16.3)
+    - RNReanimated/worklets (= 3.16.3)
     - Yoga
-  - RNReanimated/reanimated (3.16.2):
+  - RNReanimated/reanimated (3.16.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2103,9 +2103,9 @@ PODS:
     - React-utils
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.16.2)
+    - RNReanimated/reanimated/apple (= 3.16.3)
     - Yoga
-  - RNReanimated/reanimated/apple (3.16.2):
+  - RNReanimated/reanimated/apple (3.16.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2126,7 +2126,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated/worklets (3.16.2):
+  - RNReanimated/worklets (3.16.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2548,7 +2548,7 @@ SPEC CHECKSUMS:
   React-utils: 3f1fcffc14893afb9a7e5b7c736353873cc5fc95
   ReactCommon: f79ae672224dc1e6c2d932062176883c98eebd57
   ReactNativeLocalization: 076497d7ca70341c751cd3b3e7c86187332a182d
-  RNBootSplash: 66c8458007bda40cc25a3f25e4326244a71d9a73
+  RNBootSplash: 3a44c2c3ebfce98254de887ceed22c4941c8c6c5
   RNCallKeep: 94bbe46b807ccf58e9f6ec11bc4d6087323a1954
   RNCAsyncStorage: ddc4ee162bfd41b0d2c68bf2d95acd81dd7f1f93
   RNFBApp: 81a9593ff681b448d1847f5d5493906310cdebe3
@@ -2560,7 +2560,7 @@ SPEC CHECKSUMS:
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: f75d81410b40aaa99e71ae8f8bb7a88620c95042
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
-  RNReanimated: 660229a2ff10a6436370a14ae84d01daadd1e5d0
+  RNReanimated: b86a05eb5220a82c37a91ce6289a9d508f9f3a1c
   RNScreens: 62ee76dc52f65afddfa6821b01965dc79d69c35b
   RNSecureStorage: d7de7dd7321ae113a6f7dad1747a4992a20b4955
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315

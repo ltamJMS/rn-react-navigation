@@ -20,6 +20,8 @@ import * as NavigationService from 'react-navigation-helpers'
 import { Button } from 'react-native-paper'
 import useCommonData from '../services/usecases/auth/useCommonData'
 import { useAgentStatusTool } from '../services/usecases/auth/useAgentStatusTool'
+import { useSoftPhoneContext } from '../SoftPhoneProvider'
+import { SipConfig } from '../services/models/softPhone'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
@@ -33,6 +35,7 @@ export default function Login() {
   const setSipAccountData = useSetRecoilState(sipAccountState)
   const { control } = useForm()
   const characterMax = 90
+  const { setupSoftPhone } = useSoftPhoneContext()
 
   useEffect(() => {
     const getStoredCredentials = async () => {
@@ -157,6 +160,13 @@ export default function Login() {
               domain: result.data.domain,
               asteriskDomain: result.data?.asteriskDomain
             })
+            const sipConfig: SipConfig = {
+              account: result.data.account,
+              password: result.data.password,
+              domain: result.data.domain,
+              port: 8089
+            }
+            setupSoftPhone(sipConfig)
           })
           NavigationService.navigate(SCREENS.AGENT_MEMBER)
         } catch (err) {

@@ -92,7 +92,7 @@ const DialogView: React.FC<DialogViewProps> = ({
               handleRegisterSip().then(() => {
                 handleLogin(setLoading)
                   .then(() => {
-                    setupSF()
+                    // setupSF()
                     setLoading(false)
                   })
                   .catch(() => {

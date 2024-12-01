@@ -321,8 +321,8 @@ const StatusBar: React.FC = () => {
                 ) : (
                   <LoginBtn
                     handleClick={async () => {
-                      await handleLogin(setLoading)
-                      setupSF()
+                      handleLogin(setLoading)
+                      // setupSF()
                     }}
                     loading={loading}
                   />

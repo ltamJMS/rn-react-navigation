@@ -15,12 +15,13 @@ import { useRecoilState } from 'recoil'
 import {
   callRequestState,
   currentCallState,
-  holdingCallState
+  holdingCallState,
+  incomingRequestState
 } from '../../services/store/softphone'
 import { agentsState } from '../../services/store/agentStatus'
-import AgentStatus from '../../services/models/softPhone'
 import TransferModal from './TransferModal'
 import { SCREENS } from '../../shared/constants'
+import { useSoftPhoneContext } from '../../SoftPhoneProvider'
 
 const CallScreen = () => {
   const [agents] = useRecoilState(agentsState)
@@ -29,10 +30,13 @@ const CallScreen = () => {
   const [keypadActive, setKeypadActive] = useState(false)
   const [transferModalVisible, setTransferModalVisible] = useState(false)
   //
-  const { handleHold, handleUnHold, handleCall, handleRefer, handleTerminate } =
+  const { handleHold, handleUnHold, handleCall, handleRefer, handleTerminate, handleAnswer } =
     useSoftPhone()
   const [callRequest, setCallRequest] = useRecoilState(callRequestState)
+  const [incomingRequest, setIncomingRequest] =
+    useRecoilState(incomingRequestState)
   const { isOutbound, phoneNumber } = callRequest
+  const { isIncomingCall } = incomingRequest
   const [elapsedTime, setElapsedTime] = useState<number>(0)
   const [endCallTime, setEndCallTime] = useState<string>('')
   const [currentCall] = useRecoilState(currentCallState)
@@ -42,10 +46,7 @@ const CallScreen = () => {
   useEffect(() => {
     if (isOutbound && phoneNumber) {
       handleCall(phoneNumber).then(() => {
-        setCallRequest({
-          phoneNumber: '',
-          isOutbound: false
-        })
+        setCallRequest(prev => ({ ...prev, phoneNumber:'', isOutbound: false }))
       })
     }
   }, [callRequest, handleCall, isOutbound, phoneNumber, setCallRequest])
@@ -54,17 +55,9 @@ const CallScreen = () => {
     if (!currentCall && !holdingCall && !isOutbound) {
       setTimeout(() => {
         NavigationService.goBack()
-      }, 2000)
+      }, 1000)
     }
   }, [currentCall, holdingCall, isOutbound])
-
-  useEffect(() => {
-    console.log('======================= currentCall', currentCall)
-  }, [currentCall])
-
-  useEffect(() => {
-    console.log('======================= holdingCall', holdingCall)
-  }, [holdingCall])
 
   useEffect(() => {
     if (!currentCall || !currentCall.callConfirmTime) return
@@ -101,196 +94,284 @@ const CallScreen = () => {
     handleRefer(holdingCall?.sessionId, currentCall?.sessionId)
     setTransferModalVisible(false)
   }
+
+  useEffect(() => {
+    console.log('======================= currentCall', currentCall)
+  }, [currentCall])
+
+  useEffect(() => {
+    console.log('======================= isIncomingCall', isIncomingCall)
+  }, [incomingRequest])
+
+  useEffect(() => {
+    console.log('======================= holdingCall', holdingCall)
+  }, [holdingCall])
+
   return (
     <ImageBackground
       source={require('../../assets/images/bgOverlay.png')}
       style={styles.backgroundImage}
     >
-      <View style={styles.overlay}>
-        <View style={styles.callDetails}>
-          {holdingCall && (
-            <View style={styles.holdingCard}>
-              <Text style={styles.holdingText}>
-                {holdingCall.dst?.displayName || holdingCall.dst.num}
-              </Text>
-              <Text style={styles.holdingText}>保留 - 1:24</Text>
-            </View>
-          )}
-          {(currentCall || isOutbound) && (
+      {incomingRequest?.isIncomingCall ? (
+        <View style={styles.overlay}>
+          {/* show 2 buttons: Answer and Decline */}
+          <View style={styles.callDetails}>
             <View style={styles.callingCard}>
               <View style={styles.callingLeft}>
                 <Text style={styles.nameText}>
-                  {currentCall
-                    ? currentCall.dst?.displayName || currentCall.dst.num
-                    : ''}
+                  {incomingRequest?.incomingUserInfo?.displayName || 'Unknown'}
                 </Text>
                 <Text style={styles.phoneNumberText}>
-                  {currentCall && currentCall.dst?.displayName
-                    ? currentCall.dst.displayName
-                    : ''}
+                  {incomingRequest?.incomingUserInfo?.displayName || 'Unknown'}
                 </Text>
               </View>
               <View style={styles.callingRight}>
-                <Text style={styles.callStatusText}>
-                  {currentCall ? currentCall.state : ''}
-                </Text>
-                <Text style={styles.phoneNumberText}>
-                  {currentCall ? formatTime(elapsedTime) : ''}
-                </Text>
+                <Text style={styles.callStatusText}>Incoming Call</Text>
               </View>
             </View>
-          )}
-        </View>
-
-        <View style={styles.overlayUnder}>
-          {!currentCall && !holdingCall && !isOutbound ? (
-            <View style={styles.callingRight}>
-              <Text style={[styles.endCallText]}>通話が終了しました</Text>
-              <Text style={[styles.endCallText]}>{endCallTime}</Text>
-            </View>
-          ) : (
-            <View style={styles.buttonsContainer}>
-              <View style={styles.buttonRow}>
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[
-                      styles.functionButton,
-                      micActive ? styles.activeButton : {}
-                    ]}
-                    onPress={() => setMicActive(!micActive)}
-                  >
-                    <MaterialCommunityIcons
-                      name={micActive ? 'microphone-off' : 'microphone'}
-                      size={24}
-                      color="#fff"
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.buttonText}>
-                    {micActive ? 'Unmute' : 'Mic'}
-                  </Text>
-                </View>
-
-                {/* hold - unhold */}
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[
-                      styles.functionButton,
-                      speakerActive ? styles.activeButton : {}
-                    ]}
-                    onPress={() => setSpeakerActive(!speakerActive)}
-                  >
-                    <Ionicons name="volume-medium" size={24} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.buttonText}>Speaker</Text>
-                </View>
-
-                {/* hold - unhold */}
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[
-                      styles.functionButton,
-                      holdingCall ? styles.activeButton : {}
-                    ]}
-                    onPress={() => handleHoldClick()}
-                  >
-                    <MaterialCommunityIcons
-                      name={
-                        holdingCall ? 'hand-back-right-off' : 'hand-back-right'
-                      }
-                      size={20}
-                      color="#fff"
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.buttonText}>
-                    {holdingCall ? 'Unhold' : 'Hold'}
-                  </Text>
-                </View>
-              </View>
-
-              {/* call record */}
-              <View style={styles.buttonRow}>
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[styles.functionButton, { borderColor: '#606060' }]}
-                    disabled={true}
-                  >
-                    <MaterialCommunityIcons
-                      name="record-circle-outline"
-                      size={22}
-                      color="#606060"
-                    />
-                  </TouchableOpacity>
-                  <Text style={[styles.buttonText, { color: '#606060' }]}>
-                    Record
-                  </Text>
-                </View>
-
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[
-                      styles.functionButton,
-                      keypadActive ? styles.activeButton : {}
-                    ]}
-                    onPress={() => NavigationService.navigate(SCREENS.KEYPAD)}
-                  >
-                    <Ionicons name="keypad" size={20} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.buttonText}>Keypad</Text>
-                </View>
-
-                <View style={styles.button}>
-                  <TouchableOpacity
-                    style={[
-                      styles.functionButton,
-                      transferModalVisible ? styles.activeButton : {}
-                    ]}
-                    onPress={() => setTransferModalVisible(true)}
-                    disabled={!holdingCall}
-                  >
-                    <Fontisto name="share-a" size={16} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.buttonText}>Transfer</Text>
-                </View>
-              </View>
-              <TransferModal
-                visible={transferModalVisible}
-                onClose={() => setTransferModalVisible(false)}
-                agents={agentArray}
-                onTransfer={extenNumber => {
-                  console.log(`Transferring to ${extenNumber}`)
-                  handleTransfer(extenNumber)
-                }}
-                onCall={extenNumber => {
-                  console.log(`Calling ${extenNumber}`)
-                  setCallRequest({
-                    phoneNumber: extenNumber,
-                    isOutbound: true
+          </View>
+          <View style={styles.overlayUnder}>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.functionButton}
+                onPress={() => {
+                  handleAnswer(currentCall?.sessionId)
+                  // if (!softPhone || !currentCall) return
+                  // const payload = {
+                  //   event: 'custom',
+                  //   sessionId: currentCall?.sessionId || '',
+                  //   data: 'accepted'
+                  //   }
+                  //   softPhone.emitEventSF('listenCall', payload)
+                  setIncomingRequest((prev: typeof incomingRequest) => ({
+                    ...prev,
+                    isIncomingCall: false,
+                    incomingUserInfo: {},
                   })
-                  setTransferModalVisible(false)
+                  )
                 }}
-              />
+              >
+                <MaterialCommunityIcons
+                  name="phone-incoming"
+                  size={24}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.functionButton}
+                onPress={() => {
+                  handleTerminate(currentCall?.sessionId)
+                  setIncomingRequest((prev: typeof incomingRequest) => ({
+                    ...prev,
+                    isIncomingCall: false,
+                    incomingUserInfo: {},
+                  })
+                  )
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="phone-hangup"
+                  size={24}
+                  color="#fff"
+                />
+              </TouchableOpacity>
             </View>
-          )}
-
-          <TouchableOpacity
-            style={[
-              styles.endCallButton,
-              currentCall ? {} : { backgroundColor: '#606060' }
-            ]}
-            onPress={() => {
-              setEndCallTime(formatTime(elapsedTime))
-              handleTerminate(currentCall?.sessionId)
-            }}
-            disabled={!currentCall && !holdingCall}
-          >
-            <MaterialCommunityIcons
-              name="phone-hangup"
-              size={26}
-              color="#fff"
-            />
-          </TouchableOpacity>
+            </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.overlay}>
+          <View style={styles.callDetails}>
+            {holdingCall && (
+              <View style={styles.holdingCard}>
+                <Text style={styles.holdingText}>
+                  {holdingCall.dst?.displayName || holdingCall.dst.num}
+                </Text>
+                <Text style={styles.holdingText}>保留 - 1:24</Text>
+              </View>
+            )}
+            {(currentCall || isOutbound) && (
+              <View style={styles.callingCard}>
+                <View style={styles.callingLeft}>
+                  <Text style={styles.nameText}>
+                    {currentCall
+                      ? currentCall.dst?.displayName || currentCall.dst.num
+                      : ''}
+                  </Text>
+                  <Text style={styles.phoneNumberText}>
+                    {currentCall && currentCall.dst?.displayName
+                      ? currentCall.dst.displayName
+                      : ''}
+                  </Text>
+                </View>
+                <View style={styles.callingRight}>
+                  <Text style={styles.callStatusText}>
+                    {currentCall ? currentCall.state : ''}
+                  </Text>
+                  <Text style={styles.phoneNumberText}>
+                    {currentCall ? formatTime(elapsedTime) : ''}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.overlayUnder}>
+            {!currentCall && !holdingCall && !isOutbound && !isIncomingCall ? (
+              <View style={styles.callingRight}>
+                <Text style={[styles.endCallText]}>通話が終了しました</Text>
+                <Text style={[styles.endCallText]}>{endCallTime}</Text>
+              </View>
+            ) : (
+              <View style={styles.buttonsContainer}>
+                <View style={styles.buttonRow}>
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        micActive ? styles.activeButton : {}
+                      ]}
+                      onPress={() => setMicActive(!micActive)}
+                    >
+                      <MaterialCommunityIcons
+                        name={micActive ? 'microphone-off' : 'microphone'}
+                        size={24}
+                        color="#fff"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.buttonText}>
+                      {micActive ? 'Unmute' : 'Mic'}
+                    </Text>
+                  </View>
+
+                  {/* hold - unhold */}
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        speakerActive ? styles.activeButton : {}
+                      ]}
+                      onPress={() => setSpeakerActive(!speakerActive)}
+                    >
+                      <Ionicons name="volume-medium" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.buttonText}>Speaker</Text>
+                  </View>
+
+                  {/* hold - unhold */}
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        holdingCall ? styles.activeButton : {}
+                      ]}
+                      onPress={() => handleHoldClick()}
+                    >
+                      <MaterialCommunityIcons
+                        name={
+                          holdingCall
+                            ? 'hand-back-right-off'
+                            : 'hand-back-right'
+                        }
+                        size={20}
+                        color="#fff"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.buttonText}>
+                      {holdingCall ? 'Unhold' : 'Hold'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* call record */}
+                <View style={styles.buttonRow}>
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        { borderColor: '#606060' }
+                      ]}
+                      disabled={true}
+                    >
+                      <MaterialCommunityIcons
+                        name="record-circle-outline"
+                        size={22}
+                        color="#606060"
+                      />
+                    </TouchableOpacity>
+                    <Text style={[styles.buttonText, { color: '#606060' }]}>
+                      Record
+                    </Text>
+                  </View>
+
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        keypadActive ? styles.activeButton : {}
+                      ]}
+                      onPress={() => NavigationService.navigate(SCREENS.KEYPAD)}
+                    >
+                      <Ionicons name="keypad" size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.buttonText}>Keypad</Text>
+                  </View>
+
+                  <View style={styles.button}>
+                    <TouchableOpacity
+                      style={[
+                        styles.functionButton,
+                        transferModalVisible ? styles.activeButton : {}
+                      ]}
+                      onPress={() => setTransferModalVisible(true)}
+                      disabled={!holdingCall}
+                    >
+                      <Fontisto name="share-a" size={16} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.buttonText}>Transfer</Text>
+                  </View>
+                </View>
+                <TransferModal
+                  visible={transferModalVisible}
+                  onClose={() => setTransferModalVisible(false)}
+                  agents={agentArray}
+                  onTransfer={extenNumber => {
+                    console.log(`Transferring to ${extenNumber}`)
+                    handleTransfer(extenNumber)
+                  }}
+                  onCall={extenNumber => {
+                    console.log(`Calling ${extenNumber}`)
+                    setCallRequest(prev => ({
+                      ...prev,
+                      phoneNumber: extenNumber,
+                      isOutbound: true
+                    })
+                    )
+                    setTransferModalVisible(false)
+                  }}
+                />
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.endCallButton,
+                currentCall ? {} : { backgroundColor: '#606060' }
+              ]}
+              onPress={() => {
+                setEndCallTime(formatTime(elapsedTime))
+                handleTerminate(currentCall?.sessionId)
+              }}
+              disabled={!currentCall && !holdingCall}
+            >
+              <MaterialCommunityIcons
+                name="phone-hangup"
+                size={26}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </ImageBackground>
   )
 }

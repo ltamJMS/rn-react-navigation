@@ -83,7 +83,7 @@ export interface InfinitalkSipInterface {
   getIncomingWaitingSession(): RTCSession | undefined
   getSessionData(sessionId: string): CallSession | undefined
   getCallSessionMap: () => CallSessionMap
-
+  emitEventSF(event: string, payload: any): void
   setCurrentSession(session: RTCSession): void
   setCurrentSessionById(sessionId: string): void
   setHoldSession(sessionId: string): void
@@ -102,7 +102,7 @@ export interface InfinitalkSipInterface {
   ): Promise<RTCSession>
   listenCall(sessionId: string): () => void
   answer(sessionId: string, options?: any): Promise<void>
-  terminate(sessionId: string): Promise<boolean>
+  terminate(sessionId: string, options?: any): Promise<boolean>
   hold(sessionId: string): Promise<boolean>
   unhold(sessionId: string): Promise<boolean>
   sendDTMF(
@@ -176,6 +176,15 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   unregister(options?: any) {
     this.ua.unregister(options)
     this.ua.stop()
+  }
+
+  emitEventSF(event: string, payload: any) {
+    console.log('🌸🌸🌸🌸🌸🌸 EMIT EVENT SF CUSTOM', event)
+    try {
+      this.eventSFEmitter.emit('listenCall', payload)
+    } catch (error) {
+      console.error('🔴🔴🔴🔴🔴🔴 EMIT EVENT SF ERROR')
+    }
   }
 
   async call(phoneNumber: string, callOptions?: any): Promise<RTCSession> {
@@ -281,6 +290,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   }
 
   async answer(sessionId: string) {
+    console.log('🌸 ANSWER -> EVENT - customanswer')
     const sessionData = this.callSessionMap[sessionId]
 
     if (sessionData) {
@@ -663,6 +673,8 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
           session.removeAllListeners('replaces')
           session.removeAllListeners('getusermediafailed')
           session.removeAllListeners('peerconnection')
+          session.removeAllListeners('sdp')
+          session.removeAllListeners('custom')
         }
       }
 
