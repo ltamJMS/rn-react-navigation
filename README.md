@@ -1,53 +1,69 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+## 前提条件
 
-# Getting Started
+1. [Node.js](https://nodejs.org/en/) (v18)をインストールする
+2. [yarn](https://yarnpkg.com/getting-started/install)をインストールする
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## はじめに
 
-## Step 1: Start the Metro Server
+1. `git clone https://gitlab.com/infinitalk/infinitalk/<repo-url>.git`
+2. `cd repo-url`
+3. ルート ディレクトリに.env.localファイルを作成
+4. 依存関係をインストール
+   ```bash
+   # コマンド実行
+   yarn install
+   ```
+5. アプリケーションを開始
+   ```bash
+   # Android向け
+   yarn android
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+   # iOS向け
+   yarn ios
+   ```
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Git フロー
+### PR 作成
 
-```bash
-# using npm
-npm start
+1. develop から開発ブランチを切ります
 
-# OR using Yarn
-yarn start
+- 通常タスク: `git branch feature/<タスク ID>/ブランチ名`
+- バグ修正タスク: `git branch bugfix/<バグ ID>/ブランチ名`
+
+2. ESLint でコードを修正
+   ```bash
+   # コマンド実行
+   yarn lint:fix
+   ```
+3. 実装できたら commit/push
+4. PR 作成(develop に向けて下さい)
+5. レビュアーにレビュー依頼(テストケース作成を依頼したときはテストケースのレビューも粂に投げて下さい)
+
+### コミットのメッセージのルール
+
+`<タスク ID> - <タイプ>: <メッセージ>`
+
+タイプは上記のいずれか
+
+```
+build   ：ビルドシステムや依存関係に関する変更
+chore   ：コードや依存関係に影響しない雑務の変更
+ci      ：CI（継続的インテグレーション）関連の変更
+docs    ：ドキュメントのみの変更
+feature ：新しい機能の追加
+bugfix  ：バグの修正
+refactor：リファクタリング（動作には影響しないコードの改善）
+revert  ：以前のコミットを取り消す変更
+test    ：テストコードの追加や修正
+
+例: NFNTLKDVLP-1111 - feature: add new feature
 ```
 
-## Step 2: Start your Application
+### PR のルール
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+`[タスク ID] <プルリクエストのタイトル>`
 
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
+## アプリの変更
 Now that you have successfully run the app, let's modify it.
 
 1. Open `App.tsx` in your text editor of choice and edit some lines.
@@ -55,25 +71,61 @@ Now that you have successfully run the app, let's modify it.
 
    For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
 
-## Congratulations! :tada:
+## ディレクトリ構造
 
-You've successfully run and modified your React Native App. :partying_face:
+### 概要
 
-### Now what?
+```
+├── public
+├── src
+│   ├── app
+│   │   ├── components
+│   │   │   ├── atoms
+│   │   │   ├── molecules
+│   │   │   ├── organisms
+│   │   │   └── templates
+│   │   │       └── layouts
+│   │   ├── pages
+│   │   └── routes
+│   ├── constants
+│   ├── hooks
+│   ├── locales
+│   ├── services
+│   ├── store
+│   ├── styles
+│   ├── types
+│   └── utils
+└── package.json
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+### 詳細
 
-# Troubleshooting
+- **app**
+   - **components** - コンポーネント
+   - **pages** - ページ
+   - **routes** - ルート
+- **constants** - 定数の定義
+- **hooks** - カスタムフック
+- **locales** - 多言語翻訳
+- **services** - API 連携サービス
+- **store** - グローバルストア
+- **styles** - CSS スタイル
+- **types** - Typescript のタイプ及び列挙の定義
+- **utils** - ヘルパー関数(ソート、フィルタリングなど)
+- **package.json** - プロジェクトの依存関係が含まれています
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### 全ての未知の単語を見つけて無視一覧に追加方法
 
-# Learn More
+   ```
+   # 全ての未知の単語を見つける
+   $ npx cspell-cli "path_to_folder_or_file" --words-only --unique --no-progress > words.txt
 
-To learn more about React Native, take a look at the following resources:
+   # テキストを json 形式に変換
+   $ awk 'NF' words.txt | awk '{print "\"" $0 "\","}' >> words.json
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+   # 無視する単語を spell.json ファイルにコピー
+   ```
+
+## ライセンス
+
+このプロジェクトはジェイエムエス・ユナイテッド株式会社に登録されています。
