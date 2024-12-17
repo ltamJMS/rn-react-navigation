@@ -9,7 +9,7 @@
     "lint:fix": "eslint --fix",
     "start": "react-native start",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@attarchi/react-native-lottie-splash-screen": "^2.0.4",

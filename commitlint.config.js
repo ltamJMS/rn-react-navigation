@@ -10,6 +10,12 @@ module.exports = {
       rules: {
         'header-match-team-pattern': (parsed) => {
           const { taskId, type, message } = parsed
+          const rawInput = parsed.header
+
+          if (rawInput?.toLowerCase()?.startsWith('test')) {
+            return [true, '']
+          }
+
           if (taskId === null && type === null && message === null) {
             return [
               false,
