@@ -9,7 +9,7 @@
     "lint:fix": "eslint --fix",
     "start": "react-native start",
     "test": "jest",
-    "prepare": "husky install && chmod ug+x .husky/*"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@attarchi/react-native-lottie-splash-screen": "^2.0.4",
@@ -80,6 +80,7 @@
   "packageManager": "yarn@3.6.4",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
+      "node remove_console.js",
       "prettier --write",
       "eslint --fix"
     ]

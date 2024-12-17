@@ -1,10 +1,6 @@
 module.exports = {
   root: true,
-  extends: [
-    'plugin:prettier/recommended',
-    '@react-native',
-    'plugin:react/jsx-runtime'
-  ],
+  extends: ['@react-native', 'plugin:react/jsx-runtime'],
   plugins: ['simple-import-sort', 'unused-imports', '@cspell'],
   rules: {
     'simple-import-sort/imports': 'warn',
@@ -25,6 +21,8 @@ module.exports = {
     ],
     'comma-dangle': ['off'],
     semi: ['off'],
-    'jsx-quotes': [2, 'prefer-single']
+    'jsx-quotes': [2, 'prefer-single'],
+    'no-console': 'error',
+    '@typescript-eslint/no-explicit-any': 'error'
   }
 }
