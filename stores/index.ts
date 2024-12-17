@@ -1,11 +1,12 @@
 import { create } from 'zustand'
-import createUserSlice, { UserState } from './user_slice'
+
 import {
   AuthenticateState,
   createAuthenticateSlice
 } from './authenticate_slice'
 import createFirestoreSlice, { FirestoreState } from './firestore_slice'
 import createSoftPhoneSlice, { SoftPhoneState } from './softphone_slice'
+import createUserSlice, { UserState } from './user_slice'
 
 export type BoundState = UserState &
   SoftPhoneState &

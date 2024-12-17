@@ -1,7 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StateCreator } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createJSONStorage } from 'zustand/middleware'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import { User } from '../types'
 
 export type UserState = {
@@ -17,7 +18,7 @@ type UserPersist = StateCreator<
 >
 
 const createUserSlice: UserPersist = persist(
-  set => ({
+  (set) => ({
     user: null,
     setUser: (user: User) => set({ user })
   }),

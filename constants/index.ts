@@ -1,10 +1,11 @@
-import { Status } from '../types'
 import {
-  API_ROOT,
   API_GATEWAY_DOMAIN,
+  API_ROOT,
   CONTROLLER_API_ROOT,
   INFINITALK_CONSOLE_WEB_DOMAIN
 } from '@env'
+
+import { Status } from '../types'
 
 export const TOKEN_KEYS = {
   accessToken: 'access_token',

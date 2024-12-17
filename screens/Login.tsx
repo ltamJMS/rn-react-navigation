@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DefaultError, useQueryClient } from '@tanstack/react-query'
-import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native'
@@ -15,17 +14,18 @@ import {
   TextInput,
   useTheme
 } from 'react-native-paper'
+
 import useMutation from '../hooks/useMutation'
+import { LoginFormSchema, LoginFormValues } from '../schemas/login_form_schema'
 import useBoundStore from '../stores'
 import { User } from '../types'
-import { LoginFormSchema, LoginFormValues } from '../schemas/login_form_schema'
 
 export default function Login() {
   const { t } = useTranslation()
   const theme: MD3Theme = useTheme()
   const styles = makeStyles(theme)
 
-  const authenticate = useBoundStore(state => state.authenticate)
+  const authenticate = useBoundStore((state) => state.authenticate)
   const queryClient = useQueryClient()
 
   const {
@@ -49,7 +49,7 @@ export default function Login() {
   >({
     endpoint:
       '/v1/auth?needs[]=access-token&needs[]=firebase-access-token&needs[]=license',
-    onSuccess: user => {
+    onSuccess: (user) => {
       authenticate(user)
       queryClient.invalidateQueries({
         queryKey: [
@@ -69,9 +69,9 @@ export default function Login() {
       <Portal>
         <Dialog dismissable={false} visible={isPending}>
           <Dialog.Content>
-            <ActivityIndicator size="large" animating />
+            <ActivityIndicator size='large' animating />
             <View style={{ height: 5 }} />
-            <Text style={{ textAlign: 'center' }} variant="bodyLarge">
+            <Text style={{ textAlign: 'center' }} variant='bodyLarge'>
               Please wait …
             </Text>
           </Dialog.Content>
@@ -80,7 +80,7 @@ export default function Login() {
 
       <KeyboardAvoidingView
         style={styles.container}
-        behavior="padding"
+        behavior='padding'
         keyboardVerticalOffset={100}
       >
         <Text style={styles.header}>Welcome back.</Text>
@@ -88,11 +88,11 @@ export default function Login() {
         <View style={styles.input}>
           <Controller
             control={control}
-            name="username"
+            name='username'
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                mode="outlined"
-                label="Email"
+                mode='outlined'
+                label='Email'
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -101,7 +101,7 @@ export default function Login() {
             )}
           />
           {errors.username?.message && (
-            <HelperText type="error" visible={!!errors.username}>
+            <HelperText type='error' visible={!!errors.username}>
               {t(errors.username.message)}
             </HelperText>
           )}
@@ -110,11 +110,11 @@ export default function Login() {
         <View style={styles.input}>
           <Controller
             control={control}
-            name="password"
+            name='password'
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                mode="outlined"
-                label="Password"
+                mode='outlined'
+                label='Password'
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -123,13 +123,13 @@ export default function Login() {
             )}
           />
           {errors.password?.message && (
-            <HelperText type="error" visible={!!errors.password}>
+            <HelperText type='error' visible={!!errors.password}>
               {t(errors.password.message)}
             </HelperText>
           )}
         </View>
 
-        <Button mode="contained" onPress={handleSubmit(onSubmit)}>
+        <Button mode='contained' onPress={handleSubmit(onSubmit)}>
           LOGIN
         </Button>
       </KeyboardAvoidingView>

@@ -1,5 +1,4 @@
 import { DefaultError } from '@tanstack/react-query'
-import React from 'react'
 import { View } from 'react-native'
 import {
   ActivityIndicator,
@@ -7,6 +6,7 @@ import {
   Dialog,
   SegmentedButtons
 } from 'react-native-paper'
+
 import { DOMAINS } from '../constants'
 import useMutation from '../hooks/useMutation'
 import useBoundStore from '../stores'
@@ -14,11 +14,11 @@ import { ChangeStatusFormValues, LoginAgentFormValues } from '../types'
 import { encodeFormData, segmentedButtonsCalculator } from '../utils'
 
 export default function CallHistory() {
-  const statusText = useBoundStore(state => state.customer?.agentStatusText)
-  const serverNumber = useBoundStore(state => state.user?.serverNumber)
-  const sipAccount = useBoundStore(state => state.sipAccount)
-  const currentAgent = useBoundStore(state => state.currentAgent)
-  const softPhone = useBoundStore(state => state.softPhone)
+  const statusText = useBoundStore((state) => state.customer?.agentStatusText)
+  const serverNumber = useBoundStore((state) => state.user?.serverNumber)
+  const sipAccount = useBoundStore((state) => state.sipAccount)
+  const currentAgent = useBoundStore((state) => state.currentAgent)
+  const softPhone = useBoundStore((state) => state.softPhone)
 
   const status = `${currentAgent?.status}`
   const sipInfo = {
@@ -102,15 +102,15 @@ export default function CallHistory() {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Dialog dismissable={false} visible={isPending}>
         <Dialog.Content>
-          <ActivityIndicator size="large" animating />
+          <ActivityIndicator size='large' animating />
         </Dialog.Content>
       </Dialog>
 
-      <Button mode="contained" onPress={handleCall}>
+      <Button mode='contained' onPress={handleCall}>
         Call
       </Button>
 
-      <Button mode="contained" onPress={handleLoginAgent}>
+      <Button mode='contained' onPress={handleLoginAgent}>
         Login Agent
       </Button>
 

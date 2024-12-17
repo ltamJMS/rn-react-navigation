@@ -1,13 +1,13 @@
-import React from 'react'
-import { StatusBar, useColorScheme } from 'react-native'
+import LottieSplashScreen from '@attarchi/react-native-lottie-splash-screen'
 import {
-  NavigationContainer,
   DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme
+  DefaultTheme as NavigationDefaultTheme,
+  NavigationContainer
 } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import merge from 'deepmerge'
+import { StatusBar, useColorScheme } from 'react-native'
 import {
   adaptNavigationTheme,
   MD3DarkTheme,
@@ -15,15 +15,15 @@ import {
   PaperProvider
 } from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+
 import useFirestore from './hooks/useFirestore'
 import { useQuery } from './hooks/useQuery'
+import useSoftPhone from './hooks/useSoftPhone'
+// import NetworkLogger from 'react-native-network-logger'
 import AuthStacks from './navigators/AuthStacks'
 import MainTabs from './navigators/MainTabs'
 import useBoundStore from './stores'
 import { SipAccount } from './types'
-import NetworkLogger from 'react-native-network-logger'
-import useSoftPhone from './hooks/useSoftPhone'
-import LottieSplashScreen from '@attarchi/react-native-lottie-splash-screen'
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -32,7 +32,6 @@ const { LightTheme, DarkTheme } = adaptNavigationTheme({
 
 const CombinedDefaultTheme = merge(MD3LightTheme, LightTheme)
 const CombinedDarkTheme = merge(MD3DarkTheme, DarkTheme)
-
 const Stack = createNativeStackNavigator()
 
 const queryClient = new QueryClient({
@@ -55,9 +54,9 @@ export default function App() {
 
 function AppContent() {
   const colorScheme = useColorScheme()
-  const user = useBoundStore(state => state.user)
-  const isAuthenticated = useBoundStore(state => state.softPhone)
-  const createSoftPhone = useBoundStore(state => state.createSoftPhone)
+  const user = useBoundStore((state) => state.user)
+  const isAuthenticated = useBoundStore((state) => state.softPhone)
+  const createSoftPhone = useBoundStore((state) => state.createSoftPhone)
 
   useFirestore()
   useSoftPhone()
@@ -67,7 +66,7 @@ function AppContent() {
       `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
     ],
     enabled: !!user,
-    onSuccess: data => {
+    onSuccess: (data) => {
       createSoftPhone(data)
       LottieSplashScreen.hide()
     },
@@ -84,7 +83,7 @@ function AppContent() {
       <PaperProvider theme={theme}>
         <StatusBar
           barStyle={isDarkTheme ? 'light-content' : 'dark-content'}
-          backgroundColor="transparent"
+          backgroundColor='transparent'
           translucent
         />
 
@@ -95,9 +94,9 @@ function AppContent() {
             }}
           >
             {isAuthenticated ? (
-              <Stack.Screen name="main" component={MainTabs} />
+              <Stack.Screen name='main' component={MainTabs} />
             ) : (
-              <Stack.Screen name="auth" component={AuthStacks} />
+              <Stack.Screen name='auth' component={AuthStacks} />
             )}
           </Stack.Navigator>
         </NavigationContainer>

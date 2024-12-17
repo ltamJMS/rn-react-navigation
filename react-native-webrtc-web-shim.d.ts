@@ -1,17 +1,17 @@
 declare module 'react-native-webrtc-web-shim' {
   import {
     mediaDevices,
-    RTCPeerConnection,
-    RTCSessionDescription,
+    MediaStream,
     RTCIceCandidate,
-    MediaStream
+    RTCPeerConnection,
+    RTCSessionDescription
   } from 'react-native-webrtc'
 
   export {
     mediaDevices,
-    RTCPeerConnection,
-    RTCSessionDescription,
+    MediaStream,
     RTCIceCandidate,
-    MediaStream
+    RTCPeerConnection,
+    RTCSessionDescription
   }
 }

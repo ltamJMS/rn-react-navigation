@@ -1,14 +1,14 @@
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from 'react-native-paper'
+
 import useBoundStore from '../stores'
 
 export default function Home() {
   const { t } = useTranslation()
-  const user = useBoundStore(state => state.user)
-  const unAuthenticate = useBoundStore(state => state.unAuthenticate)
-  const softPhone = useBoundStore(state => state.softPhone)
+  const user = useBoundStore((state) => state.user)
+  const unAuthenticate = useBoundStore((state) => state.unAuthenticate)
+  const softPhone = useBoundStore((state) => state.softPhone)
 
   const handleCall = () => {
     softPhone?.call('08032418093')
@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Button mode="contained" onPress={handleCall}>
+      <Button mode='contained' onPress={handleCall}>
         Call
       </Button>
 
@@ -24,7 +24,7 @@ export default function Home() {
         {t('common.hello', { name: user?.name })}👋
       </Text>
 
-      <Button mode="contained" onPress={unAuthenticate}>
+      <Button mode='contained' onPress={unAuthenticate}>
         Logout
       </Button>
     </View>

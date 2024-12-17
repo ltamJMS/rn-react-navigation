@@ -1,6 +1,7 @@
 import JsSIP, { UA } from 'jssip'
-import { SipAccount } from '../types'
 import { UAConfiguration } from 'jssip/lib/UA'
+
+import { SipAccount } from '../types'
 
 export const createUA = (sipAccount: SipAccount) => {
   const { sipAccount: account, sipPassword, domain } = sipAccount

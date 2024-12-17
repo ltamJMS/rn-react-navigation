@@ -1,4 +1,5 @@
 import { StateCreator } from 'zustand'
+
 import { Agent, Customer } from '../types'
 
 export type FirestoreState = {
@@ -10,7 +11,7 @@ export type FirestoreState = {
   setCurrentAgent: (agent: Agent) => void
 }
 
-const createFirestoreSlice: StateCreator<FirestoreState> = set => ({
+const createFirestoreSlice: StateCreator<FirestoreState> = (set) => ({
   customer: null,
   agents: [],
   currentAgent: null,

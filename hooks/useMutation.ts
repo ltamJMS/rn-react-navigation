@@ -7,6 +7,7 @@ import {
   UseMutationResult
 } from '@tanstack/react-query'
 import { AxiosRequestConfig } from 'axios'
+
 import axiosInstance from '../libs/axios_instance'
 
 export default function useMutation<
@@ -31,7 +32,7 @@ export default function useMutation<
       url: endpoint,
       method: config?.method || 'POST',
       data: variables
-    }).then(response => response.data)
+    }).then((response) => response.data)
 
   return RQUseMutation(
     {

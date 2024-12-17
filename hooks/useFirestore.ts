@@ -1,14 +1,15 @@
+import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
 import { useEffect } from 'react'
+
 import useBoundStore from '../stores'
 import { Agent, Customer } from '../types'
-import auth from '@react-native-firebase/auth'
 
 export default function useFirestore() {
-  const user = useBoundStore(state => state.user)
-  const setCustomer = useBoundStore(state => state.setCustomer)
-  const setAgents = useBoundStore(state => state.setAgents)
-  const setCurrentAgent = useBoundStore(state => state.setCurrentAgent)
+  const user = useBoundStore((state) => state.user)
+  const setCustomer = useBoundStore((state) => state.setCustomer)
+  const setAgents = useBoundStore((state) => state.setAgents)
+  const setCurrentAgent = useBoundStore((state) => state.setCurrentAgent)
 
   const customerId = user?.customerId
   const userName = user?.username
@@ -19,8 +20,8 @@ export default function useFirestore() {
       return undefined
     }
 
-    let agentSubscriber: Function | undefined
-    let customerSubscriber: Function | undefined
+    let agentSubscriber: () => void | undefined
+    let customerSubscriber: () => void | undefined
 
     const initialize = async () => {
       try {
@@ -30,9 +31,9 @@ export default function useFirestore() {
           .collection('customers')
           .doc(customerId)
           .collection('agentStatuses')
-          .onSnapshot(agentQuerySnapshot => {
+          .onSnapshot((agentQuerySnapshot) => {
             const data: Agent[] = []
-            agentQuerySnapshot.forEach(agentsDocumentSnapshot => {
+            agentQuerySnapshot.forEach((agentsDocumentSnapshot) => {
               const agent = agentsDocumentSnapshot.data() as Agent
               data.push(agent)
 
@@ -47,7 +48,7 @@ export default function useFirestore() {
         customerSubscriber = firestore()
           .collection('customers')
           .doc(customerId)
-          .onSnapshot(customerQuerySnapshot => {
+          .onSnapshot((customerQuerySnapshot) => {
             const customer = customerQuerySnapshot.data() as Customer
 
             setCustomer(customer)

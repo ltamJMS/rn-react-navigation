@@ -9,6 +9,7 @@ import {
   UseQueryResult
 } from '@tanstack/react-query'
 import { AxiosRequestConfig } from 'axios'
+
 import axiosInstance from '../libs/axios_instance'
 
 export function useQuery<
@@ -35,7 +36,7 @@ export function useQuery<
         ...config,
         url: `${key?.[0]}`,
         method: config?.method || 'GET'
-      }).then(response => response.data)
+      }).then((response) => response.data)
 
       if (onSuccess) {
         await onSuccess(data)

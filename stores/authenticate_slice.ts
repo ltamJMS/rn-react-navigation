@@ -1,4 +1,5 @@
 import { StateCreator } from 'zustand'
+
 import { User } from '../types'
 import { clearTokens, storeTokens } from '../utils/token_storage'
 import { BoundState } from '.'

@@ -1,6 +1,3 @@
-import { StateCreator } from 'zustand'
-import { SipAccount } from '../types'
-import { createUA } from '../libs/js_sip'
 import { UA } from 'jssip'
 import { UnRegisterOptions } from 'jssip/lib/UA'
 import {
@@ -8,8 +5,12 @@ import {
   RTCPeerConnection,
   RTCSessionDescription
 } from 'react-native-webrtc-web-shim'
+import { StateCreator } from 'zustand'
 
-declare var global: {
+import { createUA } from '../libs/js_sip'
+import { SipAccount } from '../types'
+
+declare let global: {
   RTCPeerConnection: unknown
   RTCSessionDescription: unknown
   navigator: {
