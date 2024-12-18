@@ -22,9 +22,12 @@ export default function App() {
   )
 
   useQuery<SipAccount>({
-    queryKey: [
-      `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
-    ],
+    queryKey: ['v1/agents/users', `${user?.username}/sip-account`],
+    config: {
+      params: {
+        customerId: user?.agreementID
+      }
+    },
     enabled: !!user,
     onSuccess: (data: SipAccount) => {
       setSipAccount(data)

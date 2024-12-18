@@ -20,6 +20,7 @@ import useMutation from '_hooks/useMutation'
 import { LoginFormSchema, LoginFormValues } from '_schemas/login_form_schema'
 import useBoundStore from '_stores'
 import { User } from '_types'
+import { removeAllExceptKey } from '_utils/index'
 
 export default function Login() {
   const { t } = useTranslation()
@@ -50,9 +51,7 @@ export default function Login() {
     onSuccess: (user: User) => {
       setUser(user)
       queryClient.invalidateQueries({
-        queryKey: [
-          `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
-        ]
+        queryKey: ['v1/agents/users']
       })
     },
     onError: (error) => {
@@ -61,7 +60,7 @@ export default function Login() {
   })
 
   const onSubmit = (formValues: LoginFormValues) => {
-    queryClient.removeQueries()
+    removeAllExceptKey(queryClient, ['v1/agents/users'])
     mutate(formValues)
   }
 

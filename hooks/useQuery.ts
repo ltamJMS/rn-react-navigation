@@ -21,8 +21,8 @@ export function useQuery<
 >(
   options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> & {
     config?: AxiosRequestConfig
-    onSuccess?: (data: TQueryFnData) => void
-    onError?: (error: unknown) => void
+    onSuccess?: (data: TQueryFnData) => Promise<void> | void
+    onError?: (error: unknown) => Promise<void> | void
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> {
@@ -33,11 +33,13 @@ export function useQuery<
     queryKey: key
   }: QueryFunctionContext): Promise<TQueryFnData> => {
     try {
-      const data = await axiosInstance<TError, { data: TQueryFnData }>({
+      const url = key.join('/')
+
+      const { data } = await axiosInstance<TError, { data: TQueryFnData }>({
         ...config,
-        url: `${key?.[0]}`,
+        url,
         method: config?.method || 'GET'
-      }).then((response) => response.data)
+      })
 
       if (onSuccess) {
         await onSuccess(data)
@@ -53,7 +55,7 @@ export function useQuery<
     }
   }
 
-  return RQUseQuery(
+  return RQUseQuery<TQueryFnData, TError, TData, TQueryKey>(
     {
       queryKey,
       queryFn: queryFn || defaultQueryFn,
