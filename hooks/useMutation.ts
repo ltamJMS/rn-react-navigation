@@ -1,5 +1,4 @@
 import { AxiosRequestConfig } from 'axios'
-import axiosInstance from 'libs/axios_instance'
 
 import {
   DefaultError,
@@ -9,6 +8,8 @@ import {
   UseMutationOptions,
   UseMutationResult
 } from '@tanstack/react-query'
+
+import axiosInstance from '_libs/axios_instance'
 
 export default function useMutation<
   TVariables = void,

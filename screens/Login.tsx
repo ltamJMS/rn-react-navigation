@@ -1,4 +1,3 @@
-import useMutation from 'hooks/useMutation'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native'
@@ -13,12 +12,14 @@ import {
   TextInput,
   useTheme
 } from 'react-native-paper'
-import { LoginFormSchema, LoginFormValues } from 'schemas/login_form_schema'
-import useBoundStore from 'stores'
-import { User } from 'types'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+
+import useMutation from '_hooks/useMutation'
+import { LoginFormSchema, LoginFormValues } from '_schemas/login_form_schema'
+import useBoundStore from '_stores'
+import { User } from '_types'
 
 export default function Login() {
   const { t } = useTranslation()

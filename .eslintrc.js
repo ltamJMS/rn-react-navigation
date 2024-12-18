@@ -11,14 +11,10 @@ module.exports = {
           ['^react$', '^[a-z]'],
           // Packages starting with `@`
           ['^@'],
-          // Packages starting with `~`
-          ['^~'],
           // Imports starting with `../`
           ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
           // Imports starting with `./`
-          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-          // Side effect imports
-          ['^\\u0000']
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$']
         ]
       }
     ],

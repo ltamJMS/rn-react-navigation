@@ -1,9 +1,10 @@
-import { User } from 'types'
 import { StateCreator } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createJSONStorage } from 'zustand/middleware'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { User } from '_types'
 
 export type UserState = {
   user: User | null

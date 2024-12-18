@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from 'react-native-paper'
-import useBoundStore from 'stores'
+
+import useBoundStore from '_stores'
 
 export default function Home() {
   const { t } = useTranslation()

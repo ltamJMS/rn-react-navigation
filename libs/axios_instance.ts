@@ -3,8 +3,9 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios'
-import { DOMAINS } from 'consts'
-import useBoundStore from 'stores'
+
+import { DOMAINS } from '_constants'
+import useBoundStore from '_stores'
 
 const defaultHeaders = {
   'Content-Type': 'application/json'
