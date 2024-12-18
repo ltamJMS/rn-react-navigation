@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TOKEN_KEYS } from 'consts'
 import { TokenBulk } from 'types'
+
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const storeTokens = async (tokenBundle: TokenBulk): Promise<void> => {
   await Promise.all([

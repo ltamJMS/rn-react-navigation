@@ -1,3 +1,6 @@
+import { AxiosRequestConfig } from 'axios'
+import axiosInstance from 'libs/axios_instance'
+
 import {
   DefaultError,
   QueryClient,
@@ -8,8 +11,6 @@ import {
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query'
-import { AxiosRequestConfig } from 'axios'
-import axiosInstance from 'libs/axios_instance'
 
 export function useQuery<
   TQueryFnData = unknown,

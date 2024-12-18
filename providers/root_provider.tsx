@@ -1,11 +1,5 @@
-import {
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-  NavigationContainer
-} from '@react-navigation/native'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import merge from 'deepmerge'
 import { PropsWithChildren } from 'react'
+import merge from 'deepmerge'
 import { StatusBar, useColorScheme } from 'react-native'
 import {
   adaptNavigationTheme,
@@ -14,6 +8,13 @@ import {
   PaperProvider
 } from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+  NavigationContainer
+} from '@react-navigation/native'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // import NetworkLogger from 'react-native-network-logger'
 

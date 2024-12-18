@@ -3,7 +3,25 @@ module.exports = {
   extends: ['@react-native', 'plugin:react/jsx-runtime'],
   plugins: ['simple-import-sort', 'unused-imports', '@cspell'],
   rules: {
-    'simple-import-sort/imports': 'warn',
+    'simple-import-sort/imports': [
+      'warn',
+      {
+        groups: [
+          // `react` first, then packages starting with a character
+          ['^react$', '^[a-z]'],
+          // Packages starting with `@`
+          ['^@'],
+          // Packages starting with `~`
+          ['^~'],
+          // Imports starting with `../`
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          // Imports starting with `./`
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          // Side effect imports
+          ['^\\u0000']
+        ]
+      }
+    ],
     'simple-import-sort/exports': 'warn',
     'unused-imports/no-unused-imports': 'warn',
     '@cspell/spellchecker': [
