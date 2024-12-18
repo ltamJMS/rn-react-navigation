@@ -1,6 +1,3 @@
-import { SHOWABLE_STATUS_MAX, STATUSES } from '../constants'
-import { AgentStatusText, Status } from '../types'
-
 export const getErrorMessage = (error: unknown) => {
   let message: string
 
@@ -15,37 +12,4 @@ export const getErrorMessage = (error: unknown) => {
   }
 
   return message
-}
-
-export const segmentedButtonsCalculator = (statusText?: AgentStatusText) => {
-  const buttons = STATUSES?.reduce((acc: Status[], status, index) => {
-    if (index >= SHOWABLE_STATUS_MAX) {
-      return acc
-    }
-
-    return [
-      ...acc,
-      {
-        label: statusText?.[status.value] ?? 'Unknown',
-        value: status.value,
-        checkedColor: 'green'
-      }
-    ]
-  }, [])
-
-  return buttons
-}
-
-export const encodeFormData = <T extends Record<string, string | undefined>>(
-  data: T
-): string => {
-  const formData = new URLSearchParams()
-
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      formData.append(key, value)
-    }
-  })
-
-  return formData.toString()
 }

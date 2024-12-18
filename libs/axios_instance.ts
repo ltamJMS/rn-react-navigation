@@ -6,7 +6,6 @@ import axios, {
 
 import { DOMAINS } from '../constants'
 import useBoundStore from '../stores'
-import { getTokens } from '../utils/token_storage'
 
 const defaultHeaders = {
   'Content-Type': 'application/json'
@@ -20,7 +19,7 @@ const axiosInstance = axios.create({
 const onRequest = async (
   config: InternalAxiosRequestConfig
 ): Promise<InternalAxiosRequestConfig> => {
-  const { accessToken } = await getTokens()
+  const accessToken = useBoundStore.getState().user?.accessToken
 
   config.headers.set('Authorization', `Bearer ${accessToken}`)
 
@@ -36,8 +35,9 @@ const onResponseError = async (
   error: AxiosError
 ): Promise<AxiosResponse | AxiosError> => {
   if (error.response?.status === 401) {
-    useBoundStore.getState().unAuthenticate()
+    useBoundStore.getState().logout()
   }
+
   return Promise.reject(error)
 }
 

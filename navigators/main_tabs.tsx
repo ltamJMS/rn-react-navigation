@@ -1,25 +1,10 @@
-import {
-  BottomTabScreenProps,
-  createBottomTabNavigator
-} from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
-import Agents from '../screens/agents'
-import CallHistory from '../screens/call-history'
-import Home from '../screens/home'
-
-export type IconProps = {
-  color: string
-  size: number
-}
-
-export type MainTabsParamList = {
-  Home: undefined
-  CallHistory: undefined
-  Agents: undefined
-}
-
-export type MainTabsProps = BottomTabScreenProps<MainTabsParamList>
+import Home from '../screens/Home'
+import Setting from '../screens/Setting'
+import { IconProps } from '../types'
+import { MainTabsParamList } from '../types/navigators'
 
 const Tab = createBottomTabNavigator<MainTabsParamList>()
 
@@ -44,20 +29,11 @@ export default function MainTabs() {
         }}
       />
       <Tab.Screen
-        name='CallHistory'
-        component={CallHistory}
+        name='Setting'
+        component={Setting}
         options={{
           tabBarIcon: settingTabIcon,
-          tabBarLabel: 'Call History'
-        }}
-      />
-
-      <Tab.Screen
-        name='Agents'
-        component={Agents}
-        options={{
-          tabBarIcon: settingTabIcon,
-          tabBarLabel: 'Agents'
+          tabBarLabel: 'Setting'
         }}
       />
     </Tab.Navigator>

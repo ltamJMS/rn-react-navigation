@@ -11,15 +11,22 @@ export const storeTokens = async (tokenBundle: TokenBulk): Promise<void> => {
 }
 
 export const getTokens = async (): Promise<TokenBulk> => {
-  const accessToken: string | null = await AsyncStorage.getItem(
-    TOKEN_KEYS.accessToken
-  ).catch(() => null)
+  try {
+    const [accessToken, refreshToken] = await Promise.all([
+      AsyncStorage.getItem(TOKEN_KEYS.accessToken),
+      AsyncStorage.getItem(TOKEN_KEYS.refreshToken)
+    ])
 
-  const refreshToken: string | null = await AsyncStorage.getItem(
-    TOKEN_KEYS.refreshToken
-  ).catch(() => null)
-
-  return { refreshToken: refreshToken || '', accessToken: accessToken || '' }
+    return {
+      refreshToken: refreshToken || '',
+      accessToken: accessToken || ''
+    }
+  } catch (error: unknown) {
+    return {
+      refreshToken: '',
+      accessToken: ''
+    }
+  }
 }
 
 export const clearTokens = async (): Promise<void> => {

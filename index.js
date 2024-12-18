@@ -1,5 +1,4 @@
 import './i18n'
-import './libs/firebase_config'
 
 import { AppRegistry } from 'react-native'
 

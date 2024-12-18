@@ -11,9 +11,9 @@ import { AxiosRequestConfig } from 'axios'
 import axiosInstance from '../libs/axios_instance'
 
 export default function useMutation<
+  TVariables = void,
   TData = unknown,
   TError = DefaultError,
-  TVariables = void,
   TContext = unknown
 >(
   options: UseMutationOptions<TData, TError, TVariables, TContext> & {

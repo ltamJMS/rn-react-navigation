@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DefaultError, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native'
@@ -25,12 +25,13 @@ export default function Login() {
   const theme: MD3Theme = useTheme()
   const styles = makeStyles(theme)
 
-  const authenticate = useBoundStore((state) => state.authenticate)
+  const setUser = useBoundStore((state) => state.setUser)
   const queryClient = useQueryClient()
 
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors }
   } = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
@@ -42,20 +43,19 @@ export default function Login() {
     }
   })
 
-  const { isPending, mutate } = useMutation<
-    User,
-    DefaultError,
-    LoginFormValues
-  >({
+  const { isPending, mutate } = useMutation<LoginFormValues, User>({
     endpoint:
       '/v1/auth?needs[]=access-token&needs[]=firebase-access-token&needs[]=license',
-    onSuccess: (user) => {
-      authenticate(user)
+    onSuccess: (user: User) => {
+      setUser(user)
       queryClient.invalidateQueries({
         queryKey: [
           `/v1/agents/users/${user?.username}/sip-account?customerId=${user?.agreementID}`
         ]
       })
+    },
+    onError: (error) => {
+      setError('username', { message: error.message })
     }
   })
 
@@ -70,8 +70,8 @@ export default function Login() {
         <Dialog dismissable={false} visible={isPending}>
           <Dialog.Content>
             <ActivityIndicator size='large' animating />
-            <View style={{ height: 5 }} />
-            <Text style={{ textAlign: 'center' }} variant='bodyLarge'>
+            <View style={styles.loadingView} />
+            <Text style={styles.loadingText} variant='bodyLarge'>
               Please wait …
             </Text>
           </Dialog.Content>
@@ -161,5 +161,11 @@ const makeStyles = (theme: MD3Theme) =>
     input: {
       width: '100%',
       marginVertical: 8
+    },
+    loadingView: {
+      height: 5
+    },
+    loadingText: {
+      textAlign: 'center'
     }
   })

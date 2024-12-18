@@ -1,23 +1,15 @@
 import { create } from 'zustand'
 
-import {
-  AuthenticateState,
-  createAuthenticateSlice
-} from './authenticate_slice'
-import createFirestoreSlice, { FirestoreState } from './firestore_slice'
-import createSoftPhoneSlice, { SoftPhoneState } from './softphone_slice'
+import { AuthState, createAuthSlice } from './auth_slice'
+import createSipAccountSlice, { SipAccountState } from './sip_account_slice'
 import createUserSlice, { UserState } from './user_slice'
 
-export type BoundState = UserState &
-  SoftPhoneState &
-  AuthenticateState &
-  FirestoreState
+export type BoundState = UserState & SipAccountState & AuthState
 
 const useBoundStore = create<BoundState>((...args) => ({
   ...createUserSlice(...args),
-  ...createSoftPhoneSlice(...args),
-  ...createAuthenticateSlice(...args),
-  ...createFirestoreSlice(...args)
+  ...createSipAccountSlice(...args),
+  ...createAuthSlice(...args)
 }))
 
 export default useBoundStore

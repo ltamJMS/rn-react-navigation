@@ -7,24 +7,17 @@ import useBoundStore from '../stores'
 export default function Home() {
   const { t } = useTranslation()
   const user = useBoundStore((state) => state.user)
-  const unAuthenticate = useBoundStore((state) => state.unAuthenticate)
-  const softPhone = useBoundStore((state) => state.softPhone)
-
-  const handleCall = () => {
-    softPhone?.call('08032418093')
-  }
+  const logout = useBoundStore((state) => state.logout)
 
   return (
     <View style={styles.container}>
-      <Button mode='contained' onPress={handleCall}>
-        Call
-      </Button>
+      <Button mode='contained'>Call</Button>
 
-      <Text style={{ textAlign: 'center', fontSize: 20, color: 'red' }}>
+      <Text style={styles.text}>
         {t('common.hello', { name: user?.name })}👋
       </Text>
 
-      <Button mode='contained' onPress={unAuthenticate}>
+      <Button mode='contained' onPress={logout}>
         Logout
       </Button>
     </View>
@@ -39,5 +32,10 @@ const styles = StyleSheet.create({
     maxWidth: 340,
     alignSelf: 'center',
     justifyContent: 'center'
+  },
+  text: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'red'
   }
 })

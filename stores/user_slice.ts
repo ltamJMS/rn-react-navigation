@@ -20,7 +20,15 @@ type UserPersist = StateCreator<
 const createUserSlice: UserPersist = persist(
   (set) => ({
     user: null,
-    setUser: (user: User) => set({ user })
+    setUser: (user: User) => {
+      const customerId =
+        user.agreementID.startsWith('CRM') && user.infinitalkCustomerId
+          ? user.infinitalkCustomerId
+          : user.agreementID
+      const serverNumber = customerId.slice(0, 3)
+
+      set({ user: { ...user, customerId, serverNumber } })
+    }
   }),
   {
     name: 'user-storage',
