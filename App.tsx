@@ -1,13 +1,12 @@
 import LottieSplashScreen from '@attarchi/react-native-lottie-splash-screen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { useQuery } from 'hooks/useQuery'
+import AuthStacks from 'navigators/auth_stacks'
+import MainTabs from 'navigators/main_tabs'
+import RootProvider from 'providers/root_provider'
+import useBoundStore from 'stores'
+import { SipAccount } from 'types'
 import { useShallow } from 'zustand/shallow'
-
-import { useQuery } from './hooks/useQuery'
-import AuthStacks from './navigators/auth_stacks'
-import MainTabs from './navigators/main_tabs'
-import RootProvider from './providers/root_provider'
-import useBoundStore from './stores'
-import { SipAccount } from './types'
 
 const Stack = createNativeStackNavigator()
 

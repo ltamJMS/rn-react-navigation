@@ -1,6 +1,5 @@
+import { SipAccount } from 'types'
 import { StateCreator } from 'zustand'
-
-import { SipAccount } from '../types'
 
 export type SipAccountState = {
   sipAccount: SipAccount | null

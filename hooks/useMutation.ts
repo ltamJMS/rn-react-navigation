@@ -7,8 +7,7 @@ import {
   UseMutationResult
 } from '@tanstack/react-query'
 import { AxiosRequestConfig } from 'axios'
-
-import axiosInstance from '../libs/axios_instance'
+import axiosInstance from 'libs/axios_instance'
 
 export default function useMutation<
   TVariables = void,

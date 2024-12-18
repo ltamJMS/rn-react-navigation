@@ -1,10 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-
-import Home from '../screens/Home'
-import Setting from '../screens/Setting'
-import { IconProps } from '../types'
-import { MainTabsParamList } from '../types/navigators'
+import Home from 'screens/Home'
+import Setting from 'screens/Setting'
+import { IconProps } from 'types'
+import { MainTabsParamList } from 'types/navigators'
 
 const Tab = createBottomTabNavigator<MainTabsParamList>()
 
