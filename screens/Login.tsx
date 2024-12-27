@@ -22,6 +22,7 @@ import useCommonData from '../services/usecases/auth/useCommonData'
 import { useAgentStatusTool } from '../services/usecases/auth/useAgentStatusTool'
 import { useSoftPhoneContext } from '../SoftPhoneProvider'
 import { SipConfig } from '../services/models/softPhone'
+import JmsCodeDialog from '../shared/components/JmsCodeDialog'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
@@ -36,6 +37,7 @@ export default function Login() {
   const { control } = useForm()
   const characterMax = 90
   const { setupSoftPhone } = useSoftPhoneContext()
+  const [dialogVisible, setDialogVisible] = useState(false)
 
   useEffect(() => {
     const getStoredCredentials = async () => {
@@ -64,6 +66,14 @@ export default function Login() {
     } else {
       setIsLoading(true)
       try {
+        const code = await AsyncStorage.getItem('@jms_code')
+        console.log('🔵 CODE', code)
+        const isValidCode = code === 'JMS123456'
+        if (!isValidCode) {
+          setIsLoading(false)
+          setDialogVisible(true)
+          return
+        }
         const res = await loginByPassword(username, password)
         if (res instanceof HTTPError) {
           setIsLoading(false)
@@ -120,6 +130,11 @@ export default function Login() {
     }
   }, [password, username, remember])
 
+  const handleCodeSubmit = async (code: string) => {
+    await AsyncStorage.setItem('@jms_code', code)
+    setDialogVisible(false)
+  }
+
   useEffect(() => {
     if (authRes) {
       const applyTokenAsync = async () => {
@@ -164,6 +179,7 @@ export default function Login() {
               account: result.data.account,
               password: result.data.password,
               domain: result.data.domain,
+              asteriskDomain: result.data?.asteriskDomain,
               port: 8089
             }
             setupSoftPhone(sipConfig)
@@ -357,6 +373,11 @@ export default function Login() {
             </Button>
           </View>
         </View>
+        <JmsCodeDialog
+          visible={dialogVisible}
+          onCancel={() => setDialogVisible(false)}
+          onSubmit={handleCodeSubmit}
+        />
       </View>
     </>
   )

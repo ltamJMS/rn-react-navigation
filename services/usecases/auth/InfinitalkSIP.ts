@@ -57,6 +57,7 @@ export interface SipConfig {
   password: string
   domain: string
   port: number
+  asteriskDomain?: string
 }
 
 export interface CallSession {
@@ -77,6 +78,7 @@ export interface InfinitalkSipInterface {
   ua: UA
   callSessionMap: CallSessionMap
   eventSFEmitter: NodeJS.EventEmitter
+  domainToRegister: string
   isNeedToReInvite: boolean
   getCurrentSession(): RTCSession | undefined
   getHoldSession(): RTCSession | undefined
@@ -140,21 +142,23 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
   ua: UA
   eventSFEmitter: NodeJS.EventEmitter
   callSessionMap: Record<string, CallSession> = {}
+  domainToRegister: string = ''
   isNeedToReInvite = false
 
   constructor(sip: SipConfig, config?: InfinitalkSIPConfig) {
     this.config = config || { listenCall: false, listenUA: false }
     this.sip = sip
     this.eventSFEmitter = new EventEmitter()
-    const { account, password, domain, port } = this.sip
-    const url = `wss://${domain}:${port}/ws`
+    const { account, password, domain, port, asteriskDomain } = this.sip
+    this.domainToRegister = asteriskDomain ? asteriskDomain : domain
+    const url = `wss://${this.domainToRegister}:${port}/ws`
     const socket = new JsSIP.WebSocketInterface(url)
     const uaOptionBase = {
       sockets: [socket],
-      uri: `sip:${account}@${domain}`,
+      uri: `sip:${account}@${this.domainToRegister}`,
       password,
       register: true,
-      contact_uri: `sip:${account}@${domain};transport=ws`,
+      contact_uri: `sip:${account}@${this.domainToRegister};transport=ws`,
       session_timers: false,
       session_timers_force_refresher: true,
       user_agent: 'InfiniTalk ClientApp Ver1.23.0'
@@ -196,7 +200,7 @@ export class InfinitalkSIP implements InfinitalkSipInterface {
       const options = {
         mediaConstraints: { audio: true, video: false }
       }
-      const target = `sip:${phoneNumber}@${this.sip.domain}`
+      const target = `sip:${phoneNumber}@${this.domainToRegister}`
       console.log('🌸🌸🌸🌸🌸🌸 CALL TO phoneNumber', phoneNumber)
       console.log('🌸🌸🌸🌸🌸🌸 CALL TO target', target)
       const resSession: RTCSession = this.ua.call(target, options)

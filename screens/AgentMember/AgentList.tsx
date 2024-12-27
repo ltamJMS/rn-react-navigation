@@ -55,7 +55,7 @@ const AgentList: FC<Props> = props => {
             style={styles.avatar}
           />
           <View>
-            <Text numberOfLines={1}>{`${item.name} | ${item.userID}`}</Text>
+            <Text numberOfLines={1}>{`${item.name}`}</Text>
             <View style={styles.descriptionContainer}>
               <Text>{item.exten}</Text>
               <Icon name={icon} color={color} style={styles.icon} size={size} />

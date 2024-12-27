@@ -30,6 +30,7 @@ export interface SipConfig {
   account: string
   password: string
   domain: string
+  asteriskDomain: string
   port: number
 }
 

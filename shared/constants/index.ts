@@ -5,7 +5,8 @@ export const SCREENS = {
   AGENT_MEMBER: 'メンバー',
   KEYPAD: 'キーパッド',
   CALL_SCREEN: 'Call',
-  CALL_HISTORY: '通話履歴'
+  CALL_HISTORY: '通話履歴',
+  CALL_HISTORY_DETAIL: '通話履歴詳細'
 }
 export const firebaseDevConfig = {
   apiKey: 'AIzaSyAyy5XNS9_-QRhKGSJQE5GbKnXULhEtDKU',

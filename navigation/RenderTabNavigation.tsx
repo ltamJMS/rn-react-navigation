@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 // Screens
-import HomeScreen from '../screens/HomeScreen'
+import CallHistory from '../screens/CallHistory'
 import Keypad from '../screens/Keypad'
 import AgentMemberScreen from '../screens/AgentMember/AgentMemberScreen'
 import { SCREENS } from '../shared/constants'
@@ -91,7 +91,10 @@ const RenderTabNavigation = () => {
         component={AgentMemberScreen}
       />
       <Tab.Screen name={`${SCREENS.KEYPAD}_TAB`} component={Keypad} />
-      <Tab.Screen name={`${SCREENS.CALL_HISTORY}_TAB`} component={HomeScreen} />
+      <Tab.Screen
+        name={`${SCREENS.CALL_HISTORY}_TAB`}
+        component={CallHistory}
+      />
     </Tab.Navigator>
   )
 }
