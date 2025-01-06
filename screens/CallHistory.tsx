@@ -14,6 +14,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 // Sample data based on your response
 function getRandomInt(min: number, max: number) {
@@ -150,7 +151,42 @@ export default function CallHistory() {
     const arrowImage = isIncoming
       ? require('../assets/images/incomingCallArrow.png')
       : require('../assets/images/outgoingCallArrow.png')
+    const calTypeIconPrefix =
+      item.type === 0 ? (
+        <MaterialCommunityIcons
+          name="arrow-left"
+          size={12}
+          color="#AACD05"
+          style={{ height: 24, marginTop: 12, marginLeft: 6 }}
+        />
+      ) : (
+        <MaterialCommunityIcons
+          name="minus"
+          size={12}
+          color="#EC5079"
+          style={{ height: 24, marginTop: 12, marginLeft: 6 }}
+        />
+      )
 
+    const calTypeIconSuffix =
+      item.type === 0 ? (
+        <MaterialCommunityIcons
+          name="minus"
+          size={12}
+          color="#AACD05"
+          style={{ height: 24, marginTop: 12, marginRight: 6 }}
+        />
+      ) : (
+        <MaterialCommunityIcons
+          name="arrow-right"
+          size={12}
+          color="#EC5079"
+          style={{ height: 24, marginTop: 12, marginRight: 6 }}
+        />
+      )
+
+    const calTypeText = item.type === 0 ? '着信' : '発信'
+    const textColor = item.type === 0 ? '#AACD05' : '#EC5079'
     const formattedTime = new Date(item.startTime).toLocaleTimeString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
@@ -171,7 +207,14 @@ export default function CallHistory() {
           <Text style={{}}>{item.operator.name}</Text>
           <View style={styles.detailsContainer}>
             <Text style={styles.details}>{item.operator.phoneNumber}</Text>
-            <Image source={arrowImage} style={styles.arrow} />
+            {/* <Image source={arrowImage} style={styles.arrow} /> */}
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {calTypeIconPrefix}
+              <Text style={[styles.detailValue, { color: textColor }]}>
+                {calTypeText}
+              </Text>
+              {calTypeIconSuffix}
+            </View>
             <Text style={styles.details}>{item.contact}</Text>
           </View>
         </View>
@@ -312,10 +355,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
-  arrow: {
-    width: 56,
-    height: 35,
-    marginHorizontal: 5
+  // arrow: {
+  //   width: 56,
+  //   height: 35,
+  //   marginHorizontal: 5
+  // },
+  detailValue: {
+    fontSize: 12,
+    color: '#333'
   },
   logoAvatar: {
     width: 22,
