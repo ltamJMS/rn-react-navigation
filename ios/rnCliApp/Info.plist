@@ -21,9 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>ProviderConfiguration.IconTemplateImageName</key>  
-	<string>AppIcon</string>  
+	<string>1.3.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -41,6 +39,8 @@
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>アプリは音声を録音するためにマイクへのアクセス権が必要です。</string>
+	<key>ProviderConfiguration.IconTemplateImageName</key>
+	<string>AppIcon</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -64,6 +64,7 @@
 	<array>
 		<string>fetch</string>
 		<string>voip</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>

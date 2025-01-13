@@ -13,6 +13,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7DD31053D490EAC09561BC59 /* Pods_rnCliApp_rnCliAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B919388727FD5B8A9D052F /* Pods_rnCliApp_rnCliAppTests.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		86BCB4342D354FC200BD41CE /* dialing-tone-2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86BCB4322D354FC200BD41CE /* dialing-tone-2.mp3 */; };
+		86BCB4352D354FC200BD41CE /* dialing-tone-1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86BCB4312D354FC200BD41CE /* dialing-tone-1.mp3 */; };
+		86BCB4362D354FC200BD41CE /* dialing-tone-3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86BCB4332D354FC200BD41CE /* dialing-tone-3.mp3 */; };
 		BF2D9A6DE7B94413A9C4A1EB /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CB6AE3280814EF09C2D8120 /* BootSplash.storyboard */; };
 		CA4DD9BAA3F7D6A906C8336C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3B65B9777563C4E0D2857D71 /* PrivacyInfo.xcprivacy */; };
 		CE61CDEE2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */; settings = {ASSET_TAGS = (New, ); }; };
@@ -50,6 +53,9 @@
 		3B65B9777563C4E0D2857D71 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = rnCliApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7E39109A379E4E3AB76E2770 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = rnCliApp/Colors.xcassets; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = rnCliApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		86BCB4312D354FC200BD41CE /* dialing-tone-1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "dialing-tone-1.mp3"; sourceTree = "<group>"; };
+		86BCB4322D354FC200BD41CE /* dialing-tone-2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "dialing-tone-2.mp3"; sourceTree = "<group>"; };
+		86BCB4332D354FC200BD41CE /* dialing-tone-3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "dialing-tone-3.mp3"; sourceTree = "<group>"; };
 		87E4C4EC7FAD8604AF442E2D /* Pods-rnCliApp-rnCliAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rnCliApp-rnCliAppTests.release.xcconfig"; path = "Target Support Files/Pods-rnCliApp-rnCliAppTests/Pods-rnCliApp-rnCliAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		8CB6AE3280814EF09C2D8120 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = rnCliApp/BootSplash.storyboard; sourceTree = "<group>"; };
 		CE61CDEC2CC5F62B003C9C2A /* rnCliApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = rnCliApp.entitlements; path = rnCliApp/rnCliApp.entitlements; sourceTree = "<group>"; };
@@ -112,6 +118,9 @@
 				7E39109A379E4E3AB76E2770 /* Colors.xcassets */,
 				3B65B9777563C4E0D2857D71 /* PrivacyInfo.xcprivacy */,
 				CE61CDED2CC8C0AC003C9C2A /* phoneringtone.wav */,
+				86BCB4312D354FC200BD41CE /* dialing-tone-1.mp3 */,
+				86BCB4322D354FC200BD41CE /* dialing-tone-2.mp3 */,
+				86BCB4332D354FC200BD41CE /* dialing-tone-3.mp3 */,
 			);
 			name = rnCliApp;
 			sourceTree = "<group>";
@@ -269,6 +278,9 @@
 			files = (
 				CE61CDEF2CC8C0AC003C9C2A /* phoneringtone.wav in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				86BCB4342D354FC200BD41CE /* dialing-tone-2.mp3 in Resources */,
+				86BCB4352D354FC200BD41CE /* dialing-tone-1.mp3 in Resources */,
+				86BCB4362D354FC200BD41CE /* dialing-tone-3.mp3 in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BF2D9A6DE7B94413A9C4A1EB /* BootSplash.storyboard in Resources */,
 				E2FE4AD3462D4CB2AF4CD29D /* Colors.xcassets in Resources */,
@@ -532,7 +544,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -567,7 +579,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -666,10 +678,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -753,10 +762,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
