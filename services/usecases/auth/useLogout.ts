@@ -19,6 +19,7 @@ import {
   sipAccountsAvailableState
 } from '../../store/agentStatus'
 import { contextsState, tenantState } from '../../store/tenant'
+import { callHistoryData } from '../../store/callHistory'
 
 const useLogout = () => {
   // agentStatus store
@@ -32,6 +33,8 @@ const useLogout = () => {
   const resetAuth = useResetRecoilState(authState)
   const resetAgentLogin = useResetRecoilState(agentLoginState)
   const resetCurrentUserState = useResetRecoilState(currentUserState)
+  // callHistory store
+  const resetCallHistoryData = useResetRecoilState(callHistoryData)
   // softphone store
   const resetSipAccount = useResetRecoilState(sipAccountState)
   const resetIncomingShow = useResetRecoilState(incomingShowState)
@@ -60,6 +63,7 @@ const useLogout = () => {
       resetHoldingCall()
       resetCanSFRegisterState()
       resetCallRequestState()
+      resetCallHistoryData()
       // tenant store
       resetTenantState()
       resetContextsState()
@@ -81,6 +85,7 @@ const useLogout = () => {
     resetSipAccount,
     resetCanSFRegisterState,
     resetCallRequestState,
+    resetCallHistoryData,
     // tenant store
     resetTenantState,
     resetContextsState

@@ -28,8 +28,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
   // defaultValue='099aChatOutsideTest2/6628@talk'
 
-  const [username, setUsername] = useState('099aChatOutsideTest2')
-  const [password, setPassword] = useState('6628@talk')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [remember, setRemember] = useState<boolean>(false)
   const [authRes, setAuthRes] = useState<AuthUser>()
   const setAuth = useSetRecoilState(authState)

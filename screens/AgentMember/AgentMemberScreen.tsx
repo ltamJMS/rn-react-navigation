@@ -62,7 +62,12 @@ const AgentMemberScreen = () => {
   }, [auth, updateAgentStatus, removeAgent])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff'
+      }}
+    >
       <StatusBar />
       <AgentList agents={agents} />
     </SafeAreaView>

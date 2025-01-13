@@ -158,7 +158,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
+    backgroundColor: '#fff'
   },
   phoneNumberContainer: {
     flexDirection: 'row',

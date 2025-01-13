@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Image,
   Modal
 } from 'react-native'
@@ -15,6 +14,10 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import useAuth from '../services/usecases/auth/useAuth'
+import { useRecoilState } from 'recoil'
+import { callHistoryData } from '../services/store/callHistory'
+import { getCallHistory } from '../services/callHistory'
 
 // Sample data based on your response
 function getRandomInt(min: number, max: number) {
@@ -110,6 +113,7 @@ const groupDataByDate = (data: any[]) => {
   const currentYear = new Date().getFullYear()
 
   return Object.keys(groupedData)
+    .filter(date => groupedData[date].length > 0) // Filter out empty sections
     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
     .map(date => {
       const dateObj = new Date(date)
@@ -119,11 +123,30 @@ const groupDataByDate = (data: any[]) => {
 }
 
 export default function CallHistory() {
+  const auth = useAuth()
   const [search, setSearch] = useState('')
   const [filterOption, setFilterOption] = useState('全て')
   const [modalVisible, setModalVisible] = useState(false)
+  const [, setCallData] = useRecoilState(callHistoryData)
 
-  const sections = groupDataByDate(callData)
+  const getCallData = useCallback(async () => {
+    if (!auth) return
+    const data = await getCallHistory()
+    if (data.success) setCallData(data.data)
+  }, [auth, setCallData])
+
+  useEffect(() => {
+    if (auth) getCallData()
+  }, [auth, getCallData])
+
+  const filteredCallData = callData.filter(item => {
+    if (filterOption === '全て') return true
+    if (filterOption === '着信') return item.type === 0
+    if (filterOption === '発信') return item.type === 1
+    return false
+  })
+
+  const sections = groupDataByDate(filteredCallData)
 
   const toggleModalVisibility = () => {
     setModalVisible(!modalVisible)
@@ -147,10 +170,6 @@ export default function CallHistory() {
       return null
     }
 
-    const isIncoming = item.type === 0
-    const arrowImage = isIncoming
-      ? require('../assets/images/incomingCallArrow.png')
-      : require('../assets/images/outgoingCallArrow.png')
     const calTypeIconPrefix =
       item.type === 0 ? (
         <MaterialCommunityIcons
@@ -260,7 +279,7 @@ export default function CallHistory() {
           />
         </TouchableOpacity>
       </View>
-
+      {/* just show section which has data */}
       <SectionList
         sections={sections}
         renderItem={renderItem}

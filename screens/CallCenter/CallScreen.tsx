@@ -19,6 +19,7 @@ import {
   incomingRequestState
 } from '../../services/store/softphone'
 import { SCREENS } from '../../shared/constants'
+import RNCallKeep from 'react-native-callkeep'
 
 const CallScreen = () => {
   const [micActive, setMicActive] = useState(false)
@@ -125,6 +126,7 @@ const CallScreen = () => {
                       isIncomingCall: false,
                       incomingUserInfo: {}
                     }))
+                    RNCallKeep.endAllCalls()
                   }}
                 >
                   <MaterialCommunityIcons
@@ -150,6 +152,7 @@ const CallScreen = () => {
                       isIncomingCall: false,
                       incomingUserInfo: {}
                     }))
+                    RNCallKeep.endAllCalls()
                   }}
                 >
                   <MaterialCommunityIcons

@@ -11,17 +11,13 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseProConfig)
 }
 
-const handleIncomingCall = async () => {
-  console.log('🍀🍀🍀🍀🍀🍀 Click accept')
-  NavigationService.navigate(SCREENS.AGENT_MEMBER)
-  setTimeout(() => {
-    RNCallKeep.endAllCalls()
-  }, 6000)
+const handleAnswer = async () => {
+  console.log('🍀🍀🍀 Click accept')
+  NavigationService.navigate(SCREENS.CALL_SCREEN)
 }
 
-// Function to handle call decline
 const handleDecline = () => {
-  console.log('🍀🍀🍀🍀🍀🍀Call declined')
+  console.log('🍀🍀🍀 Call declined')
   RNCallKeep.endAllCalls()
 }
 
@@ -33,15 +29,15 @@ const options = {
 }
 
 RNCallKeep.setup(options).then(accepted => {
-  console.log('🍀🍀🍀🍀🍀 CallKeep setup completed:', accepted)
+  console.log('🍀🍀🍀 SETUP CALL KEEP', accepted)
 })
 
-RNCallKeep.addEventListener('answerCall', async () => handleIncomingCall())
+RNCallKeep.addEventListener('answerCall', async () => handleAnswer())
 RNCallKeep.addEventListener('endCall', async () => handleDecline())
 
 if (Platform.OS === 'ios') {
   VoipPushNotification.addEventListener('notification', notification => {
-    console.log('🍀🍀🍀🍀🍀VoIP push notification received:', notification)
+    console.log('🍀🍀🍀 VoIP push notification received:', notification)
     NavigationService.navigate(SCREENS.AGENT_MEMBER)
   })
 
@@ -49,12 +45,12 @@ if (Platform.OS === 'ios') {
     if (events && Array.isArray(events) && events.length > 0) {
       events.forEach(voipPushEvent => {
         const { name, data } = voipPushEvent
-        console.log('🍀🍀🍀🍀🍀VoIP voipPushEvent', name, data)
+        console.log('🍀🍀🍀 VoIP voipPushEvent', name, data)
         if (
           name ===
           VoipPushNotification.RNVoipPushRemoteNotificationReceivedEvent
         ) {
-          console.log('🍀🍀🍀🍀🍀VoIP push event received:', data)
+          console.log('🍀🍀🍀 VoIP push event received:', data)
         }
       })
     }
