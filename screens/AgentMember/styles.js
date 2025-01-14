@@ -35,5 +35,62 @@ export const styles = StyleSheet.create({
   icon: {
     marginLeft: 14,
     marginRight: 4
+  },
+  sortContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8
+  },
+  smallButton: {
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    margin: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  toggleButtonText: {
+    color: '#333',
+    marginRight: 8
+  },
+  dropdown: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 1,
+    top: 130,
+    left: 10
+  },
+  modalButton: {
+    padding: 10,
+    alignItems: 'flex-start'
+  },
+  modalButtonText: {
+    fontSize: 14,
+    color: '#000'
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  noDataText: {
+    textAlign: 'center',
+    color: 'grey',
+    marginTop: 4
+  },
+  noDataContainer: {
+    flex: 1,
+    marginTop: 60,
+    alignItems: 'center',
+    width: '100%'
   }
 })

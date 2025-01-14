@@ -1,0 +1,228 @@
+import React, { useCallback, useState } from 'react'
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView
+} from 'react-native'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { tenantState } from '../../services/store/tenant'
+import {
+  agentLoginState,
+  canSFRegisterState
+} from '../../services/store/softphone'
+import {
+  authState,
+  currentUserState,
+  sipAccountState
+} from '../../services/store/auth'
+import { changeAgentStatus, logoutAgent } from '../../services/agentStatus'
+import User from '../../services/models/User'
+import { agentStatusesState } from '../../services/store/agentStatus'
+import { Role } from '../../services/models/account'
+import { Response } from '../../services/models/Response'
+import { useSoftPhoneContext } from '../../SoftPhoneProvider'
+import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
+
+interface LoginSFBarProps {
+  availableStatuses: number[] | undefined
+}
+
+const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
+  const tenant = useRecoilValue(tenantState)
+  const [loadingButton, setLoadingButton] = useState<number | null>(null)
+  const [activeButton, setActiveButton] = useState<number | null>(null)
+  const [agentLoginStatus, setAgentLoginStatus] =
+    useRecoilState(agentLoginState)
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
+  const setAgentStatus = useSetRecoilState(agentStatusesState)
+  const auth = useRecoilValue(authState)
+  const setCanSFRegister = useSetRecoilState(canSFRegisterState)
+  const sipAccountData = useRecoilValue(sipAccountState)
+  const { softPhone } = useSoftPhoneContext()
+  const { handleLogin } = useSoftPhone()
+  const [, setLoading] = useState(false)
+  const buttons =
+    availableStatuses &&
+    availableStatuses.map(status => ({
+      label: tenant?.agentStatusText[status],
+      status
+    }))
+
+  const handleChangeStatus = useCallback(
+    (status: number) => async (): Promise<Response> => {
+      if (
+        !currentUser ||
+        !currentUser.agentStatus ||
+        !currentUser.agentStatus.groupNames ||
+        !currentUser.agentStatus.interface
+      ) {
+        return { success: false }
+      }
+      console.log('888888888888888, start change stt')
+      const change = changeAgentStatus(
+        currentUser.customerID.startsWith('CRM') &&
+          currentUser.infinitalkCustomerId
+          ? currentUser.infinitalkCustomerId
+          : currentUser.customerID,
+        currentUser.agentStatus.groupNames[0],
+        currentUser.agentStatus.interface
+      )
+      try {
+        let res
+        if (status === 0) {
+          res = await change('0', `${status}`)
+        } else {
+          res = await change('1', `${status}`)
+        }
+        if (res.success) {
+          console.log('888888888888888, next change stt')
+
+          setTimeout(() => {
+            setAgentStatus((val: any) => {
+              const updateCurrentUserAgentStatusShowOnSeatMap = {
+                ...val[`${currentUser.agentStatus?.userID}`],
+                status
+              }
+              return {
+                ...val,
+                [`${currentUser.agentStatus?.userID}`]:
+                  updateCurrentUserAgentStatusShowOnSeatMap
+              }
+            })
+            setCurrentUser((val: User | null) => {
+              if (!val) {
+                return val
+              }
+              return {
+                ...val,
+                agentStatus: {
+                  ...val.agentStatus,
+                  status
+                }
+              } as User
+            })
+
+            if (auth?.roles.includes(Role['soft-phone:normal'])) {
+              setCanSFRegister(true)
+            }
+          }, 1000)
+          setLoadingButton(null)
+          setActiveButton(status)
+          console.log('888888888888888, next done')
+          return { success: true }
+        } else {
+          setLoadingButton(null)
+          return { success: false }
+        }
+      } catch (error: any) {
+        setLoadingButton(null)
+        return { success: false }
+      }
+    },
+    [auth?.roles, currentUser, setAgentStatus, setCanSFRegister, setCurrentUser]
+  )
+
+  const handleLogoutSF = async (status: number) => {
+    if (status !== 1) return
+    setLoadingButton(status)
+    // SFログアウト
+
+    const { sipAccount, domain, agent } = sipAccountData
+
+    if (!softPhone) {
+      setLoadingButton(null)
+      return
+    }
+    softPhone.unregister({ all: true })
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    const resLogoutAgent = await logoutAgent(
+      sipAccount,
+      agent.agentAccount,
+      domain
+    )
+    if (resLogoutAgent.success) {
+      setLoadingButton(null)
+      setAgentLoginStatus(false)
+    } else {
+      setLoadingButton(null)
+    }
+    return
+  }
+
+  const handleClickTest = async (status: number) => {
+    if (status === 1) {
+      await handleLogoutSF(status)
+      return
+    }
+    setLoadingButton(status)
+    if (agentLoginStatus) {
+      //change status
+      handleChangeStatus(status)
+    } else {
+      //loginSF
+      await handleLogin(setLoading)
+      handleChangeStatus(status)
+      //change status
+    }
+  }
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scrollContainer}
+    >
+      <View style={styles.buttonContainer}>
+        {buttons?.map(button => (
+          <TouchableOpacity
+            key={button.status}
+            style={[
+              styles.button,
+              loadingButton === button.status && { backgroundColor: 'gray' },
+              activeButton === button.status && { backgroundColor: 'blue' }
+            ]}
+            onPress={() => handleClickTest(button.status)}
+          >
+            {loadingButton === button.status ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.buttonText}>{button.label}</Text>
+            )}
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flexDirection: 'row',
+    width: '100%'
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 34
+  },
+  button: {
+    backgroundColor: '#F1F1F1',
+    width: 80, // Fixed width to ensure proper spacing
+    height: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 0,
+    borderWidth: 0.3,
+    borderColor: '#DFDFDF',
+    margin: 1
+  },
+  buttonText: {
+    fontSize: 15,
+    textAlign: 'center'
+  }
+})
+
+export default LoginSFBar

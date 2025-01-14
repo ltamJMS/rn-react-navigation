@@ -42,6 +42,8 @@ import LogoutBtn from './LogoutBtn'
 import Popover, { PopoverPlacement } from 'react-native-popover-view'
 import Feather from 'react-native-vector-icons/Feather'
 import { useSoftPhoneContext } from '../../SoftPhoneProvider'
+import LoginBtnTest from './LoginSFBar'
+import LoginSFBar from './LoginSFBar'
 
 const SHOWABLE_STATUS_MAX = 4
 
@@ -385,6 +387,7 @@ const StatusBar: React.FC = () => {
                 }}
                 loading={loadingLogout}
               />
+              <LoginSFBar availableStatuses={availableStatuses} />
             </View>
           </CollapsableContainer>
         </View>
