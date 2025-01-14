@@ -200,7 +200,10 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
             style={[
               styles.buttonStatus,
               loadingButton === button.status && { backgroundColor: '#BFBFBF' },
-              activeButton === button.status && { backgroundColor: 'blue' }
+              activeButton === button.status &&
+                (button.status === 0
+                  ? { backgroundColor: '#007AFF' }
+                  : { backgroundColor: '#d658d0' })
             ]}
             onPress={() => handleClickTest(button.status)}
           >
@@ -211,7 +214,14 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
                 style={{ width: 40 }}
               />
             ) : (
-              <Text style={styles.buttonStatusText}>{button.label}</Text>
+              <Text
+                style={[
+                  styles.buttonStatusText,
+                  activeButton === button.status && { color: '#fff' } // đổi màu văn bản khi nút được kích hoạt
+                ]}
+              >
+                {button.label}
+              </Text>
             )}
           </TouchableOpacity>
         ))}
