@@ -168,7 +168,7 @@ const CallHistoryDetail: React.FC = ({ route }: any) => {
           </View>
           <View style={styles.detailsColumnValues}>
             <Text style={styles.detailValue}>
-              {new Date(callDetails.startTime).toLocaleString()}
+              {new Date(callDetails?.startTime).toLocaleString()}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {calTypeIcon}
@@ -176,16 +176,18 @@ const CallHistoryDetail: React.FC = ({ route }: any) => {
                 {calTypeText}
               </Text>
             </View>
-            <Text style={styles.detailValue}>{callDetails.operator.name}</Text>
             <Text style={styles.detailValue}>
-              {callDetails.operator.phoneNumber}
-            </Text>
-            <Text style={styles.detailValue}>{callDetails.contact}</Text>
-            <Text style={styles.detailValue}>
-              {callDetails.talkDuration} 秒
+              {callDetails?.operator?.name}
             </Text>
             <Text style={styles.detailValue}>
-              {callDetails.ringDuration} 秒
+              {callDetails?.operator?.phoneNumber}
+            </Text>
+            <Text style={styles.detailValue}>{callDetails?.contact}</Text>
+            <Text style={styles.detailValue}>
+              {callDetails?.talkDuration} 秒
+            </Text>
+            <Text style={styles.detailValue}>
+              {callDetails?.ringDuration} 秒
             </Text>
           </View>
         </View>

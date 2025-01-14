@@ -53,8 +53,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
 
   const handleChangeStatus = useCallback(
     (status: number) => async (): Promise<Response> => {
-      console.log('%%%%%%%%%%%%%%%, handleChangeStatus')
-
       if (
         !currentUser ||
         !currentUser.agentStatus ||
@@ -63,7 +61,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
       ) {
         return { success: false }
       }
-      console.log('888888888888888, start change stt')
       const change = changeAgentStatus(
         currentUser.customerID.startsWith('CRM') &&
           currentUser.infinitalkCustomerId
@@ -80,7 +77,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
           res = await change('1', `${status}`)
         }
         if (res.success) {
-          console.log('888888888888888, next change stt')
 
           setTimeout(() => {
             setAgentStatus((val: any) => {
@@ -113,7 +109,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
           }, 1000)
           setLoadingButton(null)
           setActiveButton(status)
-          console.log('888888888888888, next done')
           return { success: true }
         } else {
           setLoadingButton(null)
@@ -155,19 +150,13 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
   }
 
   const handleClickTest = async (status: number) => {
-    console.log('%%%%%%%%%%%%%%%, start click -> status', status)
-    console.log('%%%%%%%%%%%%%%%, agentLoginStatus -> ', agentLoginStatus)
-
     try {
       setLoadingButton(status)
 
       if (status === 1) {
-        console.log('%%%%%%%%%%%%%%%, status = 1 -> handleLogoutSF(status)')
         await handleLogoutSF(status)
         return
       }
-      console.log('%%%%%%%%%%%%%%%, status != 1 -> login SF')
-
       if (agentLoginStatus) {
         // Change status, await the function to ensure it completes
         const response = await handleChangeStatus(status)()
@@ -199,7 +188,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
             key={button.status}
             style={[
               styles.buttonStatus,
-              loadingButton === button.status && { backgroundColor: '#BFBFBF' },
               activeButton === button.status &&
                 (button.status === 0
                   ? { backgroundColor: '#007AFF' }
@@ -210,7 +198,7 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
             {loadingButton === button.status ? (
               <ActivityIndicator
                 size="small"
-                color="#FFFFFF"
+                color="#333"
                 style={{ width: 40 }}
               />
             ) : (
@@ -243,6 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F1F1',
     paddingHorizontal: 16,
     height: 34,
+    minWidth: 80,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 0,

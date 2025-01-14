@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -15,9 +15,6 @@ import {
 } from '../services/store/softphone'
 import { Button } from 'react-native-paper'
 import { useSoftPhone } from '../services/usecases/auth/useSoftPhone'
-var Sound = require('react-native-sound')
-
-Sound.setCategory('Playback')
 
 const Keypad = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -27,44 +24,6 @@ const Keypad = () => {
   const [, setCallRequest] = useRecoilState(callRequestState)
   const { handleCall } = useSoftPhone()
   const { handleSendDTMF } = useSoftPhone()
-
-  const [audio, setAudio] = useState<typeof Sound | null>(null)
-
-  useEffect(() => {
-    const sound = new Sound(
-      'dialing-tone-1.mp3',
-      Sound.MAIN_BUNDLE,
-      (error: any) => {
-        if (error) {
-          console.log('failed to load the sound', error)
-          return
-        }
-      }
-    )
-    sound.setVolume(1)
-    setAudio(sound)
-
-    return () => {
-      sound.release()
-    }
-  }, [])
-
-  const playTone = () => {
-    if (!audio) return
-
-    if (audio.isPlaying()) {
-      audio.pause()
-    } else {
-      audio.play((success: boolean) => {
-        if (success) {
-          console.log('successfully finished playing')
-        } else {
-          console.log('playback failed due to audio decoding errors')
-        }
-      })
-    }
-  }
-
   const isCallButtonDisabled =
     !phoneNumber || !agentLoginStatus || !!currentCall
 
@@ -72,12 +31,10 @@ const Keypad = () => {
     (value: string) => {
       if (!currentCall) {
         setPhoneNumber(prev => prev + value)
-        playTone()
       } else if (currentCall && !holdingCall) {
         handleSendDTMF({ tone: value, sessionId: currentCall?.sessionId })
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentCall, holdingCall, setPhoneNumber, handleSendDTMF]
   )
 

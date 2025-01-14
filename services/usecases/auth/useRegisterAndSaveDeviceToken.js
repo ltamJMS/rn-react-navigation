@@ -8,7 +8,7 @@ const useRegisterAndSaveDeviceToken = () => {
     try {
       // Get the token
       const token = await messaging().getToken()
-      console.log('Device Token:', token)
+      console.log('🌸 Device Token:', token)
 
       // Save token to Firestore
       await firestore().collection('deviceTokens').add({
@@ -18,9 +18,9 @@ const useRegisterAndSaveDeviceToken = () => {
         timestamp: firestore.FieldValue.serverTimestamp()
       })
 
-      console.log('Device token saved successfully!')
+      console.log('🌸 Device token saved successfully!')
     } catch (error) {
-      console.error('Error saving device token to Firestore:', error)
+      console.error('🔴 Error saving device token to Firestore:', error)
     }
   }, [])
 

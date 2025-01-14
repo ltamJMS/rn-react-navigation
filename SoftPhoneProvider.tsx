@@ -167,7 +167,6 @@ export const SoftPhoneProvider: React.FC<SoftPhoneProviderProps> = ({
           console.log('🌸 incomingCall', incomingCall)
           setCurrentCall(incomingCall)
           const sessionDataMap = softPhone?.getCallSessionMap()
-          console.log('00000 sessionDataMap', sessionDataMap)
           if (!currentCall) {
             setIncomingRequest((currVal: any) => ({
               ...currVal,

@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, useCallback } from 'react'
 import {
   FlatList,
   View,
@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
-  Image
+  Image,
+  RefreshControl
 } from 'react-native'
 import { styles } from './styles'
 import { Avatar, IconButton } from 'react-native-paper'
@@ -40,7 +41,7 @@ const AgentList: FC<Props> = props => {
     null
   )
   const [loading, setLoading] = useState(true) // Added
-
+  const [refreshing, setRefreshing] = useState(false)
   const contexts = useRecoilValue(contextsState)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const contextList = contexts
@@ -102,7 +103,7 @@ const AgentList: FC<Props> = props => {
       item.status || 0,
       tenant
     )
-    const { color, icon, size, callable } = getStatusStyle(dispStatus)
+    const { color, callable } = getStatusStyle(dispStatus)
 
     return (
       <View style={styles.container}>
@@ -151,7 +152,6 @@ const AgentList: FC<Props> = props => {
                 setSelectedItem(item.dispName)
                 setSelectedContextId(item.id)
                 setDropdownVisible(false)
-                console.log(`Selected group: ${item.dispName}`)
               }}
             >
               <Text style={styles.modalButtonText}>{item.dispName}</Text>
@@ -162,14 +162,16 @@ const AgentList: FC<Props> = props => {
       </View>
     )
   }
+  const onRefresh = () => {
+    setRefreshing(true)
+    setTimeout(() => setRefreshing(false), 1000)
+  }
 
   if (loading) {
     return (
-      <ActivityIndicator
-        style={styles.loadingIndicator}
-        size="small"
-        color="gray"
-      />
+      <View style={styles.loadingIndicator}>
+        <ActivityIndicator size="small" color="#333" />
+      </View>
     )
   }
 
@@ -197,9 +199,7 @@ const AgentList: FC<Props> = props => {
 
       {agentArray.length === 0 ? (
         <View style={styles.noDataContainer}>
-          <Image
-            source={require('../../assets/images/nodata.png')} // Replace with your actual image URL or local image
-          />
+          <Image source={require('../../assets/images/nodata.png')} />
           <Text style={styles.noDataText}>データがありません</Text>
         </View>
       ) : (
@@ -209,6 +209,12 @@ const AgentList: FC<Props> = props => {
           renderItem={renderItem}
           keyExtractor={item => item.userID.toString()}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
+          refreshControl={
+            <RefreshControl // Step 3: Add RefreshControl to FlatList
+              refreshing={refreshing}
+              onRefresh={onRefresh} // Step 4: Attach onRefresh function
+            />
+          }
         />
       )}
 

@@ -78,9 +78,7 @@ export const styles = StyleSheet.create({
     color: '#000'
   },
   loadingIndicator: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    flex: 1
   },
   noDataText: {
     textAlign: 'center',

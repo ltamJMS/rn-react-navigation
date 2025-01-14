@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useState } from 'react'
 import {
   View,
@@ -7,9 +8,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Modal
+  Modal,
+  ActivityIndicator, // Import ActivityIndicator
+  RefreshControl
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../shared/constants'
@@ -18,13 +21,13 @@ import useAuth from '../services/usecases/auth/useAuth'
 import { useRecoilState } from 'recoil'
 import { callHistoryData } from '../services/store/callHistory'
 import { getCallHistory } from '../services/callHistory'
+import Toast from 'react-native-toast-message'
 
 function formatDate(date: Date, currentYear: number) {
   const year = date.getFullYear()
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const day = date.getDate().toString().padStart(2, '0')
 
-  // If the year is the same as the current year, omit the year in the formatted date
   return year === currentYear ? `${month}/${day}` : `${year}/${month}/${day}`
 }
 
@@ -57,22 +60,44 @@ export default function CallHistory() {
   const [filterOption, setFilterOption] = useState('全て')
   const [modalVisible, setModalVisible] = useState(false)
   const [callHistory, setCallData] = useRecoilState(callHistoryData)
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [isSearchButtonEnabled, setIsSearchButtonEnabled] = useState(false)
 
   const getCallData = useCallback(async () => {
     if (!auth) return
+    setLoading(true)
     const token = auth?.token?.accessToken || ''
-    const res = await getCallHistory(token)
+    const res = await getCallHistory(token, search)
 
     if (res.success && Array.isArray(res.data.data.edges)) {
       setCallData(res.data.data.edges)
     } else {
       setCallData([])
+      Toast.show({
+        type: 'error',
+        text1: 'エラー',
+        text2: '通話履歴の取得に失敗しました'
+      })
     }
-  }, [auth, setCallData])
+    setLoading(false)
+  }, [auth, setCallData, search])
 
   useEffect(() => {
     if (auth) getCallData()
   }, [auth, getCallData])
+
+  const onRefresh = () => {
+    setRefreshing(true)
+    getCallData().then(() => {
+      setRefreshing(false)
+    })
+  }
+
+  const handleSearchInputChange = (text: string) => {
+    setSearch(text)
+    setIsSearchButtonEnabled(text.trim().length > 0)
+  }
 
   const filteredCallData = (callHistory || []).filter(item => {
     if (filterOption === '全て') return true
@@ -161,7 +186,6 @@ export default function CallHistory() {
           <Text style={{}}>{item.operator.name}</Text>
           <View style={styles.detailsContainer}>
             <Text style={styles.details}>{item.operator.phoneNumber}</Text>
-            {/* <Image source={arrowImage} style={styles.arrow} /> */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {calTypeIconPrefix}
               <Text style={[styles.detailValue, { color: textColor }]}>
@@ -197,7 +221,7 @@ export default function CallHistory() {
           <TextInput
             style={styles.search}
             placeholder="名前・電話番号で検索"
-            onChangeText={text => setSearch(text)}
+            onChangeText={handleSearchInputChange}
             value={search}
           />
         </View>
@@ -206,7 +230,7 @@ export default function CallHistory() {
           style={styles.filterButton}
         >
           <Text style={{}}>{filterOption}</Text>
-          <FontAwesome
+          <FontAwesomeIcon
             name="caret-down"
             size={16}
             color="#333"
@@ -214,13 +238,31 @@ export default function CallHistory() {
           />
         </TouchableOpacity>
       </View>
-      {/* just show section which has data */}
-      <SectionList
-        sections={sections}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        keyExtractor={item => item.id}
-      />
+
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#333" />
+        </View>
+      ) : sections.length === 0 ? (
+        <View style={styles.noDataContainer}>
+          <Image source={require('../assets/images/nodata.png')} />
+          <Text style={styles.noDataText}>データがありません</Text>
+        </View>
+      ) : (
+        <SectionList
+          sections={sections} // Đảm bảo sections có dữ liệu hợp lệ
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          keyExtractor={item => item.id}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={'#fff'}
+            />
+          }
+        />
+      )}
 
       <Modal
         transparent={true}
@@ -268,7 +310,8 @@ const styles = StyleSheet.create({
   },
   search: {
     height: 40,
-    borderColor: '#ddd'
+    borderColor: '#ddd',
+    width: '95%'
   },
   searchWrapper: {
     flexDirection: 'row',
@@ -276,14 +319,13 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     width: '80%',
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     paddingVertical: 0,
     borderRadius: 50,
     marginLeft: 8
   },
   searchIcon: {
-    marginRight: 8,
-    marginLeft: 4
+    marginRight: 8
   },
   filterButton: {
     height: 40,
@@ -309,11 +351,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
-  // arrow: {
-  //   width: 56,
-  //   height: 35,
-  //   marginHorizontal: 5
-  // },
   detailValue: {
     fontSize: 12,
     color: '#333'
@@ -355,5 +392,17 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     marginLeft: 5
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#888'
+  },
+  loadingContainer: {
+    flex: 1
   }
 })

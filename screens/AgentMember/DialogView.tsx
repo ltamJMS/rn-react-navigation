@@ -36,7 +36,6 @@ const DialogView: React.FC<DialogViewProps> = ({
 
   const handleCallClick = (phoneNumber: string) => {
     if (phoneNumber) {
-      console.log('Calling:', phoneNumber)
       setCallRequest({
         phoneNumber: phoneNumber,
         isOutbound: true
@@ -49,7 +48,7 @@ const DialogView: React.FC<DialogViewProps> = ({
   let buttonLabel
 
   if (loading) {
-    buttonLabel = <ActivityIndicator size="small" color="black" />
+    buttonLabel = <ActivityIndicator size="small" color="#333" />
   } else if (agentLoginStatus) {
     buttonLabel = DialogText.CallButton
   } else {
@@ -66,7 +65,6 @@ const DialogView: React.FC<DialogViewProps> = ({
         <Dialog.Button
           label={DialogText.CancelButton}
           onPress={() => {
-            console.log('click cancel')
             onDismiss()
           }}
         />
