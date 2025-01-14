@@ -19,77 +19,6 @@ import { useRecoilState } from 'recoil'
 import { callHistoryData } from '../services/store/callHistory'
 import { getCallHistory } from '../services/callHistory'
 
-// Sample data based on your response
-function getRandomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-function getRandomPhoneNumber() {
-  return '0' + getRandomInt(300000000, 399999999) // Giả lập số điện thoại
-}
-
-function generateFakeCallData(numberOfEntries: number) {
-  const callData = []
-
-  for (let i = 0; i < numberOfEntries; i++) {
-    const fakeDate = new Date(
-      2024,
-      getRandomInt(10, 11),
-      getRandomInt(25, 28),
-      getRandomInt(0, 23),
-      getRandomInt(0, 59)
-    ).toISOString()
-    const fakeId = `${getRandomInt(1000, 9999)}.${getRandomInt(100, 999)}`
-
-    callData.push({
-      operator: {
-        name: `Operator_${getRandomInt(100, 999)}`,
-        phoneNumber: getRandomPhoneNumber()
-      },
-      record: {
-        contact: {
-          linkFile:
-            'gs://text-service/099a/99/202412/stereo_mon/1735212963.59104-20241226-20:36:03-in.wav'
-        },
-        operator: {
-          linkFile:
-            'gs://text-service/099a/99/202412/stereo_mon/1735212963.59104-20241226-20:36:03-out.wav'
-        }
-      },
-      text: {
-        operator: {
-          status: 0,
-          improveStatus: 0
-        },
-        contact: {
-          status: 0,
-          improveStatus: 0
-        }
-      },
-      _id: fakeId,
-      id: fakeId,
-      companyId: `${getRandomInt(1000, 9999)}`,
-      startTime: fakeDate,
-      type: getRandomInt(0, 1),
-      contact: getRandomPhoneNumber(),
-      talkDuration: getRandomInt(0, 60),
-      ringDuration: getRandomInt(0, 20),
-      forwardCalls: [],
-      groupId: `${getRandomInt(10, 99)}`,
-      stereoFile: `${fakeId}-${fakeDate.substring(0, 10)}`,
-      wavUploaded: Math.random() < 0.5,
-      __v: 0,
-      createdAt: fakeDate,
-      updatedAt: fakeDate
-    })
-  }
-
-  return callData
-}
-
-const callData = generateFakeCallData(20)
-// Function to group data by date
-// Helper function to format dates
 function formatDate(date: Date, currentYear: number) {
   const year = date.getFullYear()
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
@@ -127,19 +56,25 @@ export default function CallHistory() {
   const [search, setSearch] = useState('')
   const [filterOption, setFilterOption] = useState('全て')
   const [modalVisible, setModalVisible] = useState(false)
-  const [, setCallData] = useRecoilState(callHistoryData)
+  const [callHistory, setCallData] = useRecoilState(callHistoryData)
 
   const getCallData = useCallback(async () => {
     if (!auth) return
-    const data = await getCallHistory()
-    if (data.success) setCallData(data.data)
+    const token = auth?.token?.accessToken || ''
+    const res = await getCallHistory(token)
+
+    if (res.success && Array.isArray(res.data.data.edges)) {
+      setCallData(res.data.data.edges)
+    } else {
+      setCallData([])
+    }
   }, [auth, setCallData])
 
   useEffect(() => {
     if (auth) getCallData()
   }, [auth, getCallData])
 
-  const filteredCallData = callData.filter(item => {
+  const filteredCallData = (callHistory || []).filter(item => {
     if (filterOption === '全て') return true
     if (filterOption === '着信') return item.type === 0
     if (filterOption === '発信') return item.type === 1

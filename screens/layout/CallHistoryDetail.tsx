@@ -22,7 +22,7 @@ const CallHistoryDetail: React.FC = ({ route }: any) => {
 
   useEffect(() => {
     const sound = new Sound(
-      'https://storage.googleapis.com/infini_call_records_public/051m/202501/1736063980.830219.wav',
+      'https://storage.googleapis.com/softphone-mobile-dev/099a1_CS_202401_stereo_mon_1705279146.1724-20240115-09_39_06-in.wav',
       null,
       (error: any) => {
         if (error) {
