@@ -35,6 +35,29 @@ export const saveTokenToFirestore = async (
   }
 }
 
+export const clearTokenFromFirestore = async (
+  customerID: string,
+  extenNumber: any
+) => {
+  if (!customerID || !extenNumber) {
+    return
+  }
+  try {
+    // Reference to the specific device document in Firestore
+    const deviceRef = firestore()
+      .collection('customers')
+      .doc(customerID)
+      .collection('deviceSF')
+      .doc(extenNumber)
+
+    // Delete the document containing the device token
+    await deviceRef.delete()
+    console.log('🌸 VOIP PUSH TOKEN DELETED', extenNumber)
+  } catch (err: any) {
+    console.error('🔴 DELETE FCM TOKEN FAILED', extenNumber, err)
+  }
+}
+
 export const createAgentStatus = (data: any): AgentStatus | null => {
   if (typeof data.status !== 'number') {
     return null

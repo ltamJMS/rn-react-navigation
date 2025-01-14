@@ -77,7 +77,6 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
           res = await change('1', `${status}`)
         }
         if (res.success) {
-
           setTimeout(() => {
             setAgentStatus((val: any) => {
               const updateCurrentUserAgentStatusShowOnSeatMap = {

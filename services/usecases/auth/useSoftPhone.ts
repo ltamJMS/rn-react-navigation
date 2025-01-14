@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import {
+  clearTokenFromFirestore,
   getAgents,
   handleChangeStatus,
   saveTokenToFirestore
@@ -202,6 +203,14 @@ export const useSoftPhone = () => {
                   agent.agentAccount,
                   domain
                 )
+                const dataAgent = await getAgents(
+                  auth.customerID,
+                  auth.username
+                )
+                const [agentData] = Object.values(dataAgent)
+                const extenNumber = agentData.exten
+                await clearTokenFromFirestore(auth?.customerID, extenNumber)
+
                 if (resLogoutAgent.success) {
                   Toast.show({
                     type: 'success',
