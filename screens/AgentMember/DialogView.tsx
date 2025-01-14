@@ -78,7 +78,7 @@ const DialogView: React.FC<DialogViewProps> = ({
             } else {
               setLoading(true)
               handleRegisterSip().then(() => {
-                handleLogin(setLoading)
+                handleLogin(setLoading, 0)
                   .then(() => {
                     setLoading(false)
                   })

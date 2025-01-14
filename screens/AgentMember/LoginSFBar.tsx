@@ -53,6 +53,8 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
 
   const handleChangeStatus = useCallback(
     (status: number) => async (): Promise<Response> => {
+      console.log('%%%%%%%%%%%%%%%, handleChangeStatus')
+
       if (
         !currentUser ||
         !currentUser.agentStatus ||
@@ -153,19 +155,35 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
   }
 
   const handleClickTest = async (status: number) => {
-    if (status === 1) {
-      await handleLogoutSF(status)
-      return
-    }
-    setLoadingButton(status)
-    if (agentLoginStatus) {
-      //change status
-      handleChangeStatus(status)
-    } else {
-      //loginSF
-      await handleLogin(setLoading)
-      handleChangeStatus(status)
-      //change status
+    console.log('%%%%%%%%%%%%%%%, start click -> status', status)
+    console.log('%%%%%%%%%%%%%%%, agentLoginStatus -> ', agentLoginStatus)
+
+    try {
+      setLoadingButton(status)
+
+      if (status === 1) {
+        console.log('%%%%%%%%%%%%%%%, status = 1 -> handleLogoutSF(status)')
+        await handleLogoutSF(status)
+        return
+      }
+      console.log('%%%%%%%%%%%%%%%, status != 1 -> login SF')
+
+      if (agentLoginStatus) {
+        // Change status, await the function to ensure it completes
+        const response = await handleChangeStatus(status)()
+        if (!response.success) {
+          throw new Error('Failed to change status')
+        }
+      } else {
+        // Login SF and then change status
+        await handleLogin(setLoading, status)
+        await handleChangeStatus(status)()
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      // Always reset the loading button state after operation completes
+      setLoadingButton(null)
     }
   }
 
@@ -180,16 +198,20 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
           <TouchableOpacity
             key={button.status}
             style={[
-              styles.button,
-              loadingButton === button.status && { backgroundColor: 'gray' },
+              styles.buttonStatus,
+              loadingButton === button.status && { backgroundColor: '#BFBFBF' },
               activeButton === button.status && { backgroundColor: 'blue' }
             ]}
             onPress={() => handleClickTest(button.status)}
           >
             {loadingButton === button.status ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator
+                size="small"
+                color="#FFFFFF"
+                style={{ width: 40 }}
+              />
             ) : (
-              <Text style={styles.buttonText}>{button.label}</Text>
+              <Text style={styles.buttonStatusText}>{button.label}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -205,21 +227,20 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    height: 34
+    alignItems: 'center'
   },
-  button: {
+  buttonStatus: {
     backgroundColor: '#F1F1F1',
-    width: 80, // Fixed width to ensure proper spacing
+    paddingHorizontal: 16,
     height: 34,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 0,
     borderWidth: 0.3,
     borderColor: '#DFDFDF',
-    margin: 1
+    margin: 1.5
   },
-  buttonText: {
+  buttonStatusText: {
     fontSize: 15,
     textAlign: 'center'
   }

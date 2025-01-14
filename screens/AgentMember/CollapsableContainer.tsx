@@ -40,7 +40,7 @@ export const CollapsableContainer = ({
           backgroundColor: '#FFF',
           width: '100%',
           marginRight: 16,
-          paddingHorizontal: 24,
+          paddingHorizontal: 16,
           paddingVertical: 12,
           borderRadius: 14,
           borderWidth: 1,

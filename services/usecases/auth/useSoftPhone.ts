@@ -41,7 +41,8 @@ export const useSoftPhone = () => {
   }, [softPhone])
 
   const handleLogin = async (
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    status: number
   ) => {
     setLoading(true)
     if (!softPhone || !auth) {
@@ -62,7 +63,6 @@ export const useSoftPhone = () => {
       )
       if (response.success) {
         const dataAgent = await getAgents(auth.customerID, auth.username)
-        const status = 0
         const isChangesStatusSuccess = await handleChangeStatus(
           status,
           auth,

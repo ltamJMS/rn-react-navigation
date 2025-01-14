@@ -19,7 +19,6 @@ import {
 } from '../../services/agentStatus'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { contextsState, tenantState } from '../../services/store/tenant'
-import Icon from 'react-native-vector-icons/Ionicons'
 import Octicons from 'react-native-vector-icons/Octicons'
 import { agentLoginState } from '../../services/store/softphone'
 import DialogView from './DialogView'
@@ -116,27 +115,23 @@ const AgentList: FC<Props> = props => {
           />
           <View>
             <Text numberOfLines={1}>{`${item.name}`}</Text>
-            <View style={styles.descriptionContainer}>
-              <Text>{item.exten}</Text>
-              <Icon name={icon} color={color} style={styles.icon} size={size} />
-              <Text style={{ color }} numberOfLines={2}>
-                {statusText}
-              </Text>
-            </View>
+            <Text style={{ marginTop: 4 }}>{item.exten}</Text>
           </View>
         </View>
-
-        <IconButton
-          icon="phone"
-          size={22}
-          style={styles.iconButton}
-          iconColor={`${callable ? '#007AFF' : '#cfcfcf'}`}
-          onPress={() => {
-            setSelectedAgent(item)
-            setDialogVisible(true)
-          }}
-          disabled={!callable}
-        />
+        <View style={[styles.container, { marginRight: 4 }]}>
+          <Text style={{ color }}>{statusText}</Text>
+          <IconButton
+            icon="phone"
+            size={22}
+            // style={styles.iconButton}
+            iconColor={`${callable ? '#007AFF' : '#cfcfcf'}`}
+            onPress={() => {
+              setSelectedAgent(item)
+              setDialogVisible(true)
+            }}
+            disabled={!callable}
+          />
+        </View>
       </View>
     )
   }
