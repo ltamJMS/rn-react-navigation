@@ -69,13 +69,32 @@ export const styles = StyleSheet.create({
     top: 130,
     left: 10
   },
-  modalButton: {
-    padding: 10,
+  modalBackground: {
+    flex: 1,
     alignItems: 'flex-start'
   },
+  modalContent: {
+    maxHeight: 400, // or any appropriate size
+    width: 180,
+    backgroundColor: 'white',
+    borderRadius: 0,
+    padding: 4,
+    marginTop: 200,
+    marginLeft: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+
+    shadowRadius: 5
+  },
+  modalButton: {
+    padding: 10,
+    alignItems: 'flex-start',
+    paddingVertical: 8,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#ddd'
+  },
   modalButtonText: {
-    fontSize: 14,
-    color: '#000'
+    color: '#333'
   },
   loadingIndicator: {
     flex: 1

@@ -20,7 +20,10 @@ import {
 } from '../../services/store/auth'
 import { changeAgentStatus, logoutAgent } from '../../services/agentStatus'
 import User from '../../services/models/User'
-import { agentStatusesState } from '../../services/store/agentStatus'
+import {
+  agentStatusesState,
+  SFActiveButtonState
+} from '../../services/store/agentStatus'
 import { Role } from '../../services/models/account'
 import { Response } from '../../services/models/Response'
 import { useSoftPhoneContext } from '../../SoftPhoneProvider'
@@ -33,7 +36,7 @@ interface LoginSFBarProps {
 const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
   const tenant = useRecoilValue(tenantState)
   const [loadingButton, setLoadingButton] = useState<number | null>(null)
-  const [activeButton, setActiveButton] = useState<number | null>(null)
+  const [activeButton, setActiveButton] = useRecoilState(SFActiveButtonState)
   const [agentLoginStatus, setAgentLoginStatus] =
     useRecoilState(agentLoginState)
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
@@ -107,7 +110,11 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
             }
           }, 1000)
           setLoadingButton(null)
-          setActiveButton(status)
+          setTimeout(() => {
+            setLoadingButton(null)
+            setActiveButton(status)
+          }, 1000)
+
           return { success: true }
         } else {
           setLoadingButton(null)
@@ -118,7 +125,14 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
         return { success: false }
       }
     },
-    [auth?.roles, currentUser, setAgentStatus, setCanSFRegister, setCurrentUser]
+    [
+      auth?.roles,
+      currentUser,
+      setActiveButton,
+      setAgentStatus,
+      setCanSFRegister,
+      setCurrentUser
+    ]
   )
 
   const handleLogoutSF = async (status: number) => {
@@ -140,7 +154,10 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
       domain
     )
     if (resLogoutAgent.success) {
-      setLoadingButton(null)
+      setTimeout(() => {
+        setLoadingButton(null)
+        setActiveButton(status)
+      }, 1000)
       setAgentLoginStatus(false)
     } else {
       setLoadingButton(null)
@@ -157,20 +174,17 @@ const LoginSFBar: React.FC<LoginSFBarProps> = ({ availableStatuses }) => {
         return
       }
       if (agentLoginStatus) {
-        // Change status, await the function to ensure it completes
         const response = await handleChangeStatus(status)()
         if (!response.success) {
           throw new Error('Failed to change status')
         }
       } else {
-        // Login SF and then change status
         await handleLogin(setLoading, status)
         await handleChangeStatus(status)()
       }
     } catch (error) {
       console.error(error)
     } finally {
-      // Always reset the loading button state after operation completes
       setLoadingButton(null)
     }
   }

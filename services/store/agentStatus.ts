@@ -23,3 +23,8 @@ export const sipAccountsAvailableState = atom<CommonSip[]>({
   key: 'sipAccountsAvailableState',
   default: []
 })
+
+export const SFActiveButtonState = atom<number | null>({
+  key: 'SFActiveButtonState',
+  default: null
+})

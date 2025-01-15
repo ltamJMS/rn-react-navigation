@@ -5,8 +5,9 @@ import { useSoftPhone } from '../../services/usecases/auth/useSoftPhone'
 import * as NavigationService from 'react-navigation-helpers'
 import { SCREENS } from '../../shared/constants'
 import AgentStatus from '../../services/models/softPhone'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import { callRequestState } from '../../services/store/softphone'
+import { SFActiveButtonState } from '../../services/store/agentStatus'
 
 enum DialogText {
   CallDescription = '内線番号で電話をかけますか？',
@@ -33,6 +34,7 @@ const DialogView: React.FC<DialogViewProps> = ({
   const [loading, setLoading] = useState(false)
   const [, setCallRequest] = useRecoilState(callRequestState)
   const { handleCall } = useSoftPhone()
+  const setActiveButton = useSetRecoilState(SFActiveButtonState)
 
   const handleCallClick = (phoneNumber: string) => {
     if (phoneNumber) {
@@ -75,13 +77,16 @@ const DialogView: React.FC<DialogViewProps> = ({
               handleCallClick(agent?.exten || '')
             } else {
               setLoading(true)
+              setActiveButton(null)
               handleRegisterSip().then(() => {
                 handleLogin(setLoading, 0)
                   .then(() => {
                     setLoading(false)
+                    setActiveButton(0)
                   })
                   .catch(() => {
                     setLoading(false)
+                    setActiveButton(null)
                     console.error(' LOGIN ERROR')
                   })
               })

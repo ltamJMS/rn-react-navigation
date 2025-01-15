@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Image,
   Modal,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
   RefreshControl
 } from 'react-native'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
@@ -62,24 +62,36 @@ export default function CallHistory() {
   const [callHistory, setCallData] = useRecoilState(callHistoryData)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
-  const [isSearchButtonEnabled, setIsSearchButtonEnabled] = useState(false)
 
   const getCallData = useCallback(async () => {
     if (!auth) return
     setLoading(true)
-    const token = auth?.token?.accessToken || ''
-    const res = await getCallHistory(token, search)
 
-    if (res.success && Array.isArray(res.data.data.edges)) {
-      setCallData(res.data.data.edges)
-    } else {
-      setCallData([])
-      Toast.show({
-        type: 'error',
-        text1: 'エラー',
-        text2: '通話履歴の取得に失敗しました'
-      })
+    const token = auth?.token?.accessToken || ''
+    let attempts = 0
+    const maxRetries = 3
+    let success = false
+
+    while (attempts < maxRetries && !success) {
+      attempts += 1
+      const res = await getCallHistory(token, search)
+
+      if (res.success && Array.isArray(res.data.data.edges)) {
+        setCallData(res.data.data.edges)
+        success = true
+      } else {
+        // If this is the last attempt, show error
+        if (attempts === maxRetries) {
+          setCallData([])
+          Toast.show({
+            type: 'error',
+            text1: 'エラー',
+            text2: '通話履歴の取得に失敗しました'
+          })
+        }
+      }
     }
+
     setLoading(false)
   }, [auth, setCallData, search])
 
@@ -96,7 +108,6 @@ export default function CallHistory() {
 
   const handleSearchInputChange = (text: string) => {
     setSearch(text)
-    setIsSearchButtonEnabled(text.trim().length > 0)
   }
 
   const filteredCallData = (callHistory || []).filter(item => {
@@ -269,28 +280,32 @@ export default function CallHistory() {
         visible={modalVisible}
         onRequestClose={toggleModalVisibility}
       >
-        <View style={styles.modalContainer}>
+        <TouchableOpacity
+          style={styles.modalBackground}
+          activeOpacity={1}
+          onPressOut={toggleModalVisibility}
+        >
           <View style={styles.modalContent}>
             <TouchableOpacity
               onPress={() => selectOption('全て')}
               style={styles.modalOption}
             >
-              <Text style={{}}>全て</Text>
+              <Text style={styles.optionText}>全て</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => selectOption('着信')}
               style={styles.modalOption}
             >
-              <Text style={{}}>着信</Text>
+              <Text style={styles.optionText}>着信</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => selectOption('発信')}
               style={styles.modalOption}
             >
-              <Text style={{}}>発信</Text>
+              <Text style={styles.optionText}>発信</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   )
@@ -371,24 +386,33 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8
   },
-  modalContainer: {
+  modalBackground: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 100,
-    right: 8
+    alignItems: 'flex-end'
+    // right: 10
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   modalContent: {
-    width: 80,
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    alignItems: 'center',
-    marginLeft: 8
+    width: 100,
+    backgroundColor: 'white',
+    borderRadius: 0,
+    padding: 4,
+    marginTop: 110,
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5
   },
   modalOption: {
-    padding: 10,
-    width: '100%'
+    paddingVertical: 8,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#ddd'
+  },
+  optionText: {
+    textAlign: 'center',
+    color: '#333',
+    fontSize: 16
   },
   arrowIcon: {
     marginLeft: 5

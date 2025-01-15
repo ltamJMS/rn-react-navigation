@@ -16,6 +16,7 @@ import {
   agentsState,
   agentStatusesState,
   isWebRTCUserState,
+  SFActiveButtonState,
   sipAccountsAvailableState
 } from '../../store/agentStatus'
 import { contextsState, tenantState } from '../../store/tenant'
@@ -29,6 +30,7 @@ const useLogout = () => {
   const resetSipAccountsAvailableState = useResetRecoilState(
     sipAccountsAvailableState
   )
+  const resetSFActiveButtonState = useResetRecoilState(SFActiveButtonState)
   // auth store
   const resetAuth = useResetRecoilState(authState)
   const resetAgentLogin = useResetRecoilState(agentLoginState)
@@ -52,6 +54,7 @@ const useLogout = () => {
       resetAgentStatusesState()
       resetIsWebRTCUserState()
       resetSipAccountsAvailableState()
+      resetSFActiveButtonState()
       // auth store
       resetAuth()
       resetAgentLogin()
@@ -74,6 +77,7 @@ const useLogout = () => {
     resetAgentStatusesState,
     resetIsWebRTCUserState,
     resetSipAccountsAvailableState,
+    resetSFActiveButtonState,
     // auth store
     resetAuth,
     resetAgentLogin,

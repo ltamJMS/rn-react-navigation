@@ -609,3 +609,13 @@ export const getASText = (
   const statusText = agentStatusText[dispStatus]
   return statusText || ''
 }
+
+const getStatusOrder = (dispStatus: number) => {
+  const order = [78, 88, 98, 79, 89, 99, 0, 2, 3, 4, 5, 6, 7, 1]
+  return order.indexOf(dispStatus)
+}
+
+export const getStatusForSorting = (agent: AgentStatus) => {
+  const dispStatus = getDisplayStatus(agent.phoneStatus || 0, agent.status || 0)
+  return getStatusOrder(dispStatus)
+}

@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import Slider from '@react-native-community/slider'
 import Icon from 'react-native-vector-icons/Ionicons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import useAuth from '../../services/usecases/auth/useAuth'
+import Toast from 'react-native-toast-message'
+import { getSignedUrl } from '../../services/callHistory'
 
 var Sound = require('react-native-sound')
 Sound.setCategory('Playback')
@@ -14,24 +17,53 @@ const formatTime = (seconds: number) => {
 }
 
 const CallHistoryDetail: React.FC = ({ route }: any) => {
+  const auth = useAuth()
   const { callDetails } = route.params
   const [playing, setPlaying] = useState(false)
   const [audio, setAudio] = useState<typeof Sound | null>(null)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [url, setUrl] = useState<string[]>([])
+
+  const handleGetSignedUrl = useCallback(async () => {
+    if (!auth || !callDetails) return
+    setLoading(true)
+    const token = auth?.token?.accessToken || ''
+    const contactUrl = callDetails.record.contact.linkFile
+    const operatorUrl = callDetails.record.operator.linkFile
+    const res = await getSignedUrl(contactUrl, operatorUrl, token)
+    console.log('111111 signed url', res)
+    if (res.success && Array.isArray(res.data)) {
+      console.log('11111 signed url', res.data)
+      setUrl(res.data)
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'エラー',
+        text2: '通話記録の取得に失敗しました'
+      })
+    }
+    setLoading(false)
+  }, [auth, callDetails])
 
   useEffect(() => {
-    const sound = new Sound(
-      'https://storage.googleapis.com/softphone-mobile-dev/099a1_CS_202401_stereo_mon_1705279146.1724-20240115-09_39_06-in.wav',
-      null,
-      (error: any) => {
-        if (error) {
-          console.log('failed to load the sound', error)
-          return
-        }
-        setDuration(sound.getDuration())
+    handleGetSignedUrl()
+  }, [handleGetSignedUrl])
+
+  useEffect(() => {
+    if (!url || url.length === 0) return
+    const [url1, url2] = url
+    const sssss =
+      'https://storage.googleapis.com/softphone-mobile-dev/099a1_CS_202401_stereo_mon_1705279146.1724-20240115-09_39_06-in.wav'
+    console.log('11111111 kkkk', sssss)
+    const sound = new Sound(url1, null, (error: any) => {
+      if (error) {
+        console.log('failed to load the sound', error)
+        return
       }
-    )
+      setDuration(sound.getDuration())
+    })
 
     sound.setVolume(1)
     setAudio(sound)
@@ -46,7 +78,7 @@ const CallHistoryDetail: React.FC = ({ route }: any) => {
       sound.release()
       clearInterval(interval)
     }
-  }, [])
+  }, [url])
 
   const playPause = () => {
     if (!audio) return

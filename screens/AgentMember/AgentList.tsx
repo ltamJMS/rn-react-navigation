@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import {
   FlatList,
   View,
@@ -7,7 +7,8 @@ import {
   Pressable,
   ActivityIndicator,
   Image,
-  RefreshControl
+  RefreshControl,
+  Modal
 } from 'react-native'
 import { styles } from './styles'
 import { Avatar, IconButton } from 'react-native-paper'
@@ -16,6 +17,7 @@ import AgentStatus, { AgentStatusMap } from '../../services/models/softPhone'
 import {
   getASText,
   getDisplayStatus,
+  getStatusForSorting,
   getStatusStyle
 } from '../../services/agentStatus'
 import { useRecoilState, useRecoilValue } from 'recoil'
@@ -72,15 +74,6 @@ const AgentList: FC<Props> = props => {
       agent.exten !== null &&
       agent.contextName === selectedContextId
   )
-
-  const getStatusForSorting = (agent: AgentStatus) => {
-    const statusText = getASText(
-      agent.phoneStatus || 0,
-      agent.status || 0,
-      tenant
-    )
-    return statusText === 'ログオフ' ? 1 : 0
-  }
 
   if (sortOption === '状態') {
     agentArray.sort((a, b) => {
@@ -141,25 +134,37 @@ const AgentList: FC<Props> = props => {
     if (!dropdownVisible) return null
 
     return (
-      <View style={styles.dropdown}>
-        <FlatList
-          data={contextList}
-          renderItem={({ item }) => (
-            <Pressable
-              key={item.id}
-              style={styles.modalButton}
-              onPress={() => {
-                setSelectedItem(item.dispName)
-                setSelectedContextId(item.id)
-                setDropdownVisible(false)
-              }}
-            >
-              <Text style={styles.modalButtonText}>{item.dispName}</Text>
-            </Pressable>
-          )}
-          keyExtractor={item => item.id}
-        />
-      </View>
+      <Modal
+        transparent={true}
+        visible={dropdownVisible}
+        onRequestClose={() => setDropdownVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalBackground}
+          activeOpacity={1}
+          onPressOut={() => setDropdownVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <FlatList
+              data={contextList}
+              renderItem={({ item }) => (
+                <Pressable
+                  key={item.id}
+                  style={styles.modalButton}
+                  onPress={() => {
+                    setSelectedItem(item.dispName)
+                    setSelectedContextId(item.id)
+                    setDropdownVisible(false)
+                  }}
+                >
+                  <Text style={styles.modalButtonText}>{item.dispName}</Text>
+                </Pressable>
+              )}
+              keyExtractor={item => item.id}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
     )
   }
   const onRefresh = () => {
